@@ -1,0 +1,42 @@
+{
+  "name": "official-devix-website",
+  "version": "0.1.0",
+  "private": true,
+  "engineStrict": true,
+  "engines": {
+    "node": "v21.2.0",
+    "npm": "v10.2.3"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint \"./src/**/*.{js,jsx,ts,tsx}\"",
+    "format:all": "prettier --config=\"./.prettierrc.json\" \"./**/*.{js,jsx,ts,tsx,json,css}\" --write"
+  },
+  "dependencies": {
+    "clsx": "^2.0.0",
+    "next": "14.0.3",
+    "next-seo": "^6.4.0",
+    "react": "^18",
+    "react-dom": "^18"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "@typescript-eslint/eslint-plugin": "^6.13.1",
+    "@typescript-eslint/parser": "^6.13.1",
+    "autoprefixer": "^10.0.1",
+    "eslint": "^8.55.0",
+    "eslint-config-next": "14.0.3",
+    "eslint-plugin-prettier": "^5.0.1",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "postcss": "^8",
+    "prettier": "^3.1.0",
+    "prettier-plugin-tailwindcss": "^0.5.7",
+    "tailwindcss": "^3.3.0",
+    "typescript": "^5"
+  }
+}
