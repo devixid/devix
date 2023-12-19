@@ -7,5 +7,6 @@
   "singleAttributePerLine": true,
   "endOfLine": "auto",
   "editorConfig": true,
-  "trailingComma": "all"
+  "trailingComma": "all",
+  "plugins": ["prettier-plugin-tailwindcss"]
 }

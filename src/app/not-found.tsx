@@ -8,7 +8,18 @@ export default function NotFound() {
         "container flex h-[80vh] flex-col items-center justify-center sm:mt-20",
       )}
     >
-      <Heading as="h1">Not found</Heading>
+      <div className="overflow-hidden pt-1">
+        <Heading.h1
+          initial={{
+            translateY: 50,
+          }}
+          animate={{
+            translateY: 0,
+          }}
+        >
+          Not found
+        </Heading.h1>
+      </div>
     </div>
   );
 }

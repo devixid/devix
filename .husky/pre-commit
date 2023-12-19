@@ -1,11 +1,11 @@
 #!/usr/bin/env sh
-. "$(dirname "$0")/_/husky.sh"
+. "$(dirname -- "$0")/_/husky.sh"
 
 echo 'RUNNING GIT HOOKS'
 
 echo 'Checking Validity Of Types'
 
-pnpm type-check || (
+pnpm type-check || npm run type-check || (
     echo '⛔️ There is a TYPE ERROR on your code, please fix it and do commit again ⛔️';
     false;
 )
@@ -15,8 +15,7 @@ echo 'No Type Error ✅'
 echo 'Running linter'
 
 # Check ESLint Standards
-pnpm lint ||
-(
+pnpm lint || npm run lint || (
     echo '⛔️ There is an ESLINT ERROR on your code, please fix it and do commit again ⛔️';
     false;
 )

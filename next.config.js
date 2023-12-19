@@ -4,7 +4,10 @@ const nextConfig = {
   reactStrictMode: true,
   output: "standalone",
   experimental: {
-    optimizeCss: true,
+    /**
+     * Bug pas build production
+     */
+    // optimizeCss: true,
   },
 };
 

@@ -67,19 +67,7 @@
         "skipClassAttribute": true
       }
     ],
-    "prettier/prettier": [
-      2,
-      {
-        "semi": true,
-        "tabWidth": 2,
-        "printWidth": 80,
-        "singleQuote": false,
-        "jsxSingleQuote": false,
-        "singleAttributePerLine": true,
-        "endOfLine": "auto",
-        "trailingComma": "all"
-      }
-    ],
+    "react/jsx-pascal-case": 0,
     "react/function-component-definition": [
       2,
       {
