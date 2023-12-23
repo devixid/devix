@@ -1,6 +1,7 @@
 /* eslint-disable global-require */
 import type { Config } from "tailwindcss";
 import defaultTheme from "tailwindcss/defaultTheme";
+import { nextui } from "@nextui-org/react";
 
 const config: Config = {
   content: [
@@ -30,48 +31,6 @@ const config: Config = {
       // => @media (min-width: 1400px) { ... }
     },
     extend: {
-      // colors: ({ colors }) => ({
-      //   inherit: colors.inherit,
-      //   current: colors.current,
-      //   transparent: colors.transparent,
-      //   black: colors.black,
-      //   white: colors.white,
-      //   slate: colors.slate,
-      //   gray: colors.gray,
-      //   zinc: colors.zinc,
-      //   neutral: colors.neutral,
-      //   stone: colors.stone,
-      //   red: colors.red,
-      //   orange: colors.orange,
-      //   amber: colors.amber,
-      //   yellow: colors.yellow,
-      //   lime: colors.lime,
-      //   green: colors.green,
-      //   emerald: colors.emerald,
-      //   teal: colors.teal,
-      //   cyan: colors.cyan,
-      //   sky: colors.sky,
-      //   blue: colors.blue,
-      //   indigo: colors.indigo,
-      //   violet: colors.violet,
-      //   purple: colors.purple,
-      //   fuchsia: colors.fuchsia,
-      //   pink: colors.pink,
-      //   rose: colors.rose,
-      //   woodsmoke: {
-      //     50: "#f6f6f7",
-      //     100: "#e1e2e6",
-      //     200: "#c2c4cd",
-      //     300: "#9c9eac",
-      //     400: "#77798a",
-      //     500: "#5c5e70",
-      //     600: "#484a59",
-      //     700: "#3c3d49",
-      //     800: "#33343c",
-      //     900: "#2d2d34",
-      //     950: "#09090b",
-      //   },
-      // }),
       colors: {
         ...defaultTheme.colors,
         black: {
@@ -97,6 +56,11 @@ const config: Config = {
     },
   },
   darkMode: "class",
-  plugins: [require("@tailwindcss/typography"), require("@tailwindcss/forms")],
+  plugins: [
+    require("@tailwindcss/typography"),
+    require("@tailwindcss/forms"),
+    require("@tailwindcss/line-clamp"),
+    nextui(),
+  ],
 };
 export default config;

@@ -22,3 +22,10 @@ export type TextProps<TextType extends keyof ReactHTML> =
      */
     resetStyle?: boolean;
   };
+
+export interface NavMenuInterface {
+  title: string;
+  id: string;
+}
+
+export interface NavbarProps extends HTMLMotionProps<"nav"> {}
