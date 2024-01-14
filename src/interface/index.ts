@@ -1,31 +1,27 @@
 import { HeadingConstants } from "@/constants";
-import { HTMLMotionProps } from "framer-motion";
-import { ReactHTML } from "react";
+import type { HTMLMotionProps } from "framer-motion";
+import type { ReactHTML, Dispatch, SetStateAction } from "react";
 
-// export interface HeadingProps<TagName extends keyof typeof HeadingConstants>
-//   extends HTMLMotionProps<TagName> {
-//   // as: keyof typeof HeadingConstants;
-//   className?: string | undefined;
-// }
-
-export type HeadingProps<TagName extends keyof typeof HeadingConstants> =
-  HTMLMotionProps<TagName> & {
+export type HeadingProps<T extends keyof typeof HeadingConstants> =
+  HTMLMotionProps<T> & {
     className?: string;
   };
 
-export type TextProps<TextType extends keyof ReactHTML> =
-  HTMLMotionProps<TextType> & {
-    className?: string;
-    /**
-     * Reset styles
-     * @description method to reset styles to tailwindcss typography
-     */
-    resetStyle?: boolean;
-  };
+export type TextProps<T extends keyof ReactHTML> = HTMLMotionProps<T> & {
+  className?: string;
+  /**
+   * Reset styles
+   * @description method to reset styles to tailwindcss typography
+   */
+  resetStyle?: boolean;
+};
 
 export interface NavMenuInterface {
   title: string;
   id: string;
 }
 
-export interface NavbarProps extends HTMLMotionProps<"nav"> {}
+export interface NavbarProps extends HTMLMotionProps<"nav"> {
+  isNavbarOpen: boolean;
+  setIsNavbarOpen: Dispatch<SetStateAction<boolean>>;
+}

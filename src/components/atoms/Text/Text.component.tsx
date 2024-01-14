@@ -6,7 +6,6 @@ import Link, { type LinkProps } from "next/link";
 import { forwardRef } from "react";
 import { Text } from "./Text.variant";
 
-// eslint-disable-next-line react/display-name
 const CustomLinkComponent = forwardRef<
   HTMLAnchorElement,
   LinkProps & { className?: string }
@@ -21,6 +20,7 @@ const CustomLinkComponent = forwardRef<
     {...props}
   />
 ));
+CustomLinkComponent.displayName = "Link";
 
 export const variant = Text;
 

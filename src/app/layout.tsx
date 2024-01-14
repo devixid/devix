@@ -1,10 +1,8 @@
-"use client";
-
 import { ReactNode } from "react";
-import { Header } from "@/components";
-import { NextUIProvider } from "@nextui-org/react";
+import { Footer, Header } from "@/components";
 import { archivo } from "./fonts";
 import "@/styles/globals.css";
+import Provider from "./provider";
 
 interface Props {
   children: ReactNode;
@@ -17,7 +15,7 @@ export default function RootLayout({ children }: Props) {
         className={`${archivo.className}`}
         suppressHydrationWarning
       >
-        <NextUIProvider>
+        <Provider>
           <a
             href="#main-content"
             className="hover:black-2 absolute -top-24 left-5 rounded-md bg-black-1 px-5 py-2 text-white shadow-lg transition-all duration-300 focus:top-20"
@@ -26,7 +24,8 @@ export default function RootLayout({ children }: Props) {
           </a>
           <Header />
           <main>{children}</main>
-        </NextUIProvider>
+          <Footer />
+        </Provider>
       </body>
     </html>
   );

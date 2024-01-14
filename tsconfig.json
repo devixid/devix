@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "types": ["./src/reset"],
+    "types": ["./src/reset", "./src/svg"],
     "target": "esnext",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,

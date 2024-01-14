@@ -52,7 +52,6 @@
     "@jridgewell/sourcemap-codec": "^1.4.15",
     "@rollup/plugin-terser": "^0.4.3",
     "@tailwindcss/forms": "^0.5.6",
-    "@tailwindcss/line-clamp": "^0.4.4",
     "@tailwindcss/typography": "^0.5.9",
     "@total-typescript/ts-reset": "^0.4.2",
     "@types/node": "20.4.2",
