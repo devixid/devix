@@ -2,7 +2,7 @@ name: ESLint workflow
 
 on:
   push:
-    branches: ["main", "dev"]
+    branches: ["main", "development"]
 
 jobs:
   eslint:
