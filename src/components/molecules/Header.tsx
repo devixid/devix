@@ -4,11 +4,14 @@ import { motion } from "framer-motion";
 import { memo, useState } from "react";
 import { Heading, Text } from "@/components/atoms";
 import { cn } from "@/utils";
+import { useWindow } from "@/hooks";
 import Navbar from "./Navbar";
 
 function Header() {
+  const { scrollPosition } = useWindow();
   let headingAnimationDelay = 0;
   const [isNavbarOpen, setIsNavbarOpen] = useState<boolean>(false);
+
   return (
     <motion.header
       className={cn(
@@ -25,7 +28,8 @@ function Header() {
       />
       <Heading.h4
         className={cn(
-          "z-10 mt-5 hidden uppercase tracking-normal text-black-1 md:flex",
+          `${scrollPosition.y >= 917 && scrollPosition.y <= 1620 ? "text-white" : "text-black-1"}`,
+          "z-10 mt-5 hidden uppercase tracking-normal md:flex",
         )}
       >
         {"Welcome".split("").map((word, index) => {

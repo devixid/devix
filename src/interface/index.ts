@@ -25,3 +25,10 @@ export interface NavbarProps extends HTMLMotionProps<"nav"> {
   isNavbarOpen: boolean;
   setIsNavbarOpen: Dispatch<SetStateAction<boolean>>;
 }
+
+export interface TeamCardProps extends HTMLMotionProps<"div"> {
+  description: string;
+  image: string;
+  name: string;
+  title: string;
+}

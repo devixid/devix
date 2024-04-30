@@ -10,7 +10,7 @@ export default function FaQ() {
     "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.";
 
   return (
-    <motion.div className="mb-10 h-full w-full max-w-5xl px-10 md:px-0">
+    <motion.div className="mb-10 size-full max-w-5xl px-10 md:px-0">
       <Heading.h2 className="mb-5 text-left text-[40px] font-light md:text-center md:text-5xl">
         Frequenly asked question.
       </Heading.h2>
