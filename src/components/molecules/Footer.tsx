@@ -31,7 +31,7 @@ function Footer({ ...props }: FooterProps) {
 
   return (
     <motion.footer
-      className="flex h-full w-full flex-col items-center justify-between bg-black p-10 text-white"
+      className="flex size-full flex-col items-center justify-between bg-black p-10 text-white"
       {...props}
     >
       <div className="mb-20 flex w-full max-w-5xl flex-col items-start justify-between md:flex-row md:items-center">

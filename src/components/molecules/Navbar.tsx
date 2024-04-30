@@ -8,8 +8,10 @@ import { Text } from "@/components/atoms";
 import { HiBars2 } from "react-icons/hi2";
 import { NavMenu } from "@/constants";
 import Image from "next/image";
+import { useWindow } from "@/hooks";
 
 function Navbar({ isNavbarOpen, setIsNavbarOpen, ...props }: NavbarProps) {
+  const { scrollPosition } = useWindow();
   let navbarDelayAnimation: number = 0;
   let navbarXPosition: number = 0;
 
@@ -17,8 +19,8 @@ function Navbar({ isNavbarOpen, setIsNavbarOpen, ...props }: NavbarProps) {
     <motion.nav
       {...props}
       className={cn(
-        "flex w-full flex-col items-center justify-between bg-black-1 px-5 py-2 md:w-1/4 md:rounded-br-[25px]",
-        // `${isNavbarOpen ? "h-[50%]" : "h-16"}`,
+        `${scrollPosition.y >= 917 && scrollPosition.y <= 1620 ? "bg-white" : "bg-black-1"}`,
+        "flex w-full flex-col items-center justify-between px-5 py-2 md:w-1/4 md:rounded-br-[25px]",
       )}
       initial={{ height: "64px" }}
       animate={{ height: isNavbarOpen ? "50%" : "64px" }}
@@ -26,7 +28,11 @@ function Navbar({ isNavbarOpen, setIsNavbarOpen, ...props }: NavbarProps) {
     >
       <div className="flex w-full items-center justify-between">
         <Image
-          src="/devix_logo.white.png"
+          src={
+            scrollPosition.y >= 917 && scrollPosition.y <= 1620
+              ? "/devix_logo.dark.png"
+              : "/devix_logo.white.png"
+          }
           alt="devix_logo"
           height={48}
           width={40}
@@ -40,7 +46,12 @@ function Navbar({ isNavbarOpen, setIsNavbarOpen, ...props }: NavbarProps) {
             setIsNavbarOpen((prevState) => !prevState);
           }}
         >
-          <HiBars2 className="text-3xl text-white" />
+          <HiBars2
+            className={cn(
+              "text-3xl",
+              `${scrollPosition.y >= 917 && scrollPosition.y <= 1620 ? "text-black" : "text-white"}`,
+            )}
+          />
           <Text.span className="sr-only">Navbar menu</Text.span>
         </button>
       </div>
@@ -62,7 +73,9 @@ function Navbar({ isNavbarOpen, setIsNavbarOpen, ...props }: NavbarProps) {
           return (
             <motion.li
               key={Math.floor(Math.random() * 230498234)}
-              className="text-white"
+              className={cn(
+                `${scrollPosition.y >= 917 ? "text-black" : "text-white"}`,
+              )}
               initial={{
                 x: navbarXPosition,
                 opacity: 0,

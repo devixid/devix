@@ -51,3 +51,19 @@ export const iconVariant: Variants = {
     pathLength: 1,
   },
 };
+
+export const headingText: String = "Profesional website";
+export const headingText2: String = "creation services";
+export const subHeadingText: Array<String> = [
+  "We",
+  "provide",
+  "cheap",
+  "website",
+  "creation",
+  "services",
+  "with",
+  "good",
+  "designs",
+];
+
+export * from "./team";
