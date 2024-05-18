@@ -9,7 +9,7 @@ on:
       - 'apps/backend/**'
 
 jobs:
-  build-and-lint:
+  build:
     runs-on: ubuntu-latest
 
     steps:
