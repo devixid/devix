@@ -18,9 +18,7 @@ jobs:
       - name: Install Dependencies
         run: npm install
         continue-on-error: false
-        working-directory: ./apps/frontend
 
       - name: Run ESLint
         run: npm run lint
         continue-on-error: false
-        working-directory: ./apps/frontend
