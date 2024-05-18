@@ -22,7 +22,7 @@ jobs:
           cache: "npm" # Aktifkan caching
 
       - name: Install Dependencies
-        run: npm ci # `npm ci` untuk instalasi yang lebih bersih
+        run: npm install # `npm ci` untuk instalasi yang lebih bersih
         working-directory: ./apps/frontend
 
       - name: Run ESLint
