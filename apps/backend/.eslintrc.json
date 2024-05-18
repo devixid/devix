@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json.schemastore.org/eslintrc",
+  "env": {
+    "node": true,
+    "jest": true,
+    "browser": true,
+    "es2021": true
+  },
+  "extends": [
+    "plugin:@typescript-eslint/recommended",
+    "plugin:prettier/recommended",
+    "standard-with-typescript"
+  ],
+  "overrides": [
+    {
+      "files": ["*.ts", "*.tsx"],
+      "extends": ["plugin:@typescript-eslint/recommended"]
+    }
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": 2021,
+    "project": "tsconfig.json",
+    "sourceType": "module"
+  },
+  "plugins": ["@typescript-eslint", "prettier", "import", "promise", "n"],
+  "rules": {
+    "@typescript-eslint/strict-boolean-expressions": 0,
+    "import/no-extraneous-dependencies": 0,
+    "import/prefer-default-export": 0,
+    "import/extensions": 0,
+    "import/no-anonymous-default-export": 0,
+    "quotes": [2, "double"],
+    "semi": [2, "always"],
+    "indent": 0,
+    "comma-dangle": 0,
+    "no-unused-vars": 2,
+    "@typescript-eslint/quotes": [2, "double"],
+    "@typescript-eslint/semi": [2, "always"],
+    "@typescript-eslint/indent": 0,
+    "@typescript-eslint/comma-dangle": 0,
+    "@typescript-eslint/interface-name-prefix": 0,
+    "@typescript-eslint/explicit-function-return-type": 0,
+    "@typescript-eslint/explicit-module-boundary-types": 0,
+    "@typescript-eslint/no-explicit-any": 0,
+    "@typescript-eslint/no-useless-constructor": 0,
+    "@typescript-eslint/space-before-function-paren": 0
+  }
+}

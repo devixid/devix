@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json.schemastore.org/eslintrc",
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "node": true
+  },
+  "extends": [
+    "next/core-web-vitals",
+    "plugin:react/recommended",
+    "prettier",
+    "airbnb",
+    "next",
+    "plugin:prettier/recommended",
+    "plugin:tailwindcss/recommended"
+  ],
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
+  },
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "jsx": true
+    }
+  },
+  "plugins": [
+    "@typescript-eslint",
+    "import",
+    "jsx-a11y",
+    "prettier",
+    "promise",
+    "react",
+    "tailwindcss",
+    "jsdoc"
+  ],
+  "rules": {
+    "quotes": [2, "double"],
+    "semi": [2, "always"],
+    "@typescript-eslint/quotes": [2, "double"],
+    "@typescript-eslint/semi": [2, "always"],
+    "@typescript-eslint/strict-boolean-expressions": 0,
+    "@typescript-eslint/explicit-function-return-type": 0,
+    "react/jsx-no-bind": 0,
+    "react/react-in-jsx-scope": 0,
+    "import/no-extraneous-dependencies": 0,
+    "import/prefer-default-export": 0,
+    "import/extensions": 0,
+    "import/no-anonymous-default-export": 0,
+    "@next/next/no-html-link-for-pages": [2, "src/app"],
+    "react/jsx-filename-extension": [
+      1,
+      { "extensions": [".js", ".jsx", ".ts", ".tsx"] }
+    ],
+    "import/order": 2,
+    "react/require-default-props": 0,
+    "react/jsx-props-no-spreading": 0,
+    "tailwindcss/no-custom-classname": 0,
+    "tailwindcss/classnames-order": [
+      2,
+      {
+        "callees": ["className", "clsx", "ctl", "cva", "tv", "cn"],
+        "removeDuplicates": true,
+        "skipClassAttribute": true
+      }
+    ],
+    "react/jsx-pascal-case": 0,
+    "react/function-component-definition": [
+      2,
+      {
+        "namedComponents": [
+          "function-declaration",
+          "function-expression",
+          "arrow-function"
+        ],
+        "unnamedComponents": ["function-expression", "arrow-function"]
+      }
+    ],
+    "jsx-a11y/label-has-associated-control": [
+      2,
+      {
+        "labelComponents": ["CustomInputLabel"],
+        "labelAttributes": ["label"],
+        "controlComponents": ["CustomInput"],
+        "depth": 3
+      }
+    ]
+  }
+}

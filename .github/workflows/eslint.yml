@@ -1,0 +1,38 @@
+name: ESLint workflow
+
+on:
+  push:
+    branches: ["main", "dev"]
+
+jobs:
+  eslint:
+    name: Run ESLint
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18" # Ganti dengan versi Node.js yang Anda gunakan
+          cache: "npm" # Aktifkan caching
+
+      - name: Install Dependencies
+        run: npm ci # `npm ci` untuk instalasi yang lebih bersih
+        working-directory: ./apps/frontend
+
+      - name: Run ESLint
+        run: npm run lint
+        working-directory: ./apps/frontend
+        continue-on-error: false
+
+      - name: Upload ESLint Report on Failure (optional)
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: eslint-report
+          path: ./apps/frontend/report/eslint.json

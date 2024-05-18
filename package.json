@@ -1,0 +1,42 @@
+{
+  "name": "devix",
+  "version": "1.0.0",
+  "description": "official-devix-apps",
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "pnpm -r dev",
+    "lint": "pnpm -r lint",
+    "format": "pnpm -r format",
+    "backend:dev": "pnpm --filter backend dev",
+    "frontend:dev": "pnpm --filter frontend dev",
+    "backend:lint": "pnpm --filter backend lint",
+    "frontend:lint": "pnpm --filter frontend lint",
+    "backend:format": "pnpm --filter backend format",
+    "frontend:format": "pnpm --filter frontend format",
+    "postinstall": "husky install",
+    "commit": "git add . && cz"
+  },
+  "lint-staged": {
+    "**/*.{html,css,scss,less,json,js,jsx,ts,tsx,md,mdx}\"": [
+      "prettier --config .prettierrc.json --write \"**/*.{html,css,scss,less,json,js,jsx,ts,tsx,md,mdx}\""
+    ]
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  },
+  "keywords": [
+    "devix",
+    "devixid",
+    "devixin"
+  ],
+  "devDependencies": {
+    "commitizen": "^4.3.0",
+    "cz-conventional-changelog": "^3.3.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^14.0.1"
+  }
+}
