@@ -9,6 +9,8 @@
     "dev": "pnpm -r dev",
     "lint": "pnpm -r lint",
     "format": "pnpm -r format",
+    "build": "turbo run build",
+    "test": "turbo run test",
     "backend:dev": "pnpm --filter backend dev",
     "frontend:dev": "pnpm --filter frontend dev",
     "backend:lint": "pnpm --filter backend lint",
@@ -37,6 +39,7 @@
     "commitizen": "^4.3.0",
     "cz-conventional-changelog": "^3.3.0",
     "husky": "^8.0.3",
-    "lint-staged": "^14.0.1"
+    "lint-staged": "^14.0.1",
+    "turbo": "1.2.5"
   }
 }
