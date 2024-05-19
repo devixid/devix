@@ -3,5 +3,3 @@ FROM postgres:15
 ENV POSTGRES_USER=${POSTGRES_USER}
 ENV POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
 ENV POSTGRES_DB=devix_admin
-
-COPY init.sql /docker-entrypoint-initdb.d/
