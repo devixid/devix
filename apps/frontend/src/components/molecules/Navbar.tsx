@@ -19,7 +19,11 @@ function Navbar({ isNavbarOpen, setIsNavbarOpen, ...props }: NavbarProps) {
     <motion.nav
       {...props}
       className={cn(
-        `${scrollPosition.y >= 917 && scrollPosition.y <= 1620 ? "bg-white" : "bg-black-1"}`,
+        `${
+          scrollPosition.y >= 917 && scrollPosition.y <= 1620
+            ? "bg-white"
+            : "bg-black-1"
+        }`,
         "flex w-full flex-col items-center justify-between px-5 py-2 md:w-1/4 md:rounded-br-[25px]",
       )}
       initial={{ height: "64px" }}
@@ -49,7 +53,11 @@ function Navbar({ isNavbarOpen, setIsNavbarOpen, ...props }: NavbarProps) {
           <HiBars2
             className={cn(
               "text-3xl",
-              `${scrollPosition.y >= 917 && scrollPosition.y <= 1620 ? "text-black" : "text-white"}`,
+              `${
+                scrollPosition.y >= 917 && scrollPosition.y <= 1620
+                  ? "text-black"
+                  : "text-white"
+              }`,
             )}
           />
           <Text.span className="sr-only">Navbar menu</Text.span>

@@ -28,7 +28,11 @@ function Header() {
       />
       <Heading.h4
         className={cn(
-          `${scrollPosition.y >= 917 && scrollPosition.y <= 1620 ? "text-white" : "text-black-1"}`,
+          `${
+            scrollPosition.y >= 917 && scrollPosition.y <= 1620
+              ? "text-white"
+              : "text-black-1"
+          }`,
           "z-10 mt-5 hidden uppercase tracking-normal md:flex",
         )}
       >
