@@ -1,17 +1,21 @@
+version: "3"
+
 services:
   devixid:
-    image: "postgres:15"
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: devixid
     ports:
       - "5434:5432"
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: devix_admin
   devixid_dev:
-    image: "postgres:15"
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: devixid_dev
     ports:
       - "5435:5432"
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: devix_admin_dev
