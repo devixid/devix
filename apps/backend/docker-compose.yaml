@@ -1,5 +1,4 @@
-version: "3"
-
+version: "3.8"
 services:
   devixid:
     build:
@@ -9,6 +8,8 @@ services:
     ports:
       - "5434:5432"
     environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: devix_admin
   devixid_dev:
     build:
@@ -18,4 +19,6 @@ services:
     ports:
       - "5435:5432"
     environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: devix_admin_dev
