@@ -1,10 +1,10 @@
 "use client";
 
+import { Heading, Text } from "@/components/atoms";
+import { useWindow } from "@/hooks";
+import { cn } from "@/utils";
 import { motion } from "framer-motion";
 import { memo, useState } from "react";
-import { Heading, Text } from "@/components/atoms";
-import { cn } from "@/utils";
-import { useWindow } from "@/hooks";
 import Navbar from "./Navbar";
 
 function Header() {
@@ -26,6 +26,7 @@ function Header() {
         isNavbarOpen={isNavbarOpen}
         setIsNavbarOpen={setIsNavbarOpen}
       />
+
       <Heading.h4
         className={cn(
           `${

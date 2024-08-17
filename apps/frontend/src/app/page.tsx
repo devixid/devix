@@ -19,9 +19,9 @@ export const metadata: Metadata = {
   keywords: ["devix", "devixid", "devix_id", "home"],
 };
 
-export default function Page() {
-  let headingAnimationDelay = 0;
+let headingAnimationDelay = 0;
 
+export default function Page() {
   return (
     <section
       className={cn("mx-auto mt-44 flex flex-col items-center justify-center")}
@@ -55,7 +55,7 @@ export default function Page() {
                   delay: headingAnimationDelay,
                 }}
                 key={loopKey}
-                className={cn("min-w-unit-5 md:inline-block")}
+                className={cn("min-w-unit-5")}
               >
                 {letter}
               </Text.span>
@@ -85,7 +85,7 @@ export default function Page() {
                   delay: headingAnimationDelay,
                 }}
                 key={loopKey}
-                className={cn("min-w-unit-5 md:inline-block")}
+                className={cn("min-w-unit-5")}
               >
                 {letter}
               </Text.span>
@@ -128,6 +128,7 @@ export default function Page() {
           );
         })}
       </div>
+
       <div className={cn("mb-36 mt-10")}>
         <Text.span
           resetStyle
