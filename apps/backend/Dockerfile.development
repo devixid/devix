@@ -1,6 +1,6 @@
 FROM postgres:15
 
-RUN echo "production"
+RUN echo "development"
 
 ENV POSTGRES_USER=${POSTGRES_USER}
 ENV POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
