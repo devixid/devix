@@ -12,7 +12,7 @@
     "prod": "node dist/main",
     "start:studio": "npx prisma studio",
     "migrate:deploy": "prisma migrate deploy",
-    "migrate:dev:deploy": "dotenv -e .env.development -- npx prisma migrate deploy",
+    "migrate:dev:deploy": "dotenv -e .env.development -- prisma migrate deploy",
     "debug": "nest start --debug --watch",
     "db:list": "docker ps",
     "db:rm": "docker compose rm devixid -s -f -v",
