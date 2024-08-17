@@ -22,13 +22,36 @@ export default function ScrollDownButton() {
       <Text.span className={cn("text-[14px] font-light text-black")}>
         SCROLL DOWN
       </Text.span>
-      <ScrollDown
-        initial={{ pathLength: 0 }}
-        whileInView={{ pathLength: 1 }}
-        transition={{ duration: 1 }}
-        viewport={{ amount: 1, once: true }}
-        className="absolute top-10 backdrop-invert"
-      />
+
+      <div
+        className={cn("relative", "flex flex-col", "absolute top-[39.40px]")}
+      >
+        <div
+          className={cn(
+            "h-[calc(286px/2)] overflow-hidden",
+            "flex items-start",
+          )}
+        >
+          <ScrollDown
+            initial={{ pathLength: 0 }}
+            whileInView={{ pathLength: 1 }}
+            transition={{ duration: 1 }}
+            viewport={{ amount: 1, once: true }}
+            lineFill="#000000"
+          />
+        </div>
+        <div
+          className={cn("h-[calc(286px/2)] overflow-hidden", "flex items-end")}
+        >
+          <ScrollDown
+            initial={{ pathLength: 0 }}
+            whileInView={{ pathLength: 1 }}
+            transition={{ duration: 1 }}
+            viewport={{ amount: 1, once: true }}
+            lineFill="#ffffff"
+          />
+        </div>
+      </div>
     </button>
   );
 }
