@@ -10,6 +10,18 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Portfolio {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  url         String
+  image       String   @db.VarChar(255)
+  keywords    String[]
+  uploaderId  Int
+
+  @@index([title, keywords])
+}
+
 model User {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
@@ -18,8 +30,14 @@ model User {
   email String @unique
   hash  String
 
-  firstName String?
-  lastName  String?
+  userName String?
+  fullName String?
+  role     UserRole @default(ADMIN)
 
   @@map("users")
+}
+
+enum UserRole {
+  ADMIN
+  SUPER_ADMIN
 }
