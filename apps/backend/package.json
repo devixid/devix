@@ -29,7 +29,7 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "dotenv -e .env.test -- jest --config --watch --no-cache ./test/jest-e2e.json",
-    "pretest:e2e": "yarn db:test:restart"
+    "pretest:e2e": "pnpm db:test:restart"
   },
   "lint-staged": {
     "**/*.{html,css,scss,less,json,js,jsx,ts,tsx,md,mdx}\"": [
