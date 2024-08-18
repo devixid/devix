@@ -1,5 +1,4 @@
 FROM postgres:15
 
-ENV POSTGRES_USER=${POSTGRES_USER}
-ENV POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-ENV POSTGRES_DB=${POSTGRES_DB}
+# Karena semua environment variable diload dari .env.development via docker-compose.yaml,
+# jadi kita ngga perlu set ENV atau load ARG di Dockerfilenya (kosongin aja).

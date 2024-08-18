@@ -11,6 +11,7 @@
     "dev": "nest start --watch",
     "prod": "node dist/main",
     "start:studio": "npx prisma studio",
+    "start:dev:studio": "dotenv -e .env.development -- prisma studio",
     "migrate:deploy": "prisma migrate deploy",
     "migrate:dev:deploy": "dotenv -e .env.development -- prisma migrate deploy",
     "debug": "nest start --debug --watch",
