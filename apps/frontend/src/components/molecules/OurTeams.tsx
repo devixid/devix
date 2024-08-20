@@ -4,7 +4,10 @@ import { TeamCard } from "./card";
 
 export default function OurTeams() {
   return (
-    <div className="flex w-full max-w-5xl flex-col items-center justify-around">
+    <div
+      className="flex w-full max-w-5xl flex-col items-center justify-around"
+      id="team"
+    >
       <div className="my-10 flex w-full max-w-5xl flex-col items-start justify-between px-10 md:flex-row md:px-0">
         <Heading.h2 className="font-light leading-[52.8px]">
           Meet our team.

@@ -9641,7 +9641,7 @@ snapshots:
       strip-bom: 4.0.0
       strip-json-comments: 3.1.1
 
-  commitizen@4.3.0(@types/node@20.12.12)(typescript@5.5.4):
+commitizen@4.3.0(@types/node@20.12.12)(typescript@5.5.4):
     dependencies:
       cachedir: 2.3.0
       cz-conventional-changelog: 3.3.0(@types/node@20.12.12)(typescript@5.5.4)
@@ -9657,9 +9657,6 @@ snapshots:
       minimist: 1.2.7
       strip-bom: 4.0.0
       strip-json-comments: 3.1.1
-    transitivePeerDependencies:
-      - '@types/node'
-      - typescript
 
   commitizen@4.3.0(@types/node@20.4.2)(typescript@5.5.4):
     dependencies:
