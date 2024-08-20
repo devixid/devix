@@ -8,12 +8,14 @@
   },
   "extends": [
     "plugin:@typescript-eslint/recommended",
-    "plugin:prettier/recommended",
-    "standard-with-typescript"
+    "plugin:prettier/recommended"
   ],
   "overrides": [
     {
-      "files": ["*.ts", "*.tsx"],
+      "env": {
+        "jest": true
+      },
+      "files": ["*.ts", "*.tsx", "tests/**/*"],
       "extends": ["plugin:@typescript-eslint/recommended"]
     }
   ],
@@ -44,6 +46,7 @@
     "@typescript-eslint/explicit-module-boundary-types": 0,
     "@typescript-eslint/no-explicit-any": 0,
     "@typescript-eslint/no-useless-constructor": 0,
-    "@typescript-eslint/space-before-function-paren": 0
+    "@typescript-eslint/space-before-function-paren": 0,
+    "@typescript-eslint/member-delimiter-style": 0
   }
 }

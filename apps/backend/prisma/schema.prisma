@@ -1,6 +1,9 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -20,6 +23,7 @@ model Portfolio {
   uploaderId  Int
 
   @@index([title, keywords])
+  @@map("portfolios")
 }
 
 model User {
@@ -33,8 +37,6 @@ model User {
   userName String?
   fullName String?
   role     UserRole @default(ADMIN)
-
-  @@map("users")
 }
 
 enum UserRole {
