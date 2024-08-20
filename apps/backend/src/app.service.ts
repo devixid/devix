@@ -3,6 +3,6 @@ import { Injectable } from "@nestjs/common";
 @Injectable()
 export class AppService {
   hello() {
-    return { messege: "Hello World!" };
+    return { messege: process.env.DATABASE_URL };
   }
 }

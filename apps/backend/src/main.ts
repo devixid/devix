@@ -14,6 +14,7 @@ async function bootstrap(): Promise<void> {
     console.log(
       `Server is listening on http://localhost:${process.env.PORT as string}`,
     );
+    console.log(process.env.NODE_ENV);
   });
 }
 
