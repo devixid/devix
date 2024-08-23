@@ -1,0 +1,82 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply font-archivo;
+}
+
+@layer base {
+  h1 {
+    @apply text-heading-2 leading-heading-2;
+    @apply lg:text-heading-1 lg:leading-heading-1;
+  }
+
+  h2 {
+    @apply text-heading-3 leading-heading-3;
+    @apply lg:text-heading-2 lg:leading-heading-2;
+  }
+
+  input,
+  button {
+    @apply outline-none focus:outline-none;
+    @apply disabled:cursor-not-allowed;
+  }
+}
+
+@layer components {
+  /* Checkbox */
+  .input-checkbox__container {
+    @apply relative h-6 w-6;
+  }
+
+  .input-checkbox__container .input-checkbox__input {
+    @apply absolute top-0 left-0 h-6 w-6 -z-10;
+    @apply opacity-0;
+  }
+
+  .input-checkbox__container .input-checkbox__label {
+    @apply rounded-md;
+    @apply flex items-center justify-center;
+    @apply cursor-pointer;
+  }
+
+  .input-checkbox__container .input-checkbox__checkmark {
+    @apply h-3 w-3;
+    @apply opacity-0;
+    @apply cursor-pointer;
+  }
+
+  .input-checkbox__container
+    .input-checkbox__label:hover
+    ~ .input-checkbox__label,
+  .input-checkbox__container
+    .input-checkbox__input:focus
+    ~ .input-checkbox__label {
+    @apply border-black;
+  }
+
+  .input-checkbox__container
+    .input-checkbox__input:checked
+    ~ .input-checkbox__label {
+    @apply border-black bg-black;
+  }
+
+  .input-checkbox__container
+    .input-checkbox__input:checked
+    ~ .input-checkbox__label
+    .input-checkbox__checkmark {
+    @apply opacity-100;
+  }
+
+  .input-checkbox__container
+    .input-checkbox__input:disabled
+    ~ .input-checkbox__label,
+  .input-checkbox__container
+    .input-checkbox__input:disabled
+    ~ .input-checkbox__label
+    .input-checkbox__checkmark {
+    @apply cursor-not-allowed;
+    @apply opacity-50;
+  }
+}
