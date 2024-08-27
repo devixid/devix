@@ -1,27 +1,31 @@
+import { DashboardLayout, Error404NotFound } from "@/components";
 import { authState } from "@/features/auth";
-import { createRootRoute, Outlet, redirect } from "@tanstack/react-router";
+import { createRootRoute, redirect } from "@tanstack/react-router";
 import { createStore } from "jotai";
 
 export const store = createStore(); // Jotai Store
+
 export const Route = createRootRoute({
-  component: () => (
-    <>
-      <Outlet />
-    </>
-  ),
+  component: DashboardLayout,
   beforeLoad: ({ location }) => {
     const { isAuthenticated } = store.get(authState);
 
     if (
       isAuthenticated &&
-      (location.pathname === "/signin" || location.pathname === "/")
+      (location.pathname === "/" || location.pathname === "/signin")
     ) {
-      redirect({ to: "/dashboard" });
-      return;
+      throw redirect({
+        to: "/dashboard",
+        from: location.pathname,
+      });
     }
 
-    if (location.pathname === "/" && !isAuthenticated) {
-      return redirect({ to: "/signin" });
+    if (!isAuthenticated && location.pathname !== "/signin") {
+      throw redirect({
+        to: "/signin",
+        from: location.pathname,
+      });
     }
   },
+  notFoundComponent: Error404NotFound,
 });

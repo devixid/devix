@@ -8,4 +8,3 @@ import { twMerge } from "tailwind-merge";
  * @returns {string}
  */
 export const cn = (...classes: ClassValue[]): string => twMerge(cx(...classes));
-

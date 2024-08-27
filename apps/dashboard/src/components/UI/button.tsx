@@ -1,8 +1,10 @@
+import { cn } from "@/utils";
 import { cva } from "class-variance-authority";
+import { LoaderCircleIcon } from "lucide-react";
 import { ButtonProps } from "./types";
 
 const buttonVariants = cva(
-  ["rounded-md", "disabled:cursor-not-allowed disabled:opacity-50"],
+  ["rounded-md", "transition-all duration-200 ease-in-out"],
   {
     variants: {
       variant: {
@@ -31,9 +33,15 @@ const ButtonComponent = (props: ButtonProps<typeof buttonVariants>) => {
         className: props.className,
         ...props.variants,
       })}
-      disabled={props.disabled}
+      disabled={props.disabled || props.isLoading}
     >
-      {props.children}
+      {props.isLoading ? (
+        <LoaderCircleIcon
+          className={cn("animate-spin", "h-5 w-5", "inline-block mx-auto")}
+        />
+      ) : (
+        <>{props.children}</>
+      )}
     </button>
   );
 };

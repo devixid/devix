@@ -19,8 +19,8 @@ body {
 
   input,
   button {
-    @apply outline-none focus:outline-none;
-    @apply disabled:cursor-not-allowed;
+    /* @apply outline-none focus:outline-none; */
+    @apply disabled:cursor-not-allowed disabled:opacity-75;
   }
 }
 

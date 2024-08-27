@@ -1,10 +1,12 @@
 import { cn } from "@/utils";
-import { ReactNode } from "react";
+import React, { FC } from "react";
 
-export default function Layout({ children }: { children: ReactNode }) {
+const Layout: FC<{ children?: React.ReactNode }> = ({ children }) => {
   return (
     <div className={cn("mx-auto flex items-center justify-center")}>
       {children}
     </div>
   );
-}
+};
+
+export default Layout;

@@ -7,7 +7,7 @@ const inputVariants = cva(
   [
     "w-full",
     "outline-none border border-gray-3 rounded-md",
-    "hover:border-black focus:border-black disabled:opacity-50",
+    "hover:border-black focus:border-black",
     "transition-all duration-300 ease-in-out",
   ],
   {

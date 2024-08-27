@@ -15,6 +15,14 @@ import path from "path";
 import type { Plugin } from "vite";
 
 const isValidSVGPath = (filePath: string) => /\.svg(\.tsx)?$/.test(filePath);
+const convertToCamelCase = (str: string) => {
+  return str
+    .split("-")
+    .map((word, index) =>
+      index === 0 ? word : word.charAt(0).toUpperCase() + word.slice(1),
+    )
+    .join("");
+};
 
 export default (): Plugin => ({
   enforce: "pre",
@@ -24,7 +32,7 @@ export default (): Plugin => ({
 
     const svgPath = filePath.replace(/\.svg$/, ".svg.tsx");
 
-    return path.join(path.dirname(importer || ""), svgPath);
+    return path.resolve(path.dirname(importer || ""), svgPath);
   },
   load: async (filePath) => {
     if (!isValidSVGPath(filePath)) return null;
@@ -35,8 +43,8 @@ export default (): Plugin => ({
 
     return `
         import React from "react";
-
-        export default (props?: React.SVGProps<SVGSVGElement>) => ${svg};
+        
+        export default (props?: React.SVGProps<SVGSVGElement>) => ${convertToCamelCase(svg)};
       `;
   },
 });
