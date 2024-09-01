@@ -7,7 +7,7 @@ import {
   MinLength,
 } from "class-validator";
 
-export class UserDTO {
+export class CreateUserDTO {
   @IsEmail()
   @IsNotEmpty()
   email: string;
@@ -24,6 +24,15 @@ export class UserDTO {
   @IsString()
   fullName?: string;
 
+  @IsOptional()
+  role: UserRole;
+}
+
+export class AuthDTO {
+  @IsEmail()
   @IsNotEmpty()
-  role: UserRole; // Assuming UserRole is an enum
+  email: string;
+
+  @IsNotEmpty()
+  password: string;
 }

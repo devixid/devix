@@ -12,7 +12,8 @@
     "airbnb",
     "next",
     "plugin:prettier/recommended",
-    "plugin:tailwindcss/recommended"
+    "plugin:tailwindcss/recommended",
+    "turbo"
   ],
   "settings": {
     "react": {

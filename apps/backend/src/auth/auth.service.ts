@@ -9,7 +9,7 @@ import {
 import { JwtService } from "@nestjs/jwt";
 import { type User } from "@prisma/client";
 import { type JwtPayload } from "@/interfaces";
-import { type UserDTO } from "src/auth/dto/auth.dto";
+import { type CreateUserDTO } from "src/auth/dto/auth.dto";
 
 @Injectable()
 export class AuthService {
@@ -43,7 +43,7 @@ export class AuthService {
   }
 
   @HttpCode(201)
-  async createUser(userDTO: UserDTO): Promise<User> {
+  async createUser(userDTO: CreateUserDTO): Promise<User> {
     const { email, password, ...rest } = userDTO;
 
     const hashedPassword = await argon2.hash(password);

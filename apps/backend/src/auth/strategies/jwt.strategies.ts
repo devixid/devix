@@ -5,11 +5,12 @@ import { type JwtPayload } from "@/interfaces";
 import { AdminService } from "@/admin";
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy) {
+export class JwtStrategy extends PassportStrategy(Strategy, "jwt-refresh") {
   constructor(private readonly adminService: AdminService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       secretOrKey: process.env.JWT_SECRET,
+      passReqToCallback: true,
     });
   }
 

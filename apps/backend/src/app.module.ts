@@ -9,11 +9,10 @@ import { ConfigModule } from "@nestjs/config";
 import { PassportModule } from "@nestjs/passport";
 import { JwtModule } from "@nestjs/jwt";
 import { AppService } from "./app.service";
-import { AuthService } from "./auth/auth.service";
-import { AdminService } from "./admin/admin.service";
-import { AuthController } from "./auth/auth.controller";
-import { JwtStrategy } from "./auth";
 import { LoggerMiddleware } from "./log/log.middleware";
+import { PrismaModule } from "./prisma/prisma.module";
+import { AuthModule } from "./auth/auth.module";
+import { AdminModule } from "./admin/admin.module";
 
 @Module({
   imports: [
@@ -25,9 +24,12 @@ import { LoggerMiddleware } from "./log/log.middleware";
       secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: process.env.JWT_EXPIRES_IN },
     }),
+    AuthModule,
+    AdminModule,
+    PrismaModule,
   ],
-  controllers: [AppController, AuthController],
-  providers: [AppService, AuthService, AdminService, JwtStrategy],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
