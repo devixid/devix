@@ -1,23 +1,18 @@
 import { NextFont } from "next/dist/compiled/@next/font";
-import { Archivo, Inter, Oswald } from "next/font/google";
+import { Syne, DM_Sans } from "next/font/google";
 
-export const inter: NextFont = Inter({
-  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+export const syne: NextFont = Syne({
+  weight: ["400", "500", "600", "700", "800"],
   subsets: ["latin"],
   display: "swap",
   preload: true,
+  variable: "--font-display",
 });
 
-export const oswald: NextFont = Oswald({
-  weight: ["200", "300", "400", "500", "600", "700"],
+export const dmSans: NextFont = DM_Sans({
+  weight: ["300", "400", "500", "600", "700"],
   subsets: ["latin"],
   display: "swap",
   preload: true,
-});
-
-export const archivo: NextFont = Archivo({
-  weight: ["300", "400", "500"],
-  subsets: ["latin"],
-  display: "swap",
-  preload: true,
+  variable: "--font-body",
 });

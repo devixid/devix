@@ -3,7 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
+  provider     = "postgresql"
+  relationMode = "prisma"
 }
 
 model User {
@@ -11,9 +12,36 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  email     String   @unique
+  email     String  @unique
   firstName String?
   lastName  String?
 
   @@map("users")
+}
+
+model ContactSubmission {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  message   String   @db.Text
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("contact_submissions")
+}
+
+model Testimonial {
+  id         String   @id @default(cuid())
+  clientName String
+  clientRole String
+  company    String
+  content    String   @db.Text
+  avatarUrl  String?
+  isVisible  Boolean  @default(true)
+  order      Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("testimonials")
 }

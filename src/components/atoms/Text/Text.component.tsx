@@ -1,7 +1,7 @@
 "use client";
 
 import type { TextProps } from "@/interface";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import Link, { type LinkProps } from "next/link";
 import { forwardRef } from "react";
 import { Text } from "./Text.variant";
@@ -25,7 +25,7 @@ CustomLinkComponent.displayName = "Link";
 export const variant = Text;
 
 export const p = ({ className, ...props }: TextProps<"p">) => (
-  <motion.p
+  <m.p
     className={Text({
       type: "paragraph",
       className,
@@ -40,7 +40,7 @@ export const span = ({
   resetStyle,
   ...props
 }: TextProps<"span">) => (
-  <motion.span
+  <m.span
     className={
       resetStyle
         ? className
@@ -54,4 +54,4 @@ export const span = ({
   />
 );
 
-export const link = motion.create(CustomLinkComponent);
+export const link = m.create(CustomLinkComponent);

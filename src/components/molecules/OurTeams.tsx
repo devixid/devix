@@ -1,35 +1,53 @@
-import { Heading, Text } from "@/components/atoms";
+import { Heading } from "@/components/atoms";
 import { ourTeams } from "@/constants";
 import { TeamCard } from "./card";
+import { SlideUp } from "@/components/animations/SlideUp";
 
 export default function OurTeams() {
   return (
-    <div id="team" className="flex w-full max-w-5xl flex-col items-center justify-around scroll-mt-24">
-      <div className="my-10 flex w-full max-w-5xl flex-col items-start justify-between px-10 md:flex-row md:px-0">
-        <Heading.h2 className="font-light leading-[52.8px]">
-          Meet our team.
-        </Heading.h2>
-        <div className="flex max-w-[635px] flex-col items-start justify-between">
-          <Text.p className="mb-5">
-            Our Team have the skills and knowledge necessary to build strong and
-            secure websites. They will use the latest technology to ensure that
-            your website can be accessed and used by everyone.
-          </Text.p>
+    <section id="team" className="py-20 md:py-32 scroll-mt-24">
+      <div className="mx-auto max-w-6xl px-6 lg:px-10">
+        <div className="flex flex-col md:flex-row md:gap-x-20 mb-16 md:mb-20">
+          <SlideUp yOffset={20} duration={0.8} className="md:w-1/3 mb-8 md:mb-0">
+            <p className="text-[13px] font-medium uppercase tracking-[0.2em] text-zinc-400 mb-4">
+              The Team
+            </p>
+            <Heading.h2 className="font-extralight">
+              Meet the people behind Devix.
+            </Heading.h2>
+          </SlideUp>
+
+          <SlideUp
+            yOffset={20}
+            duration={0.8}
+            delay={0.1}
+            className="md:w-2/3"
+          >
+            <p className="text-base md:text-lg text-zinc-500 leading-relaxed max-w-xl">
+              Our team has the skills and knowledge necessary to build strong and secure websites. We use the latest technology to ensure that your website can be accessed and used by everyone.
+            </p>
+          </SlideUp>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+          {ourTeams.map((team, index) => (
+            <SlideUp
+              key={team.name}
+              yOffset={20}
+              duration={0.7}
+              delay={index * 0.1}
+            >
+              <TeamCard
+                description={team.description}
+                image={team.image}
+                name={team.name}
+                title={team.title}
+                socials={team.socials}
+              />
+            </SlideUp>
+          ))}
         </div>
       </div>
-      <div className="flex w-full flex-col items-center justify-around md:flex-row">
-        {ourTeams.map((team) => {
-          return (
-            <TeamCard
-              key={team.name}
-              description={team.description}
-              image={team.image}
-              name={team.name}
-              title={team.title}
-            />
-          );
-        })}
-      </div>
-    </div>
+    </section>
   );
 }

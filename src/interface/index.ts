@@ -7,7 +7,7 @@ export type HeadingProps<T extends keyof typeof HeadingConstants> =
     className?: string;
   };
 
-export type TextProps<T extends keyof HTMLElementTagNameMap> = HTMLMotionProps<any> & {
+export type TextProps<T extends keyof HTMLElementTagNameMap> = HTMLMotionProps<T> & {
   className?: string;
   /**
    * Reset styles
@@ -25,6 +25,7 @@ export interface NavbarProps extends HTMLMotionProps<"nav"> {
   isNavbarOpen: boolean;
   setIsNavbarOpen: Dispatch<SetStateAction<boolean>>;
   activeSection?: string;
+  isDarkSection?: boolean;
 }
 
 export interface TeamCardProps extends HTMLMotionProps<"div"> {
@@ -32,4 +33,8 @@ export interface TeamCardProps extends HTMLMotionProps<"div"> {
   image: string;
   name: string;
   title: string;
+  socials: {
+    github: string;
+    linkedin: string;
+  };
 }

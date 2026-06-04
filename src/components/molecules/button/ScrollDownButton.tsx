@@ -1,34 +1,34 @@
 "use client";
 
-import { ScrollDown, Text } from "@/components/atoms";
 import { cn } from "@/utils";
-import { scrollToPosition } from "@/helpers";
+import { m } from "framer-motion";
 
 export default function ScrollDownButton() {
-  const handleScrollPosition = () => {
-    scrollToPosition({
-      targetX: 0,
-      targetY: 993,
-      smooth: true,
-    });
+  const handleScroll = () => {
+    const servicesSection = document.querySelector("#services");
+    if (servicesSection) {
+      servicesSection.scrollIntoView({ behavior: "smooth" });
+    }
   };
 
   return (
-    <button
+    <m.button
       type="button"
-      className="relative mx-auto flex cursor-pointer flex-col items-center mix-blend-difference z-50 text-white"
-      onClick={handleScrollPosition}
+      className="flex flex-col items-center gap-y-3 cursor-pointer mix-blend-difference text-white"
+      onClick={handleScroll}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ delay: 1.5, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
     >
-      <Text.span className={cn("text-[14px] font-light")}>
-        SCROLL DOWN
-      </Text.span>
-      <ScrollDown
-        initial={{ pathLength: 0 }}
-        whileInView={{ pathLength: 1 }}
-        transition={{ duration: 1 }}
-        viewport={{ amount: 1, once: true }}
-        className="absolute top-10"
+      <span className={cn("text-[11px] font-medium uppercase tracking-[0.25em] text-zinc-400")}>
+        Scroll
+      </span>
+      <m.span
+        className="block w-[1px] bg-zinc-400"
+        initial={{ height: 0 }}
+        animate={{ height: 48 }}
+        transition={{ delay: 1.8, duration: 1, ease: [0.16, 1, 0.3, 1] }}
       />
-    </button>
+    </m.button>
   );
 }

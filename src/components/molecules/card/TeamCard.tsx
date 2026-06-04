@@ -2,41 +2,64 @@
 
 import { TeamCardProps } from "@/interface";
 import Image from "next/image";
-import { motion } from "framer-motion";
-import { Heading, Text } from "@/components/atoms";
+import { Github, Linkedin } from "lucide-react";
 
 export default function TeamCard({
   description,
   image,
   name,
   title,
-  ...props
+  socials,
 }: TeamCardProps) {
   return (
-    <motion.div
-      {...props}
-      className="mx-10 my-5 flex h-full flex-col items-center rounded-md bg-white shadow-lg md:mx-0 md:mr-5 md:h-[464px] md:max-w-[260px]"
-    >
-      <div className="relative flex flex-col-reverse">
+    <div className="group relative flex flex-col w-full border border-zinc-100 hover:border-zinc-300 transition-all duration-500 overflow-hidden">
+      {/* Image area — portrait 3:4 */}
+      <div className="relative aspect-[3/4] w-full overflow-hidden">
         <Image
           alt={name}
           src={image}
-          width={260}
-          height={300}
-          className="size-full rounded-b-none rounded-t-md md:h-[300px]"
+          fill
+          sizes="(max-width: 768px) 100vw, 25vw"
+          className="object-cover transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04]"
         />
-        <Text.p className="absolute z-20 p-2 align-bottom text-xl font-medium tracking-tight text-white">
+        {/* Hover overlay gradient */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+        {/* Social icons — slide up on hover */}
+        <div className="absolute bottom-4 left-4 flex items-center gap-x-3 opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]">
+          <a
+            href={socials.github}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-white/80 hover:text-white transition-colors"
+            title={`${name}'s GitHub`}
+          >
+            <Github className="w-5 h-5" />
+          </a>
+          <a
+            href={socials.linkedin}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-white/80 hover:text-white transition-colors"
+            title={`${name}'s LinkedIn`}
+          >
+            <Linkedin className="w-5 h-5" />
+          </a>
+        </div>
+      </div>
+
+      {/* Info */}
+      <div className="flex flex-col p-5">
+        <h4 className="font-display text-lg font-medium text-black tracking-tight">
           {name}
-        </Text.p>
-      </div>
-      <div className="my-2 px-2">
-        <Heading.h4 className="mb-2 text-xl font-medium leading-tight tracking-wide">
+        </h4>
+        <span className="mt-2 inline-block w-fit border border-zinc-200 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.1em] text-zinc-500">
           {title}
-        </Heading.h4>
-        <Text.span className="leading-tighter line-clamp-4 text-base font-light">
+        </span>
+        <p className="mt-4 text-sm text-zinc-500 leading-relaxed line-clamp-3">
           {description}
-        </Text.span>
+        </p>
       </div>
-    </motion.div>
+    </div>
   );
 }

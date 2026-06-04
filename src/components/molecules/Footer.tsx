@@ -1,15 +1,10 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { memo } from "react";
-import { Heading, Text } from "@/components/atoms";
 import Image from "next/image";
 import Link from "next/link";
-import { Separator } from "@heroui/react";
 
-interface FooterProps {}
-
-function Footer({ ...props }: FooterProps) {
+function Footer() {
   const exploreMenus = [
     { name: "Our service", route: "#services" },
     { name: "Portfolio", route: "#portfolio" },
@@ -18,7 +13,7 @@ function Footer({ ...props }: FooterProps) {
 
   const companyMenus = [
     { name: "About us", route: "#about" },
-    { name: "Contact", route: "#cta" },
+    { name: "Contact", route: "#contact" },
   ];
 
   const socialMenus = [
@@ -28,94 +23,90 @@ function Footer({ ...props }: FooterProps) {
   ];
 
   return (
-    <motion.footer
-      className="flex size-full flex-col items-center justify-between bg-black p-10 text-white"
-      {...props}
-    >
-      <div className="mb-20 flex w-full max-w-5xl flex-col items-start justify-between md:flex-row md:items-center">
-        <Image
-          src="/devix_logo.white.png"
-          alt="devix_logo"
-          className="hidden md:block"
-          width={90}
-          height={105}
-        />
-        <Image
-          src="/devix_logo.white.png"
-          alt="devix_logo"
-          className="mb-10 block md:hidden"
-          width={48}
-          height={56}
-        />
-        <div className="flex w-3/4 flex-col items-start justify-around gap-y-10 md:flex-row md:gap-y-0">
-          <div className="flex flex-col">
-            <Heading.h4 className="mb-2 text-2xl font-light tracking-tight text-white">
-              Explore.
-            </Heading.h4>
-            <ul className="flex flex-col md:gap-y-4">
-              {exploreMenus.map((menu, index) => {
-                const keyLoop = `key-${index}`;
-                return (
-                  <li
-                    key={keyLoop}
-                    className="text-[18px]"
-                  >
-                    <Link href={menu.route}>{menu.name}</Link>
-                  </li>
-                );
-              })}
-            </ul>
+    <footer className="w-full bg-black-1 text-white border-t border-zinc-800">
+      <div className="mx-auto max-w-6xl px-6 lg:px-10 py-16 md:py-20">
+        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-y-12">
+          {/* Logo + tagline */}
+          <div className="flex flex-col gap-y-4">
+            <Link href="/" className="flex items-center gap-x-3">
+              <Image
+                src="/devix_logo.white.png"
+                alt="Devix"
+                width={32}
+                height={38}
+                quality={100}
+              />
+              <span className="font-display text-xl font-semibold tracking-tight text-white">
+                DEVIX
+              </span>
+            </Link>
+            <p className="text-sm text-zinc-500 max-w-[240px] leading-relaxed">
+              Crafting digital experiences for global brands.
+            </p>
           </div>
-          <div className="flex flex-col">
-            <Heading.h4 className="mb-2 text-2xl font-light tracking-tight text-white">
-              Company.
-            </Heading.h4>
-            <ul className="flex flex-col md:gap-y-4">
-              {companyMenus.map((menu, index) => {
-                const keyLoop = `key-${index}`;
-                return (
-                  <li
-                    key={keyLoop}
-                    className="text-[18px]"
-                  >
-                    <Link
-                      href={menu.route}
-                      className="text-gray"
-                    >
-                      {menu.name}
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-          <div className="flex flex-col">
-            <Heading.h4 className="mb-2 text-2xl font-light tracking-tight text-white">
-              Social Media.
-            </Heading.h4>
-            <ul className="flex flex-col md:gap-y-4">
-              {socialMenus.map((menu, index) => {
-                const keyLoop = `key-${index}`;
-                return (
-                  <li
-                    key={keyLoop}
-                    className="text-[18px]"
-                  >
-                    <Link href={menu.route} target={menu.route.startsWith("http") ? "_blank" : undefined} rel="noopener noreferrer">{menu.name}</Link>
-                  </li>
-                );
-              })}
-            </ul>
+
+          {/* Link columns */}
+          <div className="flex flex-col sm:flex-row gap-x-16 gap-y-10">
+            <div className="flex flex-col gap-y-3">
+              <h4 className="text-[11px] font-medium uppercase tracking-[0.2em] text-zinc-500 mb-2">
+                Explore
+              </h4>
+              {exploreMenus.map((menu) => (
+                <Link
+                  key={menu.name}
+                  href={menu.route}
+                  className="group relative text-sm text-zinc-400 hover:text-white transition-colors duration-300 w-fit"
+                >
+                  {menu.name}
+                  <span className="absolute bottom-0 left-0 h-[1px] w-0 bg-accent group-hover:w-full transition-all duration-400" />
+                </Link>
+              ))}
+            </div>
+
+            <div className="flex flex-col gap-y-3">
+              <h4 className="text-[11px] font-medium uppercase tracking-[0.2em] text-zinc-500 mb-2">
+                Company
+              </h4>
+              {companyMenus.map((menu) => (
+                <Link
+                  key={menu.name}
+                  href={menu.route}
+                  className="group relative text-sm text-zinc-400 hover:text-white transition-colors duration-300 w-fit"
+                >
+                  {menu.name}
+                  <span className="absolute bottom-0 left-0 h-[1px] w-0 bg-accent group-hover:w-full transition-all duration-400" />
+                </Link>
+              ))}
+            </div>
+
+            <div className="flex flex-col gap-y-3">
+              <h4 className="text-[11px] font-medium uppercase tracking-[0.2em] text-zinc-500 mb-2">
+                Social
+              </h4>
+              {socialMenus.map((menu) => (
+                <Link
+                  key={menu.name}
+                  href={menu.route}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group relative text-sm text-zinc-400 hover:text-white transition-colors duration-300 w-fit"
+                >
+                  {menu.name}
+                  <span className="absolute bottom-0 left-0 h-[1px] w-0 bg-accent group-hover:w-full transition-all duration-400" />
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
+
+        {/* Bottom bar */}
+        <div className="mt-16 pt-8 border-t border-zinc-800">
+          <p className="text-xs text-zinc-600">
+            Copyright &copy; {new Date().getFullYear()} Devix. All rights reserved.
+          </p>
+        </div>
       </div>
-      <Separator className="max-w-5xl bg-white text-white" />
-      <div className="mt-10 flex w-full max-w-5xl flex-col items-start justify-start text-start">
-        <Text.span className="text-start">
-          Copyright &copy; {new Date().getFullYear()} Devix Indonesia. All rights reserved.
-        </Text.span>
-      </div>
-    </motion.footer>
+    </footer>
   );
 }
 

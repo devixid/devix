@@ -1,66 +1,86 @@
-import { Text } from "@/components/atoms";
-import { cn } from "@/utils";
-import { Monitor, ShoppingCart, Target } from "lucide-react";
+import { SlideUp } from "@/components/animations/SlideUp";
+
+const services = [
+  {
+    num: "01",
+    title: "Custom Web Development",
+    description:
+      "High-performance websites designed from scratch to deliver speed, security, and premium aesthetics for your business.",
+  },
+  {
+    num: "02",
+    title: "E-Commerce Solutions",
+    description:
+      "Tailored online shops with seamless checkout flows, secure payment integrations, and easy product management systems.",
+  },
+  {
+    num: "03",
+    title: "Landing Page Optimization",
+    description:
+      "High-converting single-page sites built specifically to drive leads, showcase product launches, and maximize marketing ROI.",
+  },
+];
 
 export default function Offering() {
-  const services = [
-    {
-      icon: <Monitor className="w-8 h-8 text-white" />,
-      title: "Custom Web Development",
-      description:
-        "High-performance websites designed from scratch to deliver speed, security, and premium aesthetics for your business.",
-    },
-    {
-      icon: <ShoppingCart className="w-8 h-8 text-white" />,
-      title: "E-Commerce Solutions",
-      description:
-        "Tailored online shops with seamless checkout flows, secure payment integrations, and easy product management systems.",
-    },
-    {
-      icon: <Target className="w-8 h-8 text-white" />,
-      title: "Landing Page Optimization",
-      description:
-        "High-converting single-page sites built specifically to drive leads, showcase product launches, and maximize marketing ROI.",
-    },
-  ];
-
   return (
-    <div
-      className="w-full min-h-screen flex flex-col items-center justify-center bg-black text-white py-16 md:py-24 scroll-mt-24"
+    <section
       id="services"
+      className="w-full min-h-screen bg-black-1 text-white py-20 md:py-32 scroll-mt-24"
     >
-      <div className="w-full max-w-5xl px-10 md:px-0 flex flex-col items-start gap-y-12">
-        <div className="flex flex-col gap-y-6 max-w-3xl">
-          <Text.p className="text-zinc-500 font-medium uppercase tracking-wider text-sm">
-            What We Do
-          </Text.p>
-          <h2 className="text-4xl md:text-6xl font-light leading-tight text-white">
-            We offer website creation tailored to your unique business needs.
-          </h2>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full mt-8">
-          {services.map((service, index) => (
-            <div
-              key={index}
-              className="group relative flex flex-col items-start p-8 rounded-2xl bg-zinc-900/50 border border-zinc-800/80 hover:border-zinc-700 hover:bg-zinc-900 transition-all duration-300 overflow-hidden"
+      <div className="mx-auto max-w-6xl px-6 lg:px-10">
+        {/* Asymmetric layout */}
+        <div className="flex flex-col lg:flex-row lg:gap-x-20">
+          {/* Left — heading (2/3) */}
+          <div className="lg:w-2/3 mb-16 lg:mb-0">
+            <SlideUp
+              yOffset={12}
+              duration={0.7}
+              className="text-[13px] font-medium uppercase tracking-[0.2em] text-zinc-500 mb-6"
             >
-              {/* Subtle hover background glow */}
-              <div className="absolute inset-0 bg-gradient-to-br from-white/[0.03] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              
-              <div className="mb-6 p-4 rounded-xl bg-zinc-800/80 group-hover:bg-zinc-800 group-hover:scale-110 transition-all duration-300 relative z-10">
-                {service.icon}
-              </div>
-              <h3 className="text-xl font-medium mb-3 text-white relative z-10 group-hover:text-amber-400 transition-colors duration-300">
-                {service.title}
-              </h3>
-              <p className="text-zinc-400 text-sm leading-relaxed relative z-10">
-                {service.description}
-              </p>
-            </div>
-          ))}
+              What We Do
+            </SlideUp>
+            <SlideUp
+              yOffset={30}
+              duration={0.9}
+              delay={0.1}
+              className="font-display text-4xl md:text-5xl lg:text-6xl font-extralight leading-[1.1] tracking-tight text-white max-w-2xl"
+            >
+              We offer website creation tailored to your unique business needs.
+            </SlideUp>
+          </div>
+
+          {/* Right — service list (1/3) */}
+          <div className="lg:w-1/3 flex flex-col">
+            {services.map((service, index) => (
+              <SlideUp
+                key={service.num}
+                yOffset={20}
+                duration={0.7}
+                delay={index * 0.12}
+                className="group relative border-t border-zinc-700 pt-8 pb-10 last:pb-0"
+              >
+                {/* Decorative number */}
+                <span className="font-display text-6xl font-bold text-white/[0.08] absolute top-4 right-0 leading-none select-none pointer-events-none">
+                  {service.num}
+                </span>
+
+                <h3 className="text-lg font-medium text-white mb-3 transition-colors duration-300 group-hover:text-accent relative z-10">
+                  <span className="relative">
+                    {service.title}
+                    <span className="absolute bottom-0 left-0 h-[1px] w-0 bg-accent group-hover:w-full transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]" />
+                  </span>
+                </h3>
+                <p className="text-sm text-zinc-400 leading-relaxed relative z-10 max-w-[280px]">
+                  {service.description}
+                </p>
+
+                {/* Hover border accent */}
+                <span className="absolute top-0 left-0 h-[1px] w-0 bg-accent group-hover:w-full transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]" />
+              </SlideUp>
+            ))}
+          </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 }

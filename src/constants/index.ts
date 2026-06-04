@@ -52,9 +52,9 @@ export const iconVariant: Variants = {
   },
 };
 
-export const headingText: String = "Profesional website";
-export const headingText2: String = "creation services";
-export const subHeadingText: Array<String> = [
+export const headingText: string = "Professional website";
+export const headingText2: string = "creation services";
+export const subHeadingText: Array<string> = [
   "We",
   "design",
   "and",

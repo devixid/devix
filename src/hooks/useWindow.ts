@@ -56,8 +56,7 @@ const useWindow = (): UseWindowReturnTypes => {
     window.addEventListener("resize", updatePaneSize);
 
     updatePaneSize();
-
-    // eslint-disable-next-line consistent-return
+    
     return () => {
       window.removeEventListener("scroll", updateScrollPosition);
       window.removeEventListener("resize", updatePaneSize);
