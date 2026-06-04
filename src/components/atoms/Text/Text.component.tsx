@@ -8,7 +8,8 @@ import { Text } from "./Text.variant";
 
 const CustomLinkComponent = forwardRef<
   HTMLAnchorElement,
-  LinkProps & { className?: string }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  LinkProps<any> & { className?: string }
 >(({ className, href, ...props }, ref) => (
   <Link
     href={href}

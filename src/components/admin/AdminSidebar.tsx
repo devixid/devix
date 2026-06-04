@@ -94,7 +94,8 @@ export function AdminSidebar() {
               return (
                 <Link
                   key={item.href}
-                  href={item.href}
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  href={item.href as any}
                   onClick={() => setIsOpen(false)}
                   className={`flex items-center gap-4 px-4 py-3 text-xs uppercase tracking-[0.15em] font-sans transition-all duration-300 ${
                     isActive

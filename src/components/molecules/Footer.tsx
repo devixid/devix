@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { memo } from "react";
@@ -54,7 +55,7 @@ function Footer() {
               {exploreMenus.map((menu) => (
                 <Link
                   key={menu.name}
-                  href={menu.route}
+                  href={menu.route as any}
                   className="group relative text-sm text-zinc-400 hover:text-white transition-colors duration-300 w-fit"
                 >
                   {menu.name}
@@ -70,7 +71,7 @@ function Footer() {
               {companyMenus.map((menu) => (
                 <Link
                   key={menu.name}
-                  href={menu.route}
+                  href={menu.route as any}
                   className="group relative text-sm text-zinc-400 hover:text-white transition-colors duration-300 w-fit"
                 >
                   {menu.name}
@@ -86,7 +87,7 @@ function Footer() {
               {socialMenus.map((menu) => (
                 <Link
                   key={menu.name}
-                  href={menu.route}
+                  href={menu.route as any}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="group relative text-sm text-zinc-400 hover:text-white transition-colors duration-300 w-fit"
