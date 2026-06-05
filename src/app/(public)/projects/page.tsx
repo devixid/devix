@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { getFilterOptions, getProjects } from "@/actions/projects";
+import { getFilterOptions, getProjects } from "@/lib/queries/projects";
 import ProjectsClient from "./ProjectsClient";
 
 export const metadata: Metadata = {

@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { ExternalLink, GitCommit, ArrowLeft } from "lucide-react";
-import { getProjectBySlug } from "@/actions/projects";
+import { getProjectBySlug } from "@/lib/queries/projects";
 
 type Props = {
   params: { slug: string };

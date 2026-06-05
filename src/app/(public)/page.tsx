@@ -6,7 +6,7 @@ import { Metadata } from "next";
 import { HeroSection } from "./HeroSection";
 import Link from "next/link";
 import ProjectCard from "@/components/molecules/projects/ProjectCard";
-import { getFeaturedProjects } from "@/actions/projects";
+import { getFeaturedProjects } from "@/lib/queries/projects";
 
 export const metadata: Metadata = {
   title: "Devix — Premium Software Development Agency",

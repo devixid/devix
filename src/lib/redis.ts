@@ -1,44 +1,44 @@
 import { Redis } from "@upstash/redis";
 
-const redisUrl = process.env.UPSTASH_REDIS_REST_URL;
-const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN;
+// Lazy initialization — tidak diinisialisasi saat module di-load,
+// hanya saat pertama kali dipakai
+let _redis: Redis | null = null;
 
-if (!redisUrl || !redisToken) {
-  throw new Error("Upstash Redis environment variables are not configured.");
+function getRedisClient(): Redis | null {
+  if (!process.env.UPSTASH_REDIS_REST_URL || !process.env.UPSTASH_REDIS_REST_TOKEN) {
+    return null;
+  }
+  if (!_redis) {
+    _redis = new Redis({
+      url: process.env.UPSTASH_REDIS_REST_URL,
+      token: process.env.UPSTASH_REDIS_REST_TOKEN,
+    });
+  }
+  return _redis;
 }
 
-export const redis = new Redis({
-  url: redisUrl,
-  token: redisToken,
-});
-
-/**
- * Generic cached wrapper for Prisma queries.
- * @param key The unique string key for the cache.
- * @param fetcher A function that fetches the fresh data from the database.
- * @param ttlSeconds The cache expiration time in seconds.
- * @returns The cached or freshly fetched data.
- */
 export async function cachedQuery<T>(
   key: string,
   fetcher: () => Promise<T>,
-  ttlSeconds: number = 300, // default 5 minutes
+  ttlSeconds: number = 300,
 ): Promise<T> {
-  // 1. Try to get data from Redis
-  try {
-    const cachedData = await redis.get<T>(key);
-    if (cachedData) {
-      return cachedData;
-    }
-  } catch (error) {
-    console.error(`[Redis] Error fetching key "${key}":`, error);
-    // If Redis fails, gracefully fallback to DB below
+  const redis = getRedisClient();
+
+  // Kalau Redis tidak tersedia (build time atau env missing),
+  // langsung fetch dari DB tanpa caching
+  if (!redis) {
+    return fetcher();
   }
 
-  // 2. Fetch fresh data
+  try {
+    const cachedData = await redis.get<T>(key);
+    if (cachedData) return cachedData;
+  } catch (error) {
+    console.error(`[Redis] Error fetching key "${key}":`, error);
+  }
+
   const freshData = await fetcher();
 
-  // 3. Save to Redis in background
   try {
     await redis.set(key, freshData, { ex: ttlSeconds });
   } catch (error) {
@@ -48,12 +48,9 @@ export async function cachedQuery<T>(
   return freshData;
 }
 
-/**
- * Delete one or more keys from Redis to invalidate cache.
- * Use this when mutations occur (create, update, delete).
- */
 export async function invalidateCache(...keys: string[]) {
-  if (keys.length === 0) return;
+  const redis = getRedisClient();
+  if (!redis || keys.length === 0) return;
   try {
     await redis.del(...keys);
   } catch (error) {
