@@ -65,6 +65,22 @@ const cspHeader = `
   upgrade-insecure-requests;
 `;
 
+const requiredEnvVars = [
+  "DATABASE_URL",
+  "JWT_SECRET",
+  "NEXT_PUBLIC_SUPABASE_URL",
+  "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+];
+
+for (const envVar of requiredEnvVars) {
+  if (!process.env[envVar]) {
+    throw new Error(
+      `Missing required environment variable: ${envVar}\n` +
+      `Make sure it's set in your .env.local or deployment environment.`
+    );
+  }
+}
+
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   images: {
