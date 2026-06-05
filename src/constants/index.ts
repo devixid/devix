@@ -1,4 +1,6 @@
-import { Variants } from "framer-motion";
+import { ourTeams } from "./team";
+
+export { ourTeams };
 
 export const HeadingConstants = {
   h1: "h1",
@@ -10,68 +12,11 @@ export const HeadingConstants = {
 } as const;
 
 export const NavMenu = [
-  {
-    title: "Home",
-    id: "#home",
-  },
-  {
-    title: "Services",
-    id: "#services",
-  },
-  {
-    title: "Team",
-    id: "#team",
-  },
-  {
-    title: "Portofolio",
-    id: "#portfolio",
-  },
-  {
-    title: "Projects",
-    id: "/projects",
-  },
+  { id: "#home", title: "Home" },
+  { id: "#services", title: "Services" },
+  { id: "#about", title: "About" },
+  { id: "#team", title: "Team" },
+  { id: "#portfolio", title: "Portfolio" },
+  { id: "/estimator", title: "Estimator" },
 ];
 
-export const scrollDownArrowAnimation: Variants = {
-  hidden: {
-    pathLength: 0,
-    opacity: 1,
-  },
-  visible: {
-    pathLength: 1,
-    opacity: 1,
-    transition: {
-      duration: 1,
-      ease: "easeInOut",
-    },
-  },
-} as const;
-
-export const iconVariant: Variants = {
-  hidden: {
-    pathLength: 0,
-  },
-  visible: {
-    pathLength: 1,
-  },
-} as const;
-
-export const headingText: string = "Professional website" as const;
-export const headingText2: string = "creation services" as const;
-
-export const subHeadingText: Array<string> = [
-  "We",
-  "design",
-  "and",
-  "build",
-  "high-performance",
-  "custom",
-  "websites",
-  "to",
-  "grow",
-  "your",
-  "business",
-  "online.",
-];
-
-export * from "./team";

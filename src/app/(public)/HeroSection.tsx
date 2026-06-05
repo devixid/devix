@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Heading, ScrollDownButton } from "@/components";
 import { SlideUp } from "@/components/animations/SlideUp";
 import { FadeIn } from "@/components/animations/FadeIn";
@@ -52,17 +53,26 @@ export function HeroSection() {
             We design and build high-performance custom websites to grow your
             business online.
           </p>
-          <SmoothScrollLink
-            href="#cta"
-            className="group text-black-1 hover:text-accent inline-flex items-center gap-x-2 text-sm font-medium transition-colors duration-300"
-          >
-            <span className="relative">
-              Get in touch
-              <span className="bg-accent absolute bottom-0 left-0 h-[1px] w-full origin-left scale-x-0 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-x-100" />
-            </span>
-            <span className="text-lg">→</span>
-          </SmoothScrollLink>
+          <div className="flex flex-wrap items-center gap-6">
+            <Link
+              href="/estimator"
+              className="hover:text-white inline-flex items-center border border-black-1/20 px-8 py-3 text-sm font-medium tracking-[0.15em] text-black uppercase transition-all duration-300 hover:bg-black-1"
+            >
+              Estimate Project
+            </Link>
+            <SmoothScrollLink
+              href="#cta"
+              className="group text-zinc-500 hover:text-black-1 inline-flex items-center gap-x-2 text-sm font-medium transition-colors duration-300"
+            >
+              <span className="relative">
+                Get in touch
+                <span className="bg-accent absolute bottom-0 left-0 h-[1px] w-full origin-left scale-x-0 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-x-100" />
+              </span>
+              <span className="text-lg">→</span>
+            </SmoothScrollLink>
+          </div>
         </SlideUp>
+
 
         {/* Scroll indicator */}
         <FadeIn

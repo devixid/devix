@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Heading } from "@/components/atoms";
 import { SlideUp } from "@/components/animations/SlideUp";
 import { FadeIn } from "@/components/animations/FadeIn";
@@ -57,14 +58,27 @@ export default function CTA() {
           delay={0.3}
           duration={0.6}
         >
-          <SmoothScrollLink
-            href="#contact"
-            className="hover:text-black-1 inline-flex items-center border border-white/30 px-10 py-4 text-sm font-medium tracking-[0.15em] text-white uppercase transition-all duration-400 hover:bg-white"
-          >
-            Contact us
-          </SmoothScrollLink>
+          <div className="flex flex-wrap items-center justify-center gap-6">
+            <Link
+              href="/estimator"
+              className="hover:text-black-1 inline-flex items-center border border-white/30 px-10 py-4 text-sm font-medium tracking-[0.15em] text-white uppercase transition-all duration-400 hover:bg-white"
+            >
+              Estimate Project
+            </Link>
+            <SmoothScrollLink
+              href="#contact"
+              className="group inline-flex items-center gap-x-2 text-sm font-medium text-zinc-400 transition-colors duration-300 hover:text-white"
+            >
+              <span className="relative">
+                Contact us
+                <span className="bg-accent absolute bottom-0 left-0 h-[1px] w-full origin-left scale-x-0 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-x-100" />
+              </span>
+              <span className="text-lg">→</span>
+            </SmoothScrollLink>
+          </div>
         </FadeIn>
       </div>
     </section>
   );
 }
+

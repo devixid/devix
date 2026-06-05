@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import { submitContactForm } from "@/actions/contact";
 import { m, AnimatePresence } from "framer-motion";
 import { Loader2, Check } from "lucide-react";
@@ -12,6 +12,23 @@ export function ContactForm() {
   const [errorMsg, setErrorMsg] = useState("");
   const [success, setSuccess] = useState(false);
   const [isPending, startTransition] = useTransition();
+
+  useEffect(() => {
+    // Safely parse URL params on client mount to prefill form from estimator
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const type = params.get("type") || "Not specified";
+      const scope = params.get("scope") || "Not specified";
+      const complexity = params.get("complexity") || "Not specified";
+      const timeline = params.get("timeline") || "Not specified";
+      const budget = params.get("budget");
+
+      if (type !== "Not specified" || budget) {
+        const prefilledMessage = `Hi Devix Team,\n\nI would like to inquire about a new project based on my estimator results:\n\n- Project Type: ${type}\n- Scope: ${scope}\n- Complexity: ${complexity}\n- Timeline: ${timeline}\n- Estimated Budget: ${budget || "Not specified"}\n\nHere are some additional details about my project: `;
+        setMessage(prefilledMessage);
+      }
+    }
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
