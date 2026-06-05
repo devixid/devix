@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { jwtDecrypt } from "jose";
-import { globalLimiter, apiLimiter, getClientIp } from "@/lib/rate-limit";
+import { getGlobalLimiter, getApiLimiter, getClientIp } from "@/lib/rate-limit";
 
 const secretKey = process.env.JWT_SECRET;
 if (!secretKey) throw new Error("JWT_SECRET environment variable is not set.");
@@ -12,33 +12,39 @@ export async function proxy(request: NextRequest) {
 
   // 1. API Rate Limiting (Tier 4)
   if (pathname.startsWith("/api/")) {
-    const { success, limit, reset, remaining } = await apiLimiter.limit(ip);
-    if (!success) {
-      return NextResponse.json(
-        { error: "Too many requests. Please try again later." },
-        {
+    const apiLimiter = getApiLimiter();
+    if (apiLimiter) {
+      const { success, limit, reset, remaining } = await apiLimiter.limit(ip);
+      if (!success) {
+        return NextResponse.json(
+          { error: "Too many requests. Please try again later." },
+          {
+            status: 429,
+            headers: {
+              "X-RateLimit-Limit": limit.toString(),
+              "X-RateLimit-Remaining": remaining.toString(),
+              "Retry-After": Math.ceil((reset - Date.now()) / 1000).toString(),
+            },
+          },
+        );
+      }
+    }
+  } else {
+    // 2. Global Rate Limiting (Tier 1) for all non-API paths
+    // Note: In production, you might want to exclude static assets if proxy runs on them
+    const globalLimiter = getGlobalLimiter();
+    if (globalLimiter) {
+      const { success, limit, reset, remaining } = await globalLimiter.limit(ip);
+      if (!success) {
+        return new NextResponse("Too Many Requests", {
           status: 429,
           headers: {
             "X-RateLimit-Limit": limit.toString(),
             "X-RateLimit-Remaining": remaining.toString(),
             "Retry-After": Math.ceil((reset - Date.now()) / 1000).toString(),
           },
-        },
-      );
-    }
-  } else {
-    // 2. Global Rate Limiting (Tier 1) for all non-API paths
-    // Note: In production, you might want to exclude static assets if proxy runs on them
-    const { success, limit, reset, remaining } = await globalLimiter.limit(ip);
-    if (!success) {
-      return new NextResponse("Too Many Requests", {
-        status: 429,
-        headers: {
-          "X-RateLimit-Limit": limit.toString(),
-          "X-RateLimit-Remaining": remaining.toString(),
-          "Retry-After": Math.ceil((reset - Date.now()) / 1000).toString(),
-        },
-      });
+        });
+      }
     }
   }
 

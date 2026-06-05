@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "@/lib/prisma";
 import os from "os";
-import { redis } from "@/lib/redis";
+import { getRedisClient } from "@/lib/redis";
 
 export default async function handler(
   req: NextApiRequest,
@@ -30,8 +30,13 @@ export default async function handler(
     const redisStart = performance.now();
     let redisStatus = "error";
     try {
-      await redis.ping();
-      redisStatus = "connected";
+      const redis = getRedisClient();
+      if (redis) {
+        await redis.ping();
+        redisStatus = "connected";
+      } else {
+        redisStatus = "missing_env";
+      }
     } catch (e) {
       console.error("Redis health check failed:", e);
     }

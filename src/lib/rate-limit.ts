@@ -1,53 +1,88 @@
 import { Ratelimit } from "@upstash/ratelimit";
-import { redis } from "./redis";
+import { getRedisClient } from "./redis";
 
 // Create a shared ephemeral cache for all limiters
 const cache = new Map();
 
-// Tier 1: Global Limiter (Proxy level)
-// 60 requests per 60 seconds per IP using sliding window
-export const globalLimiter = new Ratelimit({
-  redis,
-  limiter: Ratelimit.slidingWindow(60, "60 s"),
-  prefix: "ratelimit:global",
-  analytics: true,
-  ephemeralCache: cache,
-});
+// Lazy initialization pattern for Ratelimit instances
+// They are created only when first accessed, allowing build process
+// to proceed even without Redis env variables
 
-// Tier 2: Auth Limiters (Server Actions level)
-// Login: 5 requests per 15 minutes per IP (Fixed window to prevent aggressive bursts)
-export const authLimiter = new Ratelimit({
-  redis,
-  limiter: Ratelimit.fixedWindow(5, "15 m"),
-  prefix: "ratelimit:auth",
-  ephemeralCache: cache,
-});
+let _globalLimiter: Ratelimit | null = null;
+export function getGlobalLimiter() {
+  const redis = getRedisClient();
+  if (!redis) return null;
+  if (!_globalLimiter) {
+    _globalLimiter = new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(60, "60 s"),
+      prefix: "ratelimit:global",
+      analytics: true,
+      ephemeralCache: cache,
+    });
+  }
+  return _globalLimiter;
+}
 
-// Register: 3 requests per 60 minutes per IP
-export const registerLimiter = new Ratelimit({
-  redis,
-  limiter: Ratelimit.fixedWindow(3, "60 m"),
-  prefix: "ratelimit:register",
-  ephemeralCache: cache,
-});
+let _authLimiter: Ratelimit | null = null;
+export function getAuthLimiter() {
+  const redis = getRedisClient();
+  if (!redis) return null;
+  if (!_authLimiter) {
+    _authLimiter = new Ratelimit({
+      redis,
+      limiter: Ratelimit.fixedWindow(5, "15 m"),
+      prefix: "ratelimit:auth",
+      ephemeralCache: cache,
+    });
+  }
+  return _authLimiter;
+}
 
-// Tier 3: Contact Form Limiter
-// 3 submissions per 10 minutes per IP
-export const contactLimiter = new Ratelimit({
-  redis,
-  limiter: Ratelimit.slidingWindow(3, "10 m"),
-  prefix: "ratelimit:contact",
-  ephemeralCache: cache,
-});
+let _registerLimiter: Ratelimit | null = null;
+export function getRegisterLimiter() {
+  const redis = getRedisClient();
+  if (!redis) return null;
+  if (!_registerLimiter) {
+    _registerLimiter = new Ratelimit({
+      redis,
+      limiter: Ratelimit.fixedWindow(3, "60 m"),
+      prefix: "ratelimit:register",
+      ephemeralCache: cache,
+    });
+  }
+  return _registerLimiter;
+}
 
-// Tier 4: API Limiter (e.g. for /api/health)
-// 30 requests per 60 seconds per IP
-export const apiLimiter = new Ratelimit({
-  redis,
-  limiter: Ratelimit.slidingWindow(30, "60 s"),
-  prefix: "ratelimit:api",
-  ephemeralCache: cache,
-});
+let _contactLimiter: Ratelimit | null = null;
+export function getContactLimiter() {
+  const redis = getRedisClient();
+  if (!redis) return null;
+  if (!_contactLimiter) {
+    _contactLimiter = new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(3, "10 m"),
+      prefix: "ratelimit:contact",
+      ephemeralCache: cache,
+    });
+  }
+  return _contactLimiter;
+}
+
+let _apiLimiter: Ratelimit | null = null;
+export function getApiLimiter() {
+  const redis = getRedisClient();
+  if (!redis) return null;
+  if (!_apiLimiter) {
+    _apiLimiter = new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(30, "60 s"),
+      prefix: "ratelimit:api",
+      ephemeralCache: cache,
+    });
+  }
+  return _apiLimiter;
+}
 
 import net from "net";
 

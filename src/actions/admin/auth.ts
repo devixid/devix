@@ -4,14 +4,17 @@ import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { setSessionCookie, clearSessionCookie } from "@/lib/auth";
 import { headers } from "next/headers";
-import { authLimiter, registerLimiter, getClientIp } from "@/lib/rate-limit";
+import { getAuthLimiter, getRegisterLimiter, getClientIp } from "@/lib/rate-limit";
 import { RegisterSchema, LoginSchema } from "@/lib/schemas";
 
 export async function registerAdmin(formData: FormData) {
   const ip = getClientIp(await headers());
-  const { success } = await registerLimiter.limit(ip);
-  if (!success) {
-    throw new Error("Too many registration attempts. Please try again later.");
+  const registerLimiter = getRegisterLimiter();
+  if (registerLimiter) {
+    const { success } = await registerLimiter.limit(ip);
+    if (!success) {
+      throw new Error("Too many registration attempts. Please try again later.");
+    }
   }
 
   const parsed = RegisterSchema.safeParse({
@@ -61,9 +64,12 @@ export async function registerAdmin(formData: FormData) {
 
 export async function loginAdmin(formData: FormData) {
   const ip = getClientIp(await headers());
-  const { success } = await authLimiter.limit(ip);
-  if (!success) {
-    throw new Error("Too many login attempts. Please try again later.");
+  const authLimiter = getAuthLimiter();
+  if (authLimiter) {
+    const { success } = await authLimiter.limit(ip);
+    if (!success) {
+      throw new Error("Too many login attempts. Please try again later.");
+    }
   }
 
   const parsed = LoginSchema.safeParse({

@@ -4,7 +4,7 @@ import { Redis } from "@upstash/redis";
 // hanya saat pertama kali dipakai
 let _redis: Redis | null = null;
 
-function getRedisClient(): Redis | null {
+export function getRedisClient(): Redis | null {
   if (!process.env.UPSTASH_REDIS_REST_URL || !process.env.UPSTASH_REDIS_REST_TOKEN) {
     return null;
   }

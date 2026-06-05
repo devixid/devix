@@ -3,7 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
-import { contactLimiter, getClientIp } from "@/lib/rate-limit";
+import { getContactLimiter, getClientIp } from "@/lib/rate-limit";
 
 import { ContactFormSchema } from "@/lib/schemas";
 
@@ -22,12 +22,15 @@ export async function submitContactForm(
   data: ContactFormData,
 ): Promise<ActionResult> {
   const ip = getClientIp(await headers());
-  const { success: rateLimitSuccess } = await contactLimiter.limit(ip);
-  if (!rateLimitSuccess) {
-    return {
-      success: false,
-      error: "Too many submissions. Please try again later.",
-    };
+  const contactLimiter = getContactLimiter();
+  if (contactLimiter) {
+    const { success: rateLimitSuccess } = await contactLimiter.limit(ip);
+    if (!rateLimitSuccess) {
+      return {
+        success: false,
+        error: "Too many submissions. Please try again later.",
+      };
+    }
   }
 
   const parsed = ContactFormSchema.safeParse(data);
