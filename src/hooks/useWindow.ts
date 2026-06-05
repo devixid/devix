@@ -56,7 +56,7 @@ const useWindow = (): UseWindowReturnTypes => {
     window.addEventListener("resize", updatePaneSize);
 
     updatePaneSize();
-    
+
     return () => {
       window.removeEventListener("scroll", updateScrollPosition);
       window.removeEventListener("resize", updatePaneSize);

@@ -39,8 +39,8 @@ export const ourTeams: Array<OurTeamProps> = [
     image: "/dimas.png",
     title: "Mobile Developer",
     socials: {
-      github: "https://github.com/dimassaputra",
-      linkedin: "https://linkedin.com/in/dimassaputra",
+      github: "https://github.com/infinitedim",
+      linkedin: "https://linkedin.com/in/yourblooo",
     },
   },
   {

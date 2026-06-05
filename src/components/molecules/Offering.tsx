@@ -25,17 +25,17 @@ export default function Offering() {
   return (
     <section
       id="services"
-      className="w-full min-h-screen bg-black-1 text-white py-20 md:py-32 scroll-mt-24"
+      className="bg-black-1 min-h-screen w-full scroll-mt-24 py-20 text-white md:py-32"
     >
       <div className="mx-auto max-w-6xl px-6 lg:px-10">
         {/* Asymmetric layout */}
         <div className="flex flex-col lg:flex-row lg:gap-x-20">
           {/* Left — heading (2/3) */}
-          <div className="lg:w-2/3 mb-16 lg:mb-0">
+          <div className="mb-16 lg:mb-0 lg:w-2/3">
             <SlideUp
               yOffset={12}
               duration={0.7}
-              className="text-[13px] font-medium uppercase tracking-[0.2em] text-zinc-500 mb-6"
+              className="mb-6 text-[13px] font-medium tracking-[0.2em] text-zinc-500 uppercase"
             >
               What We Do
             </SlideUp>
@@ -43,14 +43,14 @@ export default function Offering() {
               yOffset={30}
               duration={0.9}
               delay={0.1}
-              className="font-display text-4xl md:text-5xl lg:text-6xl font-extralight leading-[1.1] tracking-tight text-white max-w-2xl"
+              className="font-display max-w-2xl text-4xl leading-[1.1] font-extralight tracking-tight text-white md:text-5xl lg:text-6xl"
             >
               We offer website creation tailored to your unique business needs.
             </SlideUp>
           </div>
 
           {/* Right — service list (1/3) */}
-          <div className="lg:w-1/3 flex flex-col">
+          <div className="flex flex-col lg:w-1/3">
             {services.map((service, index) => (
               <SlideUp
                 key={service.num}
@@ -60,22 +60,22 @@ export default function Offering() {
                 className="group relative border-t border-zinc-700 pt-8 pb-10 last:pb-0"
               >
                 {/* Decorative number */}
-                <span className="font-display text-6xl font-bold text-white/[0.08] absolute top-4 right-0 leading-none select-none pointer-events-none">
+                <span className="font-display pointer-events-none absolute top-4 right-0 text-6xl leading-none font-bold text-white/[0.08] select-none">
                   {service.num}
                 </span>
 
-                <h3 className="text-lg font-medium text-white mb-3 transition-colors duration-300 group-hover:text-accent relative z-10">
+                <h3 className="group-hover:text-accent relative z-10 mb-3 text-lg font-medium text-white transition-colors duration-300">
                   <span className="relative">
                     {service.title}
-                    <span className="absolute bottom-0 left-0 h-[1px] w-0 bg-accent group-hover:w-full transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]" />
+                    <span className="bg-accent absolute bottom-0 left-0 h-[1px] w-0 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:w-full" />
                   </span>
                 </h3>
-                <p className="text-sm text-zinc-400 leading-relaxed relative z-10 max-w-[280px]">
+                <p className="relative z-10 max-w-[280px] text-sm leading-relaxed text-zinc-400">
                   {service.description}
                 </p>
 
                 {/* Hover border accent */}
-                <span className="absolute top-0 left-0 h-[1px] w-0 bg-accent group-hover:w-full transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]" />
+                <span className="bg-accent absolute top-0 left-0 h-[1px] w-0 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:w-full" />
               </SlideUp>
             ))}
           </div>

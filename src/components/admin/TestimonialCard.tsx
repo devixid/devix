@@ -2,7 +2,10 @@
 
 import { useState, useTransition, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { toggleTestimonialVisibility, deleteTestimonial } from "@/actions/admin";
+import {
+  toggleTestimonialVisibility,
+  deleteTestimonial,
+} from "@/actions/admin";
 
 interface TestimonialType {
   id: string;
@@ -40,7 +43,10 @@ export function TestimonialCard({ testimonial, onEdit }: Props) {
   const handleToggleVisibility = () => {
     startTransition(async () => {
       try {
-        await toggleTestimonialVisibility(testimonial.id, !testimonial.isVisible);
+        await toggleTestimonialVisibility(
+          testimonial.id,
+          !testimonial.isVisible,
+        );
         router.refresh();
       } catch (err) {
         console.error("Failed to toggle visibility:", err);
@@ -74,9 +80,11 @@ export function TestimonialCard({ testimonial, onEdit }: Props) {
   };
 
   return (
-    <div className={`border transition-all duration-300 bg-[#0F0F0F] p-6 space-y-6 flex flex-col justify-between ${
-      testimonial.isVisible ? "border-zinc-800" : "border-zinc-900 opacity-60"
-    }`}>
+    <div
+      className={`flex flex-col justify-between space-y-6 border bg-[#0F0F0F] p-6 transition-all duration-300 ${
+        testimonial.isVisible ? "border-zinc-800" : "border-zinc-900 opacity-60"
+      }`}
+    >
       {/* Top Section */}
       <div className="space-y-4">
         <div className="flex items-center gap-4">
@@ -85,45 +93,46 @@ export function TestimonialCard({ testimonial, onEdit }: Props) {
             <img
               src={testimonial.avatarUrl}
               alt={testimonial.clientName}
-              className="h-10 w-10 object-cover border border-zinc-800"
+              className="h-10 w-10 border border-zinc-800 object-cover"
               onError={(e) => {
                 // If invalid URL or image load fails, convert to placeholder fallback
                 (e.target as HTMLElement).style.display = "none";
               }}
             />
           ) : (
-            <div className="h-10 w-10 bg-zinc-900 border border-zinc-800 flex items-center justify-center text-[11px] font-sans font-medium text-zinc-400">
+            <div className="flex h-10 w-10 items-center justify-center border border-zinc-800 bg-zinc-900 font-sans text-[11px] font-medium text-zinc-400">
               {getInitials(testimonial.clientName)}
             </div>
           )}
 
           <div>
-            <h3 className="text-sm font-medium text-zinc-100 font-sans leading-tight">
+            <h3 className="font-sans text-sm leading-tight font-medium text-zinc-100">
               {testimonial.clientName}
             </h3>
-            <p className="text-[11px] text-zinc-500 font-sans mt-0.5">
-              {testimonial.clientRole} at <span className="text-zinc-400">{testimonial.company}</span>
+            <p className="mt-0.5 font-sans text-[11px] text-zinc-500">
+              {testimonial.clientRole} at{" "}
+              <span className="text-zinc-400">{testimonial.company}</span>
             </p>
           </div>
         </div>
 
         {/* Content */}
-        <p className="text-xs text-zinc-400 font-sans leading-relaxed line-clamp-4">
+        <p className="line-clamp-4 font-sans text-xs leading-relaxed text-zinc-400">
           “{testimonial.content}”
         </p>
       </div>
 
       {/* Action / Meta Row */}
-      <div className="pt-4 border-t border-zinc-900 space-y-4">
+      <div className="space-y-4 border-t border-zinc-900 pt-4">
         <div className="flex items-center justify-between">
           {/* Order Badge */}
-          <span className="text-[10px] uppercase tracking-wider text-zinc-500 font-mono">
+          <span className="font-mono text-[10px] tracking-wider text-zinc-500 uppercase">
             Order: <span className="text-zinc-300">#{testimonial.order}</span>
           </span>
 
           {/* Visibility Toggle Switch */}
-          <label className="flex items-center gap-2 cursor-pointer select-none">
-            <span className="text-[10px] uppercase tracking-wider text-zinc-500">
+          <label className="flex cursor-pointer items-center gap-2 select-none">
+            <span className="text-[10px] tracking-wider text-zinc-500 uppercase">
               {testimonial.isVisible ? "Visible" : "Hidden"}
             </span>
             <input
@@ -131,9 +140,9 @@ export function TestimonialCard({ testimonial, onEdit }: Props) {
               checked={testimonial.isVisible}
               onChange={handleToggleVisibility}
               disabled={isPending}
-              className="sr-only peer"
+              className="peer sr-only"
             />
-            <div className="relative w-8 h-4 bg-zinc-800 peer-focus:outline-none rounded-none transition-colors duration-300 peer-checked:bg-[#C8A96E] after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-black after:h-3 after:w-3 after:transition-all peer-checked:after:translate-x-4" />
+            <div className="relative h-4 w-8 rounded-none bg-zinc-800 transition-colors duration-300 peer-checked:bg-[#C8A96E] peer-focus:outline-none after:absolute after:top-[2px] after:left-[2px] after:h-3 after:w-3 after:bg-black after:transition-all after:content-[''] peer-checked:after:translate-x-4" />
           </label>
         </div>
 
@@ -142,7 +151,7 @@ export function TestimonialCard({ testimonial, onEdit }: Props) {
           <button
             onClick={() => onEdit(testimonial)}
             disabled={isPending}
-            className="text-[10px] uppercase tracking-wider font-sans font-medium text-zinc-400 hover:text-white transition-colors"
+            className="font-sans text-[10px] font-medium tracking-wider text-zinc-400 uppercase transition-colors hover:text-white"
           >
             Edit
           </button>
@@ -154,7 +163,7 @@ export function TestimonialCard({ testimonial, onEdit }: Props) {
                 <button
                   onClick={handleDelete}
                   disabled={isPending}
-                  className="text-[10px] uppercase tracking-wider font-sans font-bold text-red-500 hover:text-red-400 transition-colors"
+                  className="font-sans text-[10px] font-bold tracking-wider text-red-500 uppercase transition-colors hover:text-red-400"
                 >
                   Confirm?
                 </button>
@@ -162,7 +171,7 @@ export function TestimonialCard({ testimonial, onEdit }: Props) {
                 <button
                   onClick={() => setDeleteConfirm(false)}
                   disabled={isPending}
-                  className="text-[10px] uppercase tracking-wider font-sans text-zinc-500 hover:text-zinc-300 transition-colors"
+                  className="font-sans text-[10px] tracking-wider text-zinc-500 uppercase transition-colors hover:text-zinc-300"
                 >
                   Cancel
                 </button>
@@ -171,7 +180,7 @@ export function TestimonialCard({ testimonial, onEdit }: Props) {
               <button
                 onClick={handleDelete}
                 disabled={isPending}
-                className="text-[10px] uppercase tracking-wider font-sans font-medium text-red-950/70 hover:text-red-400 transition-colors"
+                className="font-sans text-[10px] font-medium tracking-wider text-red-950/70 uppercase transition-colors hover:text-red-400"
               >
                 Delete
               </button>

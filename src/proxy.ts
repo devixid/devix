@@ -1,5 +1,9 @@
-import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { jwtDecrypt } from "jose";
+
+const secretKey =
+  process.env.JWT_SECRET || "devix-super-secret-key-pbkdf2-hmac-iv-123456789";
+const secret = new TextEncoder().encode(secretKey);
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -14,92 +18,35 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  let response = NextResponse.next({
-    request: {
-      headers: request.headers,
-    },
-  });
+  const token = request.cookies.get("devix_admin_session")?.value;
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll: () => request.cookies.getAll(),
-        setAll: (cookiesToSet) => {
-          cookiesToSet.forEach(({ name, value, options }) => {
-            request.cookies.set(name, value);
-            response = NextResponse.next({
-              request,
-            });
-            response.cookies.set(name, value, options);
-          });
-        },
-      },
-    }
-  );
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  // Route protection
-  if (!user) {
-    if (pathname !== "/admin/login") {
+  if (!token) {
+    if (pathname !== "/admin/login" && pathname !== "/admin/register") {
       return NextResponse.redirect(new URL("/admin/login", request.url));
     }
-    return response;
-  }
-
-  // User is logged in
-  if (pathname === "/admin/login") {
-    return NextResponse.redirect(new URL("/admin", request.url));
-  }
-
-  // Whitelist check
-  const isVerified = request.cookies.get("x-admin-verified")?.value === "true";
-  if (isVerified) {
-    return response;
+    return NextResponse.next();
   }
 
   try {
-    // Query users table using supabase client
-    const { data: whitelistUser, error } = await supabase
-      .from("users")
-      .select("email")
-      .eq("email", user.email)
-      .maybeSingle();
+    // Verify the PBES2+AES-GCM JWE token
+    await jwtDecrypt(token, secret);
 
-    if (error) {
-      throw error;
+    // User is logged in
+    if (pathname === "/admin/login" || pathname === "/admin/register") {
+      return NextResponse.redirect(new URL("/admin", request.url));
     }
 
-    if (!whitelistUser) {
-      // Sign out and redirect to login
-      await supabase.auth.signOut();
-      
-      const loginRedirect = NextResponse.redirect(
-        new URL("/admin/login?error=unauthorized", request.url)
+    return NextResponse.next();
+  } catch (_) {
+    // Invalid token
+    if (pathname !== "/admin/login" && pathname !== "/admin/register") {
+      const response = NextResponse.redirect(
+        new URL("/admin/login", request.url),
       );
-      // Clear verify cookie
-      loginRedirect.cookies.set("x-admin-verified", "", { maxAge: -1 });
-      return loginRedirect;
+      response.cookies.delete("devix_admin_session");
+      return response;
     }
-
-    // Verified! Set cookie
-    response.cookies.set("x-admin-verified", "true", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 3600, // 1 hour cache
-      path: "/admin",
-    });
-
-    return response;
-  } catch (err) {
-    console.error("Database/Whitelist error in middleware:", err);
-    // Gracefully redirect to admin error page to avoid redirect loop
-    return NextResponse.redirect(new URL("/admin/error", request.url));
+    return NextResponse.next();
   }
 }
 

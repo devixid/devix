@@ -62,7 +62,9 @@ export function TestimonialForm({ initialData, onCancel, onSuccess }: Props) {
       try {
         new URL(avatarUrl);
       } catch (_) {
-        setError("Avatar URL must be a valid absolute URL (e.g. https://example.com/avatar.jpg).");
+        setError(
+          "Avatar URL must be a valid absolute URL (e.g. https://example.com/avatar.jpg).",
+        );
         return;
       }
     }
@@ -88,37 +90,48 @@ export function TestimonialForm({ initialData, onCancel, onSuccess }: Props) {
         router.refresh();
         onSuccess();
       } catch (err: unknown) {
-        setError(err instanceof Error ? err.message : "Something went wrong. Please check your input.");
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Something went wrong. Please check your input.",
+        );
       }
     });
   };
 
   return (
-    <div className="border border-zinc-800 bg-[#0F0F0F] p-8 space-y-6">
-      
+    <div className="space-y-6 border border-zinc-800 bg-[#0F0F0F] p-8">
       {/* Form Title */}
       <div>
         <h2 className="font-display text-lg font-light tracking-wider text-zinc-100">
           {initialData ? "Edit Testimonial" : "Create Testimonial"}
         </h2>
-        <p className="text-[11px] text-zinc-500 font-sans mt-0.5">
-          {initialData ? `Modifying testimonial entry ID: ${initialData.id}` : "Add a new client testimonial entry"}
+        <p className="mt-0.5 font-sans text-[11px] text-zinc-500">
+          {initialData
+            ? `Modifying testimonial entry ID: ${initialData.id}`
+            : "Add a new client testimonial entry"}
         </p>
       </div>
 
       {/* Error Message */}
       {error && (
-        <div className="p-4 bg-red-950/20 border-l border-red-500 text-red-400 text-xs font-sans">
+        <div className="border-l border-red-500 bg-red-950/20 p-4 font-sans text-xs text-red-400">
           {error}
         </div>
       )}
 
       {/* Form Fields */}
-      <form onSubmit={handleSubmit} className="space-y-5">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-5"
+      >
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
           {/* Client Name */}
           <div className="space-y-1.5">
-            <label htmlFor="clientName" className="text-[10px] font-medium uppercase tracking-wider text-zinc-400">
+            <label
+              htmlFor="clientName"
+              className="text-[10px] font-medium tracking-wider text-zinc-400 uppercase"
+            >
               Client Name *
             </label>
             <input
@@ -129,13 +142,16 @@ export function TestimonialForm({ initialData, onCancel, onSuccess }: Props) {
               disabled={isPending}
               placeholder="E.g., Jane Doe"
               required
-              className="w-full bg-[#141414] border border-zinc-800 rounded-none px-4 py-2.5 text-xs text-white placeholder-zinc-700 focus:outline-none focus:border-[#C8A96E] transition-colors"
+              className="w-full rounded-none border border-zinc-800 bg-[#141414] px-4 py-2.5 text-xs text-white placeholder-zinc-700 transition-colors focus:border-[#C8A96E] focus:outline-none"
             />
           </div>
 
           {/* Client Role */}
           <div className="space-y-1.5">
-            <label htmlFor="clientRole" className="text-[10px] font-medium uppercase tracking-wider text-zinc-400">
+            <label
+              htmlFor="clientRole"
+              className="text-[10px] font-medium tracking-wider text-zinc-400 uppercase"
+            >
               Client Role *
             </label>
             <input
@@ -146,13 +162,16 @@ export function TestimonialForm({ initialData, onCancel, onSuccess }: Props) {
               disabled={isPending}
               placeholder="E.g., Chief Executive Officer"
               required
-              className="w-full bg-[#141414] border border-zinc-800 rounded-none px-4 py-2.5 text-xs text-white placeholder-zinc-700 focus:outline-none focus:border-[#C8A96E] transition-colors"
+              className="w-full rounded-none border border-zinc-800 bg-[#141414] px-4 py-2.5 text-xs text-white placeholder-zinc-700 transition-colors focus:border-[#C8A96E] focus:outline-none"
             />
           </div>
 
           {/* Company */}
           <div className="space-y-1.5">
-            <label htmlFor="company" className="text-[10px] font-medium uppercase tracking-wider text-zinc-400">
+            <label
+              htmlFor="company"
+              className="text-[10px] font-medium tracking-wider text-zinc-400 uppercase"
+            >
               Company *
             </label>
             <input
@@ -163,13 +182,16 @@ export function TestimonialForm({ initialData, onCancel, onSuccess }: Props) {
               disabled={isPending}
               placeholder="E.g., Acme Corp"
               required
-              className="w-full bg-[#141414] border border-zinc-800 rounded-none px-4 py-2.5 text-xs text-white placeholder-zinc-700 focus:outline-none focus:border-[#C8A96E] transition-colors"
+              className="w-full rounded-none border border-zinc-800 bg-[#141414] px-4 py-2.5 text-xs text-white placeholder-zinc-700 transition-colors focus:border-[#C8A96E] focus:outline-none"
             />
           </div>
 
           {/* Avatar URL */}
           <div className="space-y-1.5">
-            <label htmlFor="avatarUrl" className="text-[10px] font-medium uppercase tracking-wider text-zinc-400">
+            <label
+              htmlFor="avatarUrl"
+              className="text-[10px] font-medium tracking-wider text-zinc-400 uppercase"
+            >
               Avatar URL (Optional)
             </label>
             <input
@@ -179,14 +201,17 @@ export function TestimonialForm({ initialData, onCancel, onSuccess }: Props) {
               onChange={(e) => setAvatarUrl(e.target.value)}
               disabled={isPending}
               placeholder="https://example.com/avatar.jpg"
-              className="w-full bg-[#141414] border border-zinc-800 rounded-none px-4 py-2.5 text-xs text-white placeholder-zinc-700 focus:outline-none focus:border-[#C8A96E] transition-colors"
+              className="w-full rounded-none border border-zinc-800 bg-[#141414] px-4 py-2.5 text-xs text-white placeholder-zinc-700 transition-colors focus:border-[#C8A96E] focus:outline-none"
             />
           </div>
         </div>
 
         {/* Content */}
         <div className="space-y-1.5">
-          <label htmlFor="content" className="text-[10px] font-medium uppercase tracking-wider text-zinc-400">
+          <label
+            htmlFor="content"
+            className="text-[10px] font-medium tracking-wider text-zinc-400 uppercase"
+          >
             Testimonial Content *
           </label>
           <textarea
@@ -197,7 +222,7 @@ export function TestimonialForm({ initialData, onCancel, onSuccess }: Props) {
             placeholder="Write the client testimonial content here..."
             required
             rows={4}
-            className="w-full bg-[#141414] border border-zinc-800 rounded-none px-4 py-3 text-xs text-white placeholder-zinc-700 focus:outline-none focus:border-[#C8A96E] transition-colors resize-none leading-relaxed"
+            className="w-full resize-none rounded-none border border-zinc-800 bg-[#141414] px-4 py-3 text-xs leading-relaxed text-white placeholder-zinc-700 transition-colors focus:border-[#C8A96E] focus:outline-none"
           />
         </div>
 
@@ -205,7 +230,10 @@ export function TestimonialForm({ initialData, onCancel, onSuccess }: Props) {
         <div className="flex flex-wrap items-center justify-between gap-4 pt-2">
           {/* Order number */}
           <div className="flex items-center gap-3">
-            <label htmlFor="order" className="text-[10px] font-medium uppercase tracking-wider text-zinc-400">
+            <label
+              htmlFor="order"
+              className="text-[10px] font-medium tracking-wider text-zinc-400 uppercase"
+            >
               Display Order:
             </label>
             <input
@@ -215,13 +243,16 @@ export function TestimonialForm({ initialData, onCancel, onSuccess }: Props) {
               onChange={(e) => setOrder(Number(e.target.value))}
               disabled={isPending}
               min={0}
-              className="w-20 bg-[#141414] border border-zinc-800 rounded-none px-3 py-1.5 text-xs text-white focus:outline-none focus:border-[#C8A96E] transition-colors"
+              className="w-20 rounded-none border border-zinc-800 bg-[#141414] px-3 py-1.5 text-xs text-white transition-colors focus:border-[#C8A96E] focus:outline-none"
             />
           </div>
 
           {/* Visibility toggle checkbox */}
-          <label htmlFor="isVisible" className="flex items-center gap-2 cursor-pointer select-none">
-            <span className="text-[10px] uppercase tracking-wider text-zinc-400">
+          <label
+            htmlFor="isVisible"
+            className="flex cursor-pointer items-center gap-2 select-none"
+          >
+            <span className="text-[10px] tracking-wider text-zinc-400 uppercase">
               Visible on website:
             </span>
             <input
@@ -230,32 +261,31 @@ export function TestimonialForm({ initialData, onCancel, onSuccess }: Props) {
               checked={isVisible}
               onChange={(e) => setIsVisible(e.target.checked)}
               disabled={isPending}
-              className="sr-only peer"
+              className="peer sr-only"
             />
-            <div className="relative w-8 h-4 bg-zinc-800 peer-focus:outline-none transition-colors duration-300 peer-checked:bg-[#C8A96E] after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-black after:h-3 after:w-3 after:transition-all peer-checked:after:translate-x-4" />
+            <div className="relative h-4 w-8 bg-zinc-800 transition-colors duration-300 peer-checked:bg-[#C8A96E] peer-focus:outline-none after:absolute after:top-[2px] after:left-[2px] after:h-3 after:w-3 after:bg-black after:transition-all after:content-[''] peer-checked:after:translate-x-4" />
           </label>
         </div>
 
         {/* Submit Actions Row */}
-        <div className="flex items-center justify-end gap-3 pt-4 border-t border-zinc-900">
+        <div className="flex items-center justify-end gap-3 border-t border-zinc-900 pt-4">
           <button
             type="button"
             onClick={onCancel}
             disabled={isPending}
-            className="border border-zinc-800 hover:border-zinc-700 bg-transparent text-zinc-400 hover:text-white px-5 py-3 text-xs uppercase tracking-wider font-sans font-medium transition-colors"
+            className="border border-zinc-800 bg-transparent px-5 py-3 font-sans text-xs font-medium tracking-wider text-zinc-400 uppercase transition-colors hover:border-zinc-700 hover:text-white"
           >
             Cancel
           </button>
-          
+
           <button
             type="submit"
             disabled={isPending}
-            className="bg-[#C8A96E] hover:bg-[#B6965C] disabled:bg-zinc-800 disabled:text-zinc-500 text-black px-5 py-3 text-xs uppercase tracking-wider font-sans font-medium transition-colors"
+            className="bg-[#C8A96E] px-5 py-3 font-sans text-xs font-medium tracking-wider text-black uppercase transition-colors hover:bg-[#B6965C] disabled:bg-zinc-800 disabled:text-zinc-500"
           >
             {isPending ? "Saving..." : "Save Testimonial"}
           </button>
         </div>
-
       </form>
     </div>
   );

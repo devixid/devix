@@ -38,6 +38,14 @@ body {
   font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
 }
 
+/* Hide footer and specific header elements on not-found page */
+body:has(.not-found-page) footer,
+body:has(.not-found-page) header nav,
+body:has(.not-found-page) header button[aria-label="Toggle menu"],
+body:has(.not-found-page) header a[href="#cta"] {
+  display: none !important;
+}
+
 /* Display font utility */
 .font-display {
   font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
@@ -93,4 +101,33 @@ body {
 .scrollbar-hide {
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
+}
+
+/* --- Global Custom Scrollbar --- */
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(128, 128, 128, 0.4) transparent;
+}
+
+/* Chrome, Edge, Safari */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(128, 128, 128, 0.3);
+  border-radius: 10px;
+  border: 3px solid transparent; 
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-accent); 
+  border-width: 2px;
 }

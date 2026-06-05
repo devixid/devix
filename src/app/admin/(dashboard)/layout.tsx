@@ -7,15 +7,13 @@ interface Props {
 
 export default function DashboardLayout({ children }: Props) {
   return (
-    <div className="min-h-screen bg-[#0A0A0A] flex flex-col md:flex-row relative">
+    <div className="relative flex min-h-screen flex-col bg-[#0A0A0A] md:flex-row">
       {/* Sidebar */}
       <AdminSidebar />
 
       {/* Main Content Pane */}
-      <div className="flex-1 flex flex-col md:pl-64 min-w-0">
-        <main className="flex-1 p-6 md:p-10 lg:p-12">
-          {children}
-        </main>
+      <div className="flex min-w-0 flex-1 flex-col md:pl-64">
+        <main className="flex-1 p-6 md:p-10 lg:p-12">{children}</main>
       </div>
     </div>
   );

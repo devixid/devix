@@ -26,15 +26,15 @@ function AccordionItem({
       <button
         type="button"
         onClick={onToggle}
-        className="flex items-center justify-between w-full py-6 text-left cursor-pointer group"
+        className="group flex w-full cursor-pointer items-center justify-between py-6 text-left"
       >
-        <span className="text-base md:text-lg font-medium text-zinc-900 group-hover:text-accent transition-colors duration-300 pr-8">
+        <span className="group-hover:text-accent pr-8 text-base font-medium text-zinc-900 transition-colors duration-300 md:text-lg">
           {question}
         </span>
         <m.span
           animate={{ rotate: isOpen ? 45 : 0 }}
           transition={{ duration: 0.25 }}
-          className="text-xl text-zinc-400 flex-shrink-0 leading-none"
+          className="flex-shrink-0 text-xl leading-none text-zinc-400"
         >
           +
         </m.span>
@@ -48,7 +48,7 @@ function AccordionItem({
             transition={{ duration: 0.4, ease: expoOut }}
             className="overflow-hidden"
           >
-            <p className="pb-6 text-sm text-zinc-500 leading-relaxed max-w-lg">
+            <p className="max-w-lg pb-6 text-sm leading-relaxed text-zinc-500">
               {answer}
             </p>
           </m.div>

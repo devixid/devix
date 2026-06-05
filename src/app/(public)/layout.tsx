@@ -11,7 +11,7 @@ export default function PublicLayout({ children }: Props) {
     <LazyMotionProvider>
       <a
         href="#main-content"
-        className="hover:black-2 absolute -top-24 left-5 rounded-md bg-black-1 px-5 py-2 text-white shadow-lg transition-all duration-300 focus:top-20"
+        className="hover:black-2 bg-black-1 absolute -top-24 left-5 rounded-md px-5 py-2 text-white shadow-lg transition-all duration-300 focus:top-20"
       >
         Skip to content
       </a>

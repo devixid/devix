@@ -21,6 +21,6 @@ export async function createSupabaseServer() {
           }
         },
       },
-    }
+    },
   );
 }

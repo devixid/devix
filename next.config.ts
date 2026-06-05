@@ -12,12 +12,11 @@ const nextConfig: NextConfig = {
   typedRoutes: true,
   experimental: {
     typedEnv: true,
-
   },
   turbopack: {
     resolveAlias: {
-      canvas: "./empty-module.ts"
-    }
+      canvas: "./empty-module.ts",
+    },
   },
   typescript: {
     ignoreBuildErrors: false,
@@ -25,7 +24,10 @@ const nextConfig: NextConfig = {
   compiler: {
     styledComponents: false,
   },
-  ...(isDev ? {} : {async headers() {
+  ...(isDev
+    ? {}
+    : {
+        async headers() {
           return [
             {
               source: "/(.*)",
@@ -97,7 +99,7 @@ const nextConfig: NextConfig = {
             },
           ];
         },
-      })
+      }),
 };
 
 export default nextConfig;

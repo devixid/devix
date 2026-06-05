@@ -26,6 +26,10 @@ export const NavMenu = [
     title: "Portofolio",
     id: "#portfolio",
   },
+  {
+    title: "Projects",
+    id: "/projects",
+  },
 ];
 
 export const scrollDownArrowAnimation: Variants = {

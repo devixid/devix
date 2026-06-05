@@ -14,13 +14,17 @@ export default function ScrollDownButton() {
   return (
     <m.button
       type="button"
-      className="flex flex-col items-center gap-y-3 cursor-pointer mix-blend-difference text-white"
+      className="flex cursor-pointer flex-col items-center gap-y-3 text-white mix-blend-difference"
       onClick={handleScroll}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ delay: 1.5, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
     >
-      <span className={cn("text-[11px] font-medium uppercase tracking-[0.25em] text-zinc-400")}>
+      <span
+        className={cn(
+          "text-[11px] font-medium tracking-[0.25em] text-zinc-400 uppercase",
+        )}
+      >
         Scroll
       </span>
       <m.span

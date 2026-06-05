@@ -14,7 +14,9 @@ type ActionResult = {
   error?: string;
 };
 
-export async function submitContactForm(data: ContactFormData): Promise<ActionResult> {
+export async function submitContactForm(
+  data: ContactFormData,
+): Promise<ActionResult> {
   // Validasi server-side
   if (!data.name || data.name.trim().length < 2) {
     return { success: false, error: "Name must be at least 2 characters." };

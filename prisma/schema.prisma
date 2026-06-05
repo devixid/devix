@@ -8,13 +8,14 @@ datasource db {
 }
 
 model User {
-  id        String   @id @db.Uuid
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id             String   @id @default(uuid()) @db.Uuid
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
-  email     String  @unique
-  firstName String?
-  lastName  String?
+  email          String  @unique
+  hashedPassword String
+  firstName      String?
+  lastName       String?
 
   @@map("users")
 }
@@ -44,4 +45,50 @@ model Testimonial {
   updatedAt  DateTime @updatedAt
 
   @@map("testimonials")
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  description String   @db.Text
+  category    String
+  imageUrl    String
+  liveUrl     String?
+  githubUrl   String?
+  isFeatured  Boolean  @default(false)
+  isVisible   Boolean  @default(true)
+  completedAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  techStacks  ProjectTechStack[]
+  developers  ProjectDeveloper[]
+
+  @@map("projects")
+}
+
+model ProjectTechStack {
+  id        String  @id @default(cuid())
+  name      String
+  projectId String
+
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, name])
+  @@index([projectId])
+  @@map("project_tech_stacks")
+}
+
+model ProjectDeveloper {
+  id        String  @id @default(cuid())
+  name      String
+  role      String?
+  projectId String
+
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, name])
+  @@index([projectId])
+  @@map("project_developers")
 }

@@ -14,29 +14,32 @@ export function InboxSearch() {
 
   const [search, setSearch] = useState(currentQuery);
 
-  const updateParams = useCallback((updates: { query?: string; status?: string }) => {
-    const params = new URLSearchParams(searchParams?.toString());
+  const updateParams = useCallback(
+    (updates: { query?: string; status?: string }) => {
+      const params = new URLSearchParams(searchParams?.toString());
 
-    if (updates.query !== undefined) {
-      if (updates.query) {
-        params.set("query", updates.query);
-      } else {
-        params.delete("query");
+      if (updates.query !== undefined) {
+        if (updates.query) {
+          params.set("query", updates.query);
+        } else {
+          params.delete("query");
+        }
       }
-    }
 
-    if (updates.status !== undefined) {
-      if (updates.status && updates.status !== "all") {
-        params.set("status", updates.status);
-      } else {
-        params.delete("status");
+      if (updates.status !== undefined) {
+        if (updates.status && updates.status !== "all") {
+          params.set("status", updates.status);
+        } else {
+          params.delete("status");
+        }
       }
-    }
 
-    startTransition(() => {
-      router.push(`/admin/inbox?${params.toString()}`);
-    });
-  }, [router, searchParams]);
+      startTransition(() => {
+        router.push(`/admin/inbox?${params.toString()}`);
+      });
+    },
+    [router, searchParams],
+  );
 
   // Debounced search term effect
   useEffect(() => {
@@ -58,22 +61,24 @@ export function InboxSearch() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search inquiries by sender, email, or message content..."
-          className="w-full bg-[#0F0F0F] border border-zinc-800 rounded-none px-5 py-4 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-[#C8A96E] transition-colors duration-300"
+          className="w-full rounded-none border border-zinc-800 bg-[#0F0F0F] px-5 py-4 text-sm text-white placeholder-zinc-600 transition-colors duration-300 focus:border-[#C8A96E] focus:outline-none"
         />
         {isPending && (
-          <div className="absolute right-5 top-1/2 -translate-y-1/2 flex items-center">
-            <span className="text-[10px] uppercase tracking-wider text-zinc-500">Searching...</span>
+          <div className="absolute top-1/2 right-5 flex -translate-y-1/2 items-center">
+            <span className="text-[10px] tracking-wider text-zinc-500 uppercase">
+              Searching...
+            </span>
           </div>
         )}
       </div>
 
       {/* Filter Tabs */}
-      <div className="flex border-b border-zinc-900 overflow-x-auto">
+      <div className="flex overflow-x-auto border-b border-zinc-900">
         {(["all", "unread", "read"] as const).map((tab) => (
           <button
             key={tab}
             onClick={() => updateParams({ status: tab })}
-            className={`px-6 py-4 text-xs font-sans uppercase tracking-[0.2em] transition-all duration-300 border-b-2 whitespace-nowrap ${
+            className={`border-b-2 px-6 py-4 font-sans text-xs tracking-[0.2em] whitespace-nowrap uppercase transition-all duration-300 ${
               currentStatus === tab
                 ? "border-[#C8A96E] text-[#C8A96E]"
                 : "border-transparent text-zinc-500 hover:text-zinc-300"

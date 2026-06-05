@@ -1,38 +1,45 @@
 import { Heading } from "@/components/atoms";
 import { SlideUp } from "@/components/animations/SlideUp";
 import { FadeIn } from "@/components/animations/FadeIn";
+import { SmoothScrollLink } from "@/components/atoms/SmoothScrollLink";
 
 export default function CTA() {
   return (
     <section
       id="cta"
-      className="relative w-full bg-black-1 text-white py-24 md:py-32 scroll-mt-24 overflow-hidden"
+      className="bg-black-1 relative w-full scroll-mt-24 overflow-hidden py-24 text-white md:py-32"
     >
       {/* Rotating badge */}
-      <div className="absolute top-8 right-8 md:top-12 md:right-12 pointer-events-none">
-        <div className="animate-spin-slow w-24 h-24 md:w-28 md:h-28 relative">
-          <svg viewBox="0 0 120 120" className="w-full h-full">
+      <div className="pointer-events-none absolute top-8 right-8 md:top-12 md:right-12">
+        <div className="animate-spin-slow relative h-24 w-24 md:h-28 md:w-28">
+          <svg
+            viewBox="0 0 120 120"
+            className="h-full w-full"
+          >
             <defs>
               <path
                 id="circlePath"
                 d="M 60, 60 m -45, 0 a 45,45 0 1,1 90,0 a 45,45 0 1,1 -90,0"
               />
             </defs>
-            <text className="fill-zinc-500 text-[11px] uppercase tracking-[0.25em]">
+            <text className="fill-zinc-500 text-[11px] tracking-[0.25em] uppercase">
               <textPath href="#circlePath">
                 Available for projects · Available for projects ·{" "}
               </textPath>
             </text>
           </svg>
           <div className="absolute inset-0 flex items-center justify-center">
-            <span className="w-2 h-2 rounded-full bg-accent" />
+            <span className="bg-accent h-2 w-2 rounded-full" />
           </div>
         </div>
       </div>
 
-      <div className="mx-auto max-w-6xl px-6 lg:px-10 flex flex-col items-center text-center">
-        <SlideUp yOffset={30} duration={0.9}>
-          <Heading.h2 className="text-white font-extralight text-4xl md:text-5xl lg:text-7xl mb-6">
+      <div className="mx-auto flex max-w-6xl flex-col items-center px-6 text-center lg:px-10">
+        <SlideUp
+          yOffset={30}
+          duration={0.9}
+        >
+          <Heading.h2 className="mb-6 text-4xl font-extralight text-white md:text-5xl lg:text-7xl">
             Ready to work with us?
           </Heading.h2>
         </SlideUp>
@@ -41,18 +48,21 @@ export default function CTA() {
           yOffset={20}
           duration={0.8}
           delay={0.15}
-          className="text-zinc-400 text-base md:text-lg mb-12 max-w-md"
+          className="mb-12 max-w-md text-base text-zinc-400 md:text-lg"
         >
           Let's turn your vision into a stunning digital reality.
         </SlideUp>
 
-        <FadeIn delay={0.3} duration={0.6}>
-          <a
+        <FadeIn
+          delay={0.3}
+          duration={0.6}
+        >
+          <SmoothScrollLink
             href="#contact"
-            className="inline-flex items-center border border-white/30 text-white px-10 py-4 text-sm font-medium uppercase tracking-[0.15em] hover:bg-white hover:text-black-1 transition-all duration-400"
+            className="hover:text-black-1 inline-flex items-center border border-white/30 px-10 py-4 text-sm font-medium tracking-[0.15em] text-white uppercase transition-all duration-400 hover:bg-white"
           >
             Contact us
-          </a>
+          </SmoothScrollLink>
         </FadeIn>
       </div>
     </section>

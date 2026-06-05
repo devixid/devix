@@ -12,45 +12,44 @@ export default async function AdminOverviewPage() {
     <div className="space-y-12">
       {/* Header */}
       <div>
-        <span className="text-[11px] font-medium tracking-[0.25em] uppercase text-zinc-500 block mb-3">
+        <span className="mb-3 block text-[11px] font-medium tracking-[0.25em] text-zinc-500 uppercase">
           Console
         </span>
         <h1 className="font-display text-3xl font-light tracking-wide text-zinc-100">
           Operations Overview
         </h1>
-        <p className="font-sans text-sm text-zinc-400 mt-2 max-w-xl">
+        <p className="mt-2 max-w-xl font-sans text-sm text-zinc-400">
           Real-time diagnostics and content management summaries for Devix.
         </p>
       </div>
 
       {/* Grid Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-        
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:gap-8">
         {/* Inbox Stats Card */}
-        <div className="border border-zinc-800 bg-[#0F0F0F] p-8 flex flex-col justify-between transition-all duration-300 hover:border-zinc-700">
+        <div className="flex flex-col justify-between border border-zinc-800 bg-[#0F0F0F] p-8 transition-all duration-300 hover:border-zinc-700">
           <div>
-            <div className="flex justify-between items-center mb-6">
-              <span className="text-[11px] font-medium tracking-wider uppercase text-zinc-500">
+            <div className="mb-6 flex items-center justify-between">
+              <span className="text-[11px] font-medium tracking-wider text-zinc-500 uppercase">
                 Inbox Submissions
               </span>
               {stats.unreadSubmissions > 0 && (
-                <span className="bg-[#C8A96E]/10 text-[#C8A96E] text-[10px] uppercase tracking-wider font-medium px-2 py-1">
+                <span className="bg-[#C8A96E]/10 px-2 py-1 text-[10px] font-medium tracking-wider text-[#C8A96E] uppercase">
                   {stats.unreadSubmissions} Unread
                 </span>
               )}
             </div>
-            <div className="flex items-baseline gap-2 mb-2">
-              <span className="text-4xl md:text-5xl font-display font-light text-zinc-100">
+            <div className="mb-2 flex items-baseline gap-2">
+              <span className="font-display text-4xl font-light text-zinc-100 md:text-5xl">
                 {stats.totalSubmissions}
               </span>
-              <span className="text-zinc-500 text-sm">total inquiries</span>
+              <span className="text-sm text-zinc-500">total inquiries</span>
             </div>
           </div>
 
-          <div className="mt-8 pt-6 border-t border-zinc-900">
+          <div className="mt-8 border-t border-zinc-900 pt-6">
             <Link
               href="/admin/inbox"
-              className="inline-flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-[#C8A96E] hover:text-[#B6965C] transition-colors"
+              className="inline-flex items-center gap-2 text-xs font-medium tracking-wider text-[#C8A96E] uppercase transition-colors hover:text-[#B6965C]"
             >
               Manage Inbox <span className="text-sm">→</span>
             </Link>
@@ -58,44 +57,43 @@ export default async function AdminOverviewPage() {
         </div>
 
         {/* Testimonials Stats Card */}
-        <div className="border border-zinc-800 bg-[#0F0F0F] p-8 flex flex-col justify-between transition-all duration-300 hover:border-zinc-700">
+        <div className="flex flex-col justify-between border border-zinc-800 bg-[#0F0F0F] p-8 transition-all duration-300 hover:border-zinc-700">
           <div>
-            <div className="flex justify-between items-center mb-6">
-              <span className="text-[11px] font-medium tracking-wider uppercase text-zinc-500">
+            <div className="mb-6 flex items-center justify-between">
+              <span className="text-[11px] font-medium tracking-wider text-zinc-500 uppercase">
                 Testimonials
               </span>
-              <span className="text-zinc-500 text-[10px] uppercase tracking-wider font-medium">
+              <span className="text-[10px] font-medium tracking-wider text-zinc-500 uppercase">
                 {stats.visibleTestimonials} Visible
               </span>
             </div>
-            <div className="flex items-baseline gap-2 mb-2">
-              <span className="text-4xl md:text-5xl font-display font-light text-zinc-100">
+            <div className="mb-2 flex items-baseline gap-2">
+              <span className="font-display text-4xl font-light text-zinc-100 md:text-5xl">
                 {stats.totalTestimonials}
               </span>
-              <span className="text-zinc-500 text-sm">total testimonials</span>
+              <span className="text-sm text-zinc-500">total testimonials</span>
             </div>
           </div>
 
-          <div className="mt-8 pt-6 border-t border-zinc-900">
+          <div className="mt-8 border-t border-zinc-900 pt-6">
             <Link
               href="/admin/testimonials"
-              className="inline-flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-[#C8A96E] hover:text-[#B6965C] transition-colors"
+              className="inline-flex items-center gap-2 text-xs font-medium tracking-wider text-[#C8A96E] uppercase transition-colors hover:text-[#B6965C]"
             >
               Manage Testimonials <span className="text-sm">→</span>
             </Link>
           </div>
         </div>
-
       </div>
 
       {/* Database Diagnostic Details */}
       <div className="border border-zinc-800 bg-[#0F0F0F] p-8">
-        <span className="text-[11px] font-medium tracking-wider uppercase text-zinc-500 block mb-6">
+        <span className="mb-6 block text-[11px] font-medium tracking-wider text-zinc-500 uppercase">
           System Infrastructure
         </span>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-left">
+        <div className="grid grid-cols-2 gap-6 text-left md:grid-cols-4">
           <div>
-            <span className="text-[10px] uppercase tracking-wider text-zinc-600 block mb-1">
+            <span className="mb-1 block text-[10px] tracking-wider text-zinc-600 uppercase">
               Database Core
             </span>
             <span className="text-xs font-medium text-zinc-300">
@@ -103,7 +101,7 @@ export default async function AdminOverviewPage() {
             </span>
           </div>
           <div>
-            <span className="text-[10px] uppercase tracking-wider text-zinc-600 block mb-1">
+            <span className="mb-1 block text-[10px] tracking-wider text-zinc-600 uppercase">
               ORM Engine
             </span>
             <span className="text-xs font-medium text-zinc-300">
@@ -111,7 +109,7 @@ export default async function AdminOverviewPage() {
             </span>
           </div>
           <div>
-            <span className="text-[10px] uppercase tracking-wider text-zinc-600 block mb-1">
+            <span className="mb-1 block text-[10px] tracking-wider text-zinc-600 uppercase">
               Auth Mechanism
             </span>
             <span className="text-xs font-medium text-zinc-300">
@@ -119,7 +117,7 @@ export default async function AdminOverviewPage() {
             </span>
           </div>
           <div>
-            <span className="text-[10px] uppercase tracking-wider text-zinc-600 block mb-1">
+            <span className="mb-1 block text-[10px] tracking-wider text-zinc-600 uppercase">
               Caching Layer
             </span>
             <span className="text-xs font-medium text-zinc-300">

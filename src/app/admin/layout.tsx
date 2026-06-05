@@ -6,7 +6,7 @@ interface Props {
 
 export default function AdminLayout({ children }: Props) {
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-zinc-100 font-sans antialiased">
+    <div className="min-h-screen bg-[#0A0A0A] font-sans text-zinc-100 antialiased">
       {children}
     </div>
   );

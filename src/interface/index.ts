@@ -7,14 +7,15 @@ export type HeadingProps<T extends keyof typeof HeadingConstants> =
     className?: string;
   };
 
-export type TextProps<T extends keyof HTMLElementTagNameMap> = HTMLMotionProps<T> & {
-  className?: string;
-  /**
-   * Reset styles
-   * @description method to reset styles to tailwindcss typography
-   */
-  resetStyle?: boolean;
-};
+export type TextProps<T extends keyof HTMLElementTagNameMap> =
+  HTMLMotionProps<T> & {
+    className?: string;
+    /**
+     * Reset styles
+     * @description method to reset styles to tailwindcss typography
+     */
+    resetStyle?: boolean;
+  };
 
 export interface NavMenuInterface {
   title: string;

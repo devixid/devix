@@ -9,5 +9,5 @@ export const getVisibleTestimonials = unstable_cache(
     });
   },
   ["visible-testimonials"],
-  { tags: ["testimonials"], revalidate: 3600 }
+  { tags: ["testimonials"], revalidate: 3600 },
 );

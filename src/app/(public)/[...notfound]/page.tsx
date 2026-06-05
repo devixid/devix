@@ -13,5 +13,4 @@ export const metadata: Metadata = {
 export default function NotFoundCatchAll(): null {
   // method ini buat manggil not-found page yang ada di folder app
   notFound();
-  return null;
 }

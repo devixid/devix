@@ -44,16 +44,17 @@ export default function FaQ() {
           <SlideUp
             yOffset={20}
             duration={0.8}
-            className="lg:w-1/3 mb-12 lg:mb-0 lg:sticky lg:top-32 lg:self-start"
+            className="mb-12 lg:sticky lg:top-32 lg:mb-0 lg:w-1/3 lg:self-start"
           >
-            <p className="text-[13px] font-medium uppercase tracking-[0.2em] text-zinc-400 mb-4">
+            <p className="mb-4 text-[13px] font-medium tracking-[0.2em] text-zinc-400 uppercase">
               FAQ
             </p>
-            <Heading.h2 className="font-extralight mb-4">
+            <Heading.h2 className="mb-4 font-extralight">
               Frequently asked questions.
             </Heading.h2>
-            <p className="text-sm text-zinc-500 leading-relaxed">
-              Everything you need to know about working with us. Can't find the answer you're looking for? Feel free to reach out.
+            <p className="text-sm leading-relaxed text-zinc-500">
+              Everything you need to know about working with us. Can't find the
+              answer you're looking for? Feel free to reach out.
             </p>
           </SlideUp>
 

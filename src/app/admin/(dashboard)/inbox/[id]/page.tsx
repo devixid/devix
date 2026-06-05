@@ -24,45 +24,44 @@ export default async function InboxDetailPage({ params }: Props) {
   }
 
   return (
-    <div className="space-y-10 max-w-4xl">
+    <div className="max-w-4xl space-y-10">
       {/* Back button */}
       <div>
         <Link
           href="/admin/inbox"
-          className="inline-flex items-center gap-2 text-xs font-sans uppercase tracking-[0.2em] text-zinc-500 hover:text-zinc-300 transition-colors"
+          className="inline-flex items-center gap-2 font-sans text-xs tracking-[0.2em] text-zinc-500 uppercase transition-colors hover:text-zinc-300"
         >
           ← Return to Inbox
         </Link>
       </div>
 
       {/* Message Card */}
-      <div className="border border-zinc-800 bg-[#0F0F0F] p-8 md:p-12 space-y-8">
-        
+      <div className="space-y-8 border border-zinc-800 bg-[#0F0F0F] p-8 md:p-12">
         {/* Info Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-8 border-b border-zinc-900">
+        <div className="grid grid-cols-1 gap-6 border-b border-zinc-900 pb-8 md:grid-cols-2">
           <div>
-            <span className="text-[10px] uppercase tracking-wider text-zinc-500 block mb-1">
+            <span className="mb-1 block text-[10px] tracking-wider text-zinc-500 uppercase">
               Sender Name
             </span>
-            <span className="text-sm font-medium text-zinc-200 block">
+            <span className="block text-sm font-medium text-zinc-200">
               {submission.name}
             </span>
           </div>
 
           <div>
-            <span className="text-[10px] uppercase tracking-wider text-zinc-500 block mb-1">
+            <span className="mb-1 block text-[10px] tracking-wider text-zinc-500 uppercase">
               Email Address
             </span>
-            <span className="text-sm font-mono text-zinc-200 block">
+            <span className="block font-mono text-sm text-zinc-200">
               {submission.email}
             </span>
           </div>
 
           <div>
-            <span className="text-[10px] uppercase tracking-wider text-zinc-500 block mb-1">
+            <span className="mb-1 block text-[10px] tracking-wider text-zinc-500 uppercase">
               Date Received
             </span>
-            <span className="text-sm text-zinc-300 block">
+            <span className="block text-sm text-zinc-300">
               {new Date(submission.createdAt).toLocaleDateString("en-US", {
                 weekday: "long",
                 year: "numeric",
@@ -75,12 +74,14 @@ export default async function InboxDetailPage({ params }: Props) {
           </div>
 
           <div>
-            <span className="text-[10px] uppercase tracking-wider text-zinc-500 block mb-1">
+            <span className="mb-1 block text-[10px] tracking-wider text-zinc-500 uppercase">
               Status
             </span>
-            <div className="flex items-center gap-2 mt-1">
-              <span className={`h-2.5 w-2.5 ${submission.isRead ? "bg-zinc-700" : "bg-[#C8A96E]"}`} />
-              <span className="text-xs uppercase tracking-wider font-medium text-zinc-400">
+            <div className="mt-1 flex items-center gap-2">
+              <span
+                className={`h-2.5 w-2.5 ${submission.isRead ? "bg-zinc-700" : "bg-[#C8A96E]"}`}
+              />
+              <span className="text-xs font-medium tracking-wider text-zinc-400 uppercase">
                 {submission.isRead ? "Read" : "New Message"}
               </span>
             </div>
@@ -89,10 +90,10 @@ export default async function InboxDetailPage({ params }: Props) {
 
         {/* Message Content */}
         <div className="space-y-3">
-          <span className="text-[10px] uppercase tracking-wider text-zinc-500 block">
+          <span className="block text-[10px] tracking-wider text-zinc-500 uppercase">
             Message
           </span>
-          <p className="font-sans text-sm text-zinc-300 whitespace-pre-wrap leading-relaxed">
+          <p className="font-sans text-sm leading-relaxed whitespace-pre-wrap text-zinc-300">
             {submission.message}
           </p>
         </div>
@@ -104,7 +105,6 @@ export default async function InboxDetailPage({ params }: Props) {
           email={submission.email}
           name={submission.name}
         />
-
       </div>
     </div>
   );

@@ -9,14 +9,16 @@ interface Props {
 
 export default function RootLayout({ children }: Props) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${syne.className} ${dmSans.className}`}>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${syne.className} ${dmSans.className}`}
+    >
       <body
         className={`${dmSans.className}`}
         suppressHydrationWarning
       >
-        <Provider>
-          {children}
-        </Provider>
+        <Provider>{children}</Provider>
       </body>
     </html>
   );

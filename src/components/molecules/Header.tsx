@@ -7,6 +7,7 @@ import { NavMenu } from "@/constants";
 import { useWindow } from "@/hooks";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 function getElementBackgroundColor(el: Element | null): string {
   if (!el) return "rgb(255, 255, 255)";
@@ -37,6 +38,7 @@ function isDarkColor(colorString: string): boolean {
 }
 
 function Header() {
+  const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("");
   const [isDarkSection, setIsDarkSection] = useState(false);
@@ -44,7 +46,33 @@ function Header() {
   const { scrollPosition } = useWindow();
 
   useEffect(() => {
-    const sectionIds = ["#home", "#services", "#about", "#team", "#portfolio", "#cta"];
+    if (pathname !== "/") {
+      setActiveSection(pathname || "");
+      return;
+    }
+
+    const pendingScroll = sessionStorage.getItem("scrollToSection");
+    if (pendingScroll) {
+      sessionStorage.removeItem("scrollToSection");
+      setTimeout(() => {
+        const elem = document.getElementById(pendingScroll);
+        if (elem) {
+          window.scrollTo({
+            top: elem.getBoundingClientRect().top + window.scrollY - 80,
+            behavior: "smooth",
+          });
+        }
+      }, 100);
+    }
+
+    const sectionIds = [
+      "#home",
+      "#services",
+      "#about",
+      "#team",
+      "#portfolio",
+      "#cta",
+    ];
     const elements = sectionIds
       .map((id) => document.querySelector(id))
       .filter((el): el is Element => el !== null);
@@ -60,14 +88,14 @@ function Header() {
       {
         rootMargin: "-80px 0px -80% 0px",
         threshold: 0,
-      }
+      },
     );
 
     elements.forEach((el) => observer.observe(el));
     return () => {
       elements.forEach((el) => observer.unobserve(el));
     };
-  }, []);
+  }, [pathname]);
 
   useEffect(() => {
     setIsScrolled(scrollPosition.y > 60);
@@ -88,15 +116,36 @@ function Header() {
       const bgColor = getElementBackgroundColor(element);
       setIsDarkSection(isDarkColor(bgColor));
     }
-  }, [scrollPosition.y]);
+  }, [scrollPosition.y, pathname]);
 
-  const handleNavClick = useCallback((_e: React.MouseEvent<HTMLAnchorElement>, _id: string) => {
-    setMobileMenuOpen(false);
-  }, []);
+  const handleNavClick = useCallback(
+    (e: React.MouseEvent<HTMLAnchorElement>, targetPath: string) => {
+      setMobileMenuOpen(false);
+
+      if (targetPath.startsWith("#")) {
+        const targetId = targetPath.replace(/.*#/, "");
+        if (pathname === "/") {
+          e.preventDefault();
+          const elem = document.getElementById(targetId);
+          if (elem) {
+            window.scrollTo({
+              top: elem.getBoundingClientRect().top + window.scrollY - 80,
+              behavior: "smooth",
+            });
+          }
+        } else {
+          sessionStorage.setItem("scrollToSection", targetId);
+        }
+      }
+    },
+    [pathname],
+  );
 
   // Color scheme based on background detection
   const textColor = isDarkSection ? "text-white" : "text-black-1";
-  const borderColor = isDarkSection ? "border-zinc-700/60" : "border-zinc-200/60";
+  const borderColor = isDarkSection
+    ? "border-zinc-700/60"
+    : "border-zinc-200/60";
   const bgBlur = isScrolled
     ? isDarkSection
       ? "bg-black-1/80 backdrop-blur-md"
@@ -108,14 +157,19 @@ function Header() {
       className={cn(
         "fixed inset-x-0 top-0 z-50 transition-all duration-500",
         bgBlur,
-        isScrolled && `border-b ${borderColor}`
+        isScrolled && `border-b ${borderColor}`,
       )}
     >
       <div className="mx-auto flex h-[72px] max-w-6xl items-center justify-between px-6 lg:px-10">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-x-3">
+        <Link
+          href="/"
+          className="flex items-center gap-x-3"
+        >
           <Image
-            src={isDarkSection ? "/devix_logo.white.png" : "/devix_logo.dark.png"}
+            src={
+              isDarkSection ? "/devix_logo.white.png" : "/devix_logo.dark.png"
+            }
             alt="Devix"
             width={32}
             height={38}
@@ -124,7 +178,7 @@ function Header() {
           <span
             className={cn(
               "font-display text-xl font-semibold tracking-tight transition-colors duration-300",
-              textColor
+              textColor,
             )}
           >
             DEVIX
@@ -132,69 +186,90 @@ function Header() {
         </Link>
 
         {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-x-8">
+        <nav className="hidden items-center gap-x-8 md:flex">
           {NavMenu.map((menu) => {
             const isActive = activeSection === menu.id;
+            const isHash = menu.id.startsWith("#");
+            const href = isHash ? "/" : menu.id;
+
             return (
-              <a
+              <Link
                 key={menu.id}
-                href={menu.id}
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                href={href as any}
                 onClick={(e) => handleNavClick(e, menu.id)}
                 className={cn(
-                  "relative text-[13px] font-medium uppercase tracking-[0.15em] transition-colors duration-300",
+                  "relative text-[13px] font-medium tracking-[0.15em] uppercase transition-colors duration-300",
                   isActive
-                    ? isDarkSection ? "text-white" : "text-black-1"
-                    : isDarkSection ? "text-zinc-400 hover:text-white" : "text-zinc-500 hover:text-black-1"
+                    ? isDarkSection
+                      ? "text-white"
+                      : "text-black-1"
+                    : isDarkSection
+                      ? "text-zinc-400 hover:text-white"
+                      : "hover:text-black-1 text-zinc-500",
                 )}
               >
                 {menu.title}
                 {/* Active indicator */}
                 <m.span
-                  className="absolute -bottom-1 left-0 h-[1px] bg-accent"
+                  className="bg-accent absolute -bottom-1 left-0 h-[1px]"
                   initial={false}
                   animate={{ width: isActive ? "100%" : "0%" }}
                   transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
                   style={{ display: "block" }}
                 />
-              </a>
+              </Link>
             );
           })}
         </nav>
 
         {/* Desktop CTA */}
-        <a
-          href="#cta"
+        <Link
+          href="/"
+          onClick={(e) => handleNavClick(e, "#cta")}
           className={cn(
-            "hidden md:inline-flex items-center text-[13px] font-medium uppercase tracking-[0.15em] transition-all duration-300 border px-5 py-2.5",
+            "hidden items-center border px-5 py-2.5 text-[13px] font-medium tracking-[0.15em] uppercase transition-all duration-300 md:inline-flex",
             isDarkSection
-              ? "border-white/30 text-white hover:bg-white hover:text-black-1"
-              : "border-black-1/20 text-black-1 hover:bg-black-1 hover:text-white"
+              ? "hover:text-black-1 border-white/30 text-white hover:bg-white"
+              : "border-black-1/20 text-black-1 hover:bg-black-1 hover:text-white",
           )}
         >
           Get in touch
-        </a>
+        </Link>
 
         {/* Mobile hamburger */}
         <button
           type="button"
           aria-label="Toggle menu"
-          className="md:hidden z-[60] flex flex-col gap-[5px] justify-center items-center w-8 h-8 cursor-pointer"
+          className="z-[60] flex h-8 w-8 cursor-pointer flex-col items-center justify-center gap-[5px] md:hidden"
           onClick={() => setMobileMenuOpen((prev) => !prev)}
         >
           <m.span
-            animate={mobileMenuOpen ? { rotate: 45, y: 3.5 } : { rotate: 0, y: 0 }}
+            animate={
+              mobileMenuOpen ? { rotate: 45, y: 3.5 } : { rotate: 0, y: 0 }
+            }
             transition={{ duration: 0.25 }}
             className={cn(
-              "w-6 h-[1.5px] block transition-colors duration-300",
-              mobileMenuOpen ? "bg-white" : isDarkSection ? "bg-white" : "bg-black-1"
+              "block h-[1.5px] w-6 transition-colors duration-300",
+              mobileMenuOpen
+                ? "bg-white"
+                : isDarkSection
+                  ? "bg-white"
+                  : "bg-black-1",
             )}
           />
           <m.span
-            animate={mobileMenuOpen ? { rotate: -45, y: -3.5 } : { rotate: 0, y: 0 }}
+            animate={
+              mobileMenuOpen ? { rotate: -45, y: -3.5 } : { rotate: 0, y: 0 }
+            }
             transition={{ duration: 0.25 }}
             className={cn(
-              "w-6 h-[1.5px] block transition-colors duration-300",
-              mobileMenuOpen ? "bg-white" : isDarkSection ? "bg-white" : "bg-black-1"
+              "block h-[1.5px] w-6 transition-colors duration-300",
+              mobileMenuOpen
+                ? "bg-white"
+                : isDarkSection
+                  ? "bg-white"
+                  : "bg-black-1",
             )}
           />
         </button>
@@ -206,39 +281,55 @@ function Header() {
         animate={mobileMenuOpen ? { opacity: 1, y: 0 } : { opacity: 0, y: -20 }}
         transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
         className={cn(
-          "md:hidden fixed inset-0 top-0 z-50 flex flex-col items-center justify-center gap-y-8 bg-black-1",
-          mobileMenuOpen ? "pointer-events-auto" : "pointer-events-none"
+          "bg-black-1 fixed inset-0 top-0 z-50 flex flex-col items-center justify-center gap-y-8 md:hidden",
+          mobileMenuOpen ? "pointer-events-auto" : "pointer-events-none",
         )}
       >
         {NavMenu.map((menu, index) => {
           const isActive = activeSection === menu.id;
+          const isHash = menu.id.startsWith("#");
+          const href = isHash ? "/" : menu.id;
+
           return (
-            <m.a
+            <m.div
               key={menu.id}
-              href={menu.id}
-              onClick={(e) => handleNavClick(e, menu.id)}
               initial={{ opacity: 0, y: 20 }}
-              animate={mobileMenuOpen ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-              transition={{ duration: 0.4, delay: index * 0.08, ease: [0.16, 1, 0.3, 1] }}
-              className={cn(
-                "font-display text-3xl font-light tracking-tight transition-colors",
-                isActive ? "text-accent" : "text-zinc-400 hover:text-white"
-              )}
+              animate={
+                mobileMenuOpen ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }
+              }
+              transition={{
+                duration: 0.4,
+                delay: index * 0.08,
+                ease: [0.16, 1, 0.3, 1],
+              }}
             >
-              {menu.title}
-            </m.a>
+              <Link
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                href={href as any}
+                onClick={(e) => handleNavClick(e, menu.id)}
+                className={cn(
+                  "font-display inline-block text-3xl font-light tracking-tight transition-colors",
+                  isActive ? "text-accent" : "text-zinc-400 hover:text-white",
+                )}
+              >
+                {menu.title}
+              </Link>
+            </m.div>
           );
         })}
-        <m.a
-          href="#cta"
-          onClick={() => setMobileMenuOpen(false)}
+        <m.div
           initial={{ opacity: 0 }}
           animate={mobileMenuOpen ? { opacity: 1 } : { opacity: 0 }}
           transition={{ duration: 0.4, delay: 0.4 }}
-          className="mt-4 border border-white/30 px-8 py-3 text-sm uppercase tracking-[0.2em] text-white hover:bg-white hover:text-black-1 transition-all duration-300"
         >
-          Get in touch
-        </m.a>
+          <Link
+            href="/"
+            onClick={(e) => handleNavClick(e, "#cta")}
+            className="hover:text-black-1 mt-4 inline-block border border-white/30 px-8 py-3 text-sm tracking-[0.2em] text-white uppercase transition-all duration-300 hover:bg-white"
+          >
+            Get in touch
+          </Link>
+        </m.div>
       </m.div>
     </header>
   );

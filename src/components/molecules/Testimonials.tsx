@@ -8,15 +8,18 @@ export default async function Testimonials() {
   if (testimonials.length === 0) return null;
 
   return (
-    <section id="testimonials" className="bg-black-1 text-white py-20 md:py-32 scroll-mt-24">
+    <section
+      id="testimonials"
+      className="bg-black-1 scroll-mt-24 py-20 text-white md:py-32"
+    >
       <div className="mx-auto max-w-6xl px-6 lg:px-10">
         {/* Header section with heading and controls */}
-        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-y-6 mb-16">
+        <div className="mb-16 flex flex-col gap-y-6 md:flex-row md:items-end md:justify-between">
           <div className="max-w-xl">
-            <p className="text-[13px] font-medium uppercase tracking-[0.2em] text-zinc-500 mb-4">
+            <p className="mb-4 text-[13px] font-medium tracking-[0.2em] text-zinc-500 uppercase">
               Testimonials
             </p>
-            <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-extralight leading-[1.1] tracking-tight text-white">
+            <h2 className="font-display text-4xl leading-[1.1] font-extralight tracking-tight text-white md:text-5xl lg:text-6xl">
               What our clients say.
             </h2>
           </div>
@@ -28,7 +31,7 @@ export default async function Testimonials() {
         {/* Snapping horizontal scroll container */}
         <div
           id="testimonials-scroll-container"
-          className="flex gap-6 overflow-x-auto scroll-smooth snap-x snap-mandatory pb-6 scrollbar-hide"
+          className="scrollbar-hide flex snap-x snap-mandatory gap-6 overflow-x-auto scroll-smooth pb-6"
         >
           {testimonials.map((item) => {
             // Get initials for fallback avatar
@@ -42,21 +45,21 @@ export default async function Testimonials() {
             return (
               <div
                 key={item.id}
-                className="snap-start flex-shrink-0 w-full min-w-[280px] sm:min-w-[380px] max-w-[420px] bg-zinc-900 border border-zinc-800 p-8 flex flex-col justify-between"
+                className="flex w-full max-w-[420px] min-w-[280px] flex-shrink-0 snap-start flex-col justify-between border border-zinc-800 bg-zinc-900 p-8 sm:min-w-[380px]"
               >
                 <div>
                   {/* Decorative quote mark */}
-                  <span className="font-display text-6xl font-light text-accent/60 select-none block leading-none mb-4">
+                  <span className="font-display text-accent/60 mb-4 block text-6xl leading-none font-light select-none">
                     “
                   </span>
-                  <p className="font-body text-zinc-300 text-base leading-relaxed">
+                  <p className="font-body text-base leading-relaxed text-zinc-300">
                     {item.content}
                   </p>
                 </div>
 
-                <div className="border-t border-zinc-800 mt-8 pt-6 flex items-center gap-x-4">
+                <div className="mt-8 flex items-center gap-x-4 border-t border-zinc-800 pt-6">
                   {/* Avatar */}
-                  <div className="relative w-10 h-10 rounded-full overflow-hidden bg-zinc-700 flex items-center justify-center flex-shrink-0">
+                  <div className="relative flex h-10 w-10 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-zinc-700">
                     {item.avatarUrl ? (
                       <Image
                         src={item.avatarUrl}
@@ -65,7 +68,7 @@ export default async function Testimonials() {
                         className="object-cover"
                       />
                     ) : (
-                      <span className="text-xs font-semibold text-zinc-300 tracking-wider">
+                      <span className="text-xs font-semibold tracking-wider text-zinc-300">
                         {initials}
                       </span>
                     )}
@@ -73,10 +76,10 @@ export default async function Testimonials() {
 
                   {/* Client Info */}
                   <div className="flex flex-col">
-                    <span className="font-body font-medium text-white text-sm">
+                    <span className="font-body text-sm font-medium text-white">
                       {item.clientName}
                     </span>
-                    <span className="font-body text-xs text-zinc-500 mt-0.5">
+                    <span className="font-body mt-0.5 text-xs text-zinc-500">
                       {item.clientRole} · {item.company}
                     </span>
                   </div>

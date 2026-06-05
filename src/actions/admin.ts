@@ -2,31 +2,30 @@
 
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
-import { createSupabaseServer } from "@/lib/supabase-server";
+import { getSessionCookie } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 
 // Helper to verify admin session and whitelist status
 async function verifyAdminSession() {
-  const supabase = await createSupabaseServer();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const session = await getSessionCookie();
 
-  if (!user || !user.email) {
+  if (!session || !session.email) {
     throw new Error("Unauthorized access. Session not found.");
   }
 
   // Check if email is whitelisted
   const dbUser = await prisma.user.findUnique({
-    where: { email: user.email },
+    where: { email: session.email as string },
     select: { email: true },
   });
 
   if (!dbUser) {
-    throw new Error("Unauthorized access. Admin whitelist verification failed.");
+    throw new Error(
+      "Unauthorized access. Admin whitelist verification failed.",
+    );
   }
 
-  return user;
+  return session;
 }
 
 // ----------------------------------------------------
@@ -35,7 +34,12 @@ async function verifyAdminSession() {
 export async function getOverviewStats() {
   await verifyAdminSession();
 
-  const [totalSubmissions, unreadSubmissions, totalTestimonials, visibleTestimonials] = await Promise.all([
+  const [
+    totalSubmissions,
+    unreadSubmissions,
+    totalTestimonials,
+    visibleTestimonials,
+  ] = await Promise.all([
     prisma.contactSubmission.count(),
     prisma.contactSubmission.count({ where: { isRead: false } }),
     prisma.testimonial.count(),
@@ -53,7 +57,9 @@ export async function getOverviewStats() {
 // ----------------------------------------------------
 // 2. INBOX ACTIONS
 // ----------------------------------------------------
-export async function getInboxSubmissions(params: { query?: string; status?: "all" | "unread" | "read" } = {}) {
+export async function getInboxSubmissions(
+  params: { query?: string; status?: "all" | "unread" | "read" } = {},
+) {
   await verifyAdminSession();
 
   const { query, status } = params;
@@ -148,7 +154,10 @@ function validateTestimonialInput(data: TestimonialInput) {
     try {
       new URL(data.avatarUrl);
     } catch (err) {
-      throw new Error("Avatar URL must be a valid absolute URL (e.g. https://example.com/avatar.jpg).", { cause: err });
+      throw new Error(
+        "Avatar URL must be a valid absolute URL (e.g. https://example.com/avatar.jpg).",
+        { cause: err },
+      );
     }
   }
 }
@@ -196,7 +205,10 @@ export async function updateTestimonial(id: string, data: TestimonialInput) {
   return updated;
 }
 
-export async function toggleTestimonialVisibility(id: string, isVisible: boolean) {
+export async function toggleTestimonialVisibility(
+  id: string,
+  isVisible: boolean,
+) {
   await verifyAdminSession();
 
   const updated = await prisma.testimonial.update({
