@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { jwtDecrypt } from "jose";
+import { globalLimiter, apiLimiter, getClientIp } from "@/lib/rate-limit";
 
 const secretKey =
   process.env.JWT_SECRET || "devix-super-secret-key-pbkdf2-hmac-iv-123456789";
@@ -7,8 +8,42 @@ const secret = new TextEncoder().encode(secretKey);
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const ip = getClientIp(request.headers);
 
-  // Only run middleware on /admin paths
+  // 1. API Rate Limiting (Tier 4)
+  if (pathname.startsWith("/api/")) {
+    const { success, limit, reset, remaining } = await apiLimiter.limit(ip);
+    if (!success) {
+      return NextResponse.json(
+        { error: "Too many requests. Please try again later." },
+        {
+          status: 429,
+          headers: {
+            "X-RateLimit-Limit": limit.toString(),
+            "X-RateLimit-Remaining": remaining.toString(),
+            "Retry-After": Math.ceil((reset - Date.now()) / 1000).toString(),
+          },
+        },
+      );
+    }
+  } else {
+    // 2. Global Rate Limiting (Tier 1) for all non-API paths
+    // Note: In production, you might want to exclude static assets if proxy runs on them
+    const { success, limit, reset, remaining } = await globalLimiter.limit(ip);
+    if (!success) {
+      return new NextResponse("Too Many Requests", {
+        status: 429,
+        headers: {
+          "X-RateLimit-Limit": limit.toString(),
+          "X-RateLimit-Remaining": remaining.toString(),
+          "Retry-After": Math.ceil((reset - Date.now()) / 1000).toString(),
+        },
+      });
+    }
+  }
+
+  // 3. Admin Authentication Logic
+  // Only run auth middleware on /admin paths
   if (!pathname.startsWith("/admin")) {
     return NextResponse.next();
   }
@@ -51,5 +86,6 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*"],
+  // Apply middleware to all routes except static assets
+  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
 };

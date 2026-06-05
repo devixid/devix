@@ -44,6 +44,7 @@ model Testimonial {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
+  @@index([isVisible])
   @@map("testimonials")
 }
 
@@ -65,6 +66,8 @@ model Project {
   techStacks  ProjectTechStack[]
   developers  ProjectDeveloper[]
 
+  @@index([isVisible])
+  @@index([isFeatured])
   @@map("projects")
 }
 

@@ -45,7 +45,7 @@ export const scrollDownArrowAnimation: Variants = {
       ease: "easeInOut",
     },
   },
-};
+} as const;
 
 export const iconVariant: Variants = {
   hidden: {
@@ -54,10 +54,11 @@ export const iconVariant: Variants = {
   visible: {
     pathLength: 1,
   },
-};
+} as const;
 
-export const headingText: string = "Professional website";
-export const headingText2: string = "creation services";
+export const headingText: string = "Professional website" as const;
+export const headingText2: string = "creation services" as const;
+
 export const subHeadingText: Array<string> = [
   "We",
   "design",

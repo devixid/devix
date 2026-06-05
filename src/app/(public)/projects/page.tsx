@@ -8,7 +8,7 @@ export const metadata: Metadata = {
     "Explore our portfolio of custom web development, e-commerce, and SaaS projects.",
 };
 
-export const revalidate = 0; // Disable static caching for this page so it updates immediately when new projects are added
+export const revalidate = 60; // Enable ISR for 60 seconds with Redis caching
 
 export default async function ProjectsPage() {
   const [projects, filterOptions] = await Promise.all([

@@ -2,6 +2,8 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
+import { contactLimiter, getClientIp } from "@/lib/rate-limit";
 
 type ContactFormData = {
   name: string;
@@ -17,6 +19,15 @@ type ActionResult = {
 export async function submitContactForm(
   data: ContactFormData,
 ): Promise<ActionResult> {
+  const ip = getClientIp(await headers());
+  const { success: rateLimitSuccess } = await contactLimiter.limit(ip);
+  if (!rateLimitSuccess) {
+    return {
+      success: false,
+      error: "Too many submissions. Please try again later.",
+    };
+  }
+
   // Validasi server-side
   if (!data.name || data.name.trim().length < 2) {
     return { success: false, error: "Name must be at least 2 characters." };

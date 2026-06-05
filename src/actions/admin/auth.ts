@@ -3,8 +3,16 @@
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { setSessionCookie, clearSessionCookie } from "@/lib/auth";
+import { headers } from "next/headers";
+import { authLimiter, registerLimiter, getClientIp } from "@/lib/rate-limit";
 
 export async function registerAdmin(formData: FormData) {
+  const ip = getClientIp(await headers());
+  const { success } = await registerLimiter.limit(ip);
+  if (!success) {
+    throw new Error("Too many registration attempts. Please try again later.");
+  }
+
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
   const firstName = formData.get("firstName") as string;
@@ -47,6 +55,12 @@ export async function registerAdmin(formData: FormData) {
 }
 
 export async function loginAdmin(formData: FormData) {
+  const ip = getClientIp(await headers());
+  const { success } = await authLimiter.limit(ip);
+  if (!success) {
+    throw new Error("Too many login attempts. Please try again later.");
+  }
+
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
 

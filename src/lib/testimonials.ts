@@ -1,13 +1,15 @@
 import { prisma } from "@/lib/prisma";
-import { unstable_cache } from "next/cache";
+import { cachedQuery } from "@/lib/redis";
 
-export const getVisibleTestimonials = unstable_cache(
-  async () => {
-    return prisma.testimonial.findMany({
-      where: { isVisible: true },
-      orderBy: { order: "asc" },
-    });
-  },
-  ["visible-testimonials"],
-  { tags: ["testimonials"], revalidate: 3600 },
-);
+export async function getVisibleTestimonials() {
+  return cachedQuery(
+    "testimonials:visible",
+    async () => {
+      return prisma.testimonial.findMany({
+        where: { isVisible: true },
+        orderBy: { order: "asc" },
+      });
+    },
+    600, // 10 minutes TTL
+  );
+}

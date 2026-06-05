@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { getSessionCookie } from "@/lib/auth";
+import { cachedQuery, invalidateCache } from "@/lib/redis";
 
 // Helper for auth
 async function verifyAdminSession() {
@@ -12,10 +13,18 @@ async function verifyAdminSession() {
     throw new Error("Unauthorized access. Session not found.");
   }
 
-  const dbUser = await prisma.user.findUnique({
-    where: { email: session.email as string },
-    select: { email: true },
-  });
+  // Check if email is whitelisted using cached query
+  const emailStr = session.email as string;
+  const dbUser = await cachedQuery(
+    `admin:whitelist:${emailStr}`,
+    async () => {
+      return prisma.user.findUnique({
+        where: { email: emailStr },
+        select: { email: true },
+      });
+    },
+    600, // Cache whitelist for 10 mins
+  );
 
   if (!dbUser) {
     throw new Error(
@@ -46,6 +55,11 @@ export async function toggleProjectVisibility(id: string, isVisible: boolean) {
     data: { isVisible },
   });
 
+  await invalidateCache(
+    "projects:all",
+    "projects:featured",
+    "projects:filters",
+  );
   revalidatePath("/admin/projects");
   revalidatePath("/projects");
   revalidatePath("/");
@@ -60,6 +74,11 @@ export async function toggleProjectFeatured(id: string, isFeatured: boolean) {
     data: { isFeatured },
   });
 
+  await invalidateCache(
+    "projects:all",
+    "projects:featured",
+    "projects:filters",
+  );
   revalidatePath("/admin/projects");
   revalidatePath("/projects");
   revalidatePath("/");
@@ -73,6 +92,11 @@ export async function deleteProject(id: string) {
     where: { id },
   });
 
+  await invalidateCache(
+    "projects:all",
+    "projects:featured",
+    "projects:filters",
+  );
   revalidatePath("/admin/projects");
   revalidatePath("/projects");
   revalidatePath("/");
@@ -128,6 +152,11 @@ export async function createProject(data: ProjectInput) {
     },
   });
 
+  await invalidateCache(
+    "projects:all",
+    "projects:featured",
+    "projects:filters",
+  );
   revalidatePath("/admin/projects");
   revalidatePath("/projects");
   revalidatePath("/");
@@ -188,6 +217,11 @@ export async function updateProject(id: string, data: ProjectInput) {
     return updated;
   });
 
+  await invalidateCache(
+    "projects:all",
+    "projects:featured",
+    "projects:filters",
+  );
   revalidatePath("/admin/projects");
   revalidatePath("/projects");
   revalidatePath("/");

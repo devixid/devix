@@ -10,7 +10,13 @@ const globalForPrisma = globalThis as unknown as {
 
 const createPrismaClient = () => {
   const connectionString = process.env.DATABASE_URL;
-  const pool = new Pool({ connectionString });
+  // Initialize the pool with an explicit max size and idle timeout
+  // to prevent connection exhaustion in serverless or highly concurrent environments
+  const pool = new Pool({
+    connectionString,
+    max: 10, // Maximum number of clients in the pool
+    idleTimeoutMillis: 30000, // Close idle clients after 30 seconds
+  });
   const adapter = new PrismaPg(pool);
 
   return new PrismaClient({

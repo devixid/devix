@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import { getSessionCookie } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
+import { cachedQuery, invalidateCache } from "@/lib/redis";
 
 // Helper to verify admin session and whitelist status
 async function verifyAdminSession() {
@@ -13,11 +14,18 @@ async function verifyAdminSession() {
     throw new Error("Unauthorized access. Session not found.");
   }
 
-  // Check if email is whitelisted
-  const dbUser = await prisma.user.findUnique({
-    where: { email: session.email as string },
-    select: { email: true },
-  });
+  // Check if email is whitelisted using cached query
+  const emailStr = session.email as string;
+  const dbUser = await cachedQuery(
+    `admin:whitelist:${emailStr}`,
+    async () => {
+      return prisma.user.findUnique({
+        where: { email: emailStr },
+        select: { email: true },
+      });
+    },
+    600, // Cache whitelist for 10 mins
+  );
 
   if (!dbUser) {
     throw new Error(
@@ -178,6 +186,7 @@ export async function createTestimonial(data: TestimonialInput) {
     },
   });
 
+  await invalidateCache("testimonials:all", "testimonials:visible");
   revalidatePath("/admin/testimonials");
   revalidatePath("/"); // Update home testimonials
   return created;
@@ -200,6 +209,7 @@ export async function updateTestimonial(id: string, data: TestimonialInput) {
     },
   });
 
+  await invalidateCache("testimonials:all", "testimonials:visible");
   revalidatePath("/admin/testimonials");
   revalidatePath("/"); // Update home testimonials
   return updated;
@@ -216,6 +226,7 @@ export async function toggleTestimonialVisibility(
     data: { isVisible },
   });
 
+  await invalidateCache("testimonials:all", "testimonials:visible");
   revalidatePath("/admin/testimonials");
   revalidatePath("/");
   return updated;
@@ -228,6 +239,7 @@ export async function deleteTestimonial(id: string) {
     where: { id },
   });
 
+  await invalidateCache("testimonials:all", "testimonials:visible");
   revalidatePath("/admin/testimonials");
   revalidatePath("/");
 }
