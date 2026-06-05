@@ -1,7 +1,29 @@
 import { ReactNode } from "react";
+import { Metadata } from "next";
 import { syne, dmSans } from "./fonts";
 import "@/styles/globals.css";
 import Provider from "./provider";
+
+export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL || "https://devixid.vercel.app",
+  ),
+  title: {
+    default: "Devix | Premium Software Development Agency",
+    template: "%s | Devix",
+  },
+  description:
+    "Devix designs and builds high-performance custom web applications and software solutions for global brands.",
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    siteName: "Devix",
+  },
+  twitter: {
+    card: "summary_large_image",
+    site: "@devix",
+  },
+};
 
 interface Props {
   children: ReactNode;

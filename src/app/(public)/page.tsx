@@ -9,16 +9,20 @@ import ProjectCard from "@/components/molecules/projects/ProjectCard";
 import { getFeaturedProjects } from "@/actions/projects";
 
 export const metadata: Metadata = {
-  title: "Devix — Web Agency",
+  title: "Devix — Premium Software Development Agency",
   description:
-    "We design and build high-performance custom websites for global brands.",
+    "We design and build high-performance custom websites and software solutions for global brands.",
   keywords: [
     "devix",
     "web agency",
+    "software development agency",
     "custom websites",
     "next.js",
     "web development",
   ],
+  alternates: {
+    canonical: "/",
+  },
 };
 
 export const revalidate = 60;
@@ -26,8 +30,28 @@ export const revalidate = 60;
 export default async function Page() {
   const featuredProjects = await getFeaturedProjects();
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ProfessionalService",
+    name: "Devix",
+    url: process.env.NEXT_PUBLIC_SITE_URL || "https://devixid.vercel.app",
+    logo: `${process.env.NEXT_PUBLIC_SITE_URL || "https://devixid.vercel.app"}/logo.png`,
+    description:
+      "Premium Software Development Agency specializing in Next.js and React.",
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: "Jakarta",
+      addressCountry: "ID",
+    },
+  };
+
   return (
     <div className="grain-overlay">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+
       {/* Hero */}
       <HeroSection />
 
