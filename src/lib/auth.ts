@@ -1,10 +1,8 @@
 import { EncryptJWT, jwtDecrypt } from "jose";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 
-// JWT_SECRET should be defined in .env
-// Using a default fallback for development purposes only.
-const secretKey =
-  process.env.JWT_SECRET || "devix-super-secret-key-pbkdf2-hmac-iv-123456789";
+const secretKey = process.env.JWT_SECRET;
+if (!secretKey) throw new Error("JWT_SECRET environment variable is not set.");
 const secret = new TextEncoder().encode(secretKey);
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -17,7 +15,7 @@ export async function encryptSession(payload: any) {
       enc: "A256GCM",
     })
     .setIssuedAt()
-    .setExpirationTime("24h")
+    .setExpirationTime("8h")
     .encrypt(secret);
 }
 
@@ -33,21 +31,66 @@ export async function decryptSession(token: string) {
 export async function setSessionCookie(userId: string, email: string) {
   const token = await encryptSession({ userId, email });
 
-  (await cookies()).set("devix_admin_session", token, {
+  (await cookies()).set("__Host-devix_session", token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
+    secure: true,
+    sameSite: "strict",
     path: "/",
-    maxAge: 60 * 60 * 24, // 24 hours
+    maxAge: 60 * 60 * 8, // 8 hours
   });
 }
 
 export async function clearSessionCookie() {
-  (await cookies()).delete("devix_admin_session");
+  (await cookies()).delete("__Host-devix_session");
 }
 
 export async function getSessionCookie() {
-  const token = (await cookies()).get("devix_admin_session")?.value;
+  const token = (await cookies()).get("__Host-devix_session")?.value;
   if (!token) return null;
   return await decryptSession(token);
+}
+
+// Check CSRF Origin
+export async function verifyCsrfOrigin() {
+  const headersList = await headers();
+  const origin = headersList.get("origin");
+  const allowedOrigin = process.env.NEXT_PUBLIC_SITE_URL;
+  if (origin && origin !== allowedOrigin) {
+    throw new Error("Invalid request origin.");
+  }
+}
+
+// Verify Admin Session and Whitelist Status
+export async function verifyAdminSession() {
+  const session = await getSessionCookie();
+
+  if (!session || !session.email) {
+    throw new Error("Unauthorized access. Session not found.");
+  }
+
+  // Use dynamic import or lazy load for prisma & redis if needed,
+  // or just import at the top of the file
+  const { prisma } = await import("@/lib/prisma");
+  const { cachedQuery } = await import("@/lib/redis");
+
+  // Check if email is whitelisted using cached query
+  const emailStr = session.email as string;
+  const dbUser = await cachedQuery(
+    `admin:whitelist:${emailStr}`,
+    async () => {
+      return prisma.user.findUnique({
+        where: { email: emailStr },
+        select: { email: true },
+      });
+    },
+    600, // Cache whitelist for 10 mins
+  );
+
+  if (!dbUser) {
+    throw new Error(
+      "Unauthorized access. Admin whitelist verification failed.",
+    );
+  }
+
+  return session;
 }

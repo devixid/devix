@@ -2,8 +2,8 @@ import { NextResponse, type NextRequest } from "next/server";
 import { jwtDecrypt } from "jose";
 import { globalLimiter, apiLimiter, getClientIp } from "@/lib/rate-limit";
 
-const secretKey =
-  process.env.JWT_SECRET || "devix-super-secret-key-pbkdf2-hmac-iv-123456789";
+const secretKey = process.env.JWT_SECRET;
+if (!secretKey) throw new Error("JWT_SECRET environment variable is not set.");
 const secret = new TextEncoder().encode(secretKey);
 
 export async function proxy(request: NextRequest) {
@@ -53,10 +53,10 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const token = request.cookies.get("devix_admin_session")?.value;
+  const token = request.cookies.get("__Host-devix_session")?.value;
 
   if (!token) {
-    if (pathname !== "/admin/login" && pathname !== "/admin/register") {
+    if (pathname !== "/admin/login") {
       return NextResponse.redirect(new URL("/admin/login", request.url));
     }
     return NextResponse.next();
@@ -67,18 +67,18 @@ export async function proxy(request: NextRequest) {
     await jwtDecrypt(token, secret);
 
     // User is logged in
-    if (pathname === "/admin/login" || pathname === "/admin/register") {
+    if (pathname === "/admin/login") {
       return NextResponse.redirect(new URL("/admin", request.url));
     }
 
     return NextResponse.next();
   } catch (_) {
     // Invalid token
-    if (pathname !== "/admin/login" && pathname !== "/admin/register") {
+    if (pathname !== "/admin/login") {
       const response = NextResponse.redirect(
         new URL("/admin/login", request.url),
       );
-      response.cookies.delete("devix_admin_session");
+      response.cookies.delete("__Host-devix_session");
       return response;
     }
     return NextResponse.next();

@@ -5,6 +5,8 @@ import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { contactLimiter, getClientIp } from "@/lib/rate-limit";
 
+import { ContactFormSchema } from "@/lib/schemas";
+
 type ContactFormData = {
   name: string;
   email: string;
@@ -28,26 +30,20 @@ export async function submitContactForm(
     };
   }
 
-  // Validasi server-side
-  if (!data.name || data.name.trim().length < 2) {
-    return { success: false, error: "Name must be at least 2 characters." };
+  const parsed = ContactFormSchema.safeParse(data);
+  if (!parsed.success) {
+    const firstError = parsed.error.issues[0];
+    return { success: false, error: firstError.message };
   }
 
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!data.email || !emailRegex.test(data.email)) {
-    return { success: false, error: "Please enter a valid email address." };
-  }
-
-  if (!data.message || data.message.trim().length < 10) {
-    return { success: false, error: "Message must be at least 10 characters." };
-  }
+  const validatedData = parsed.data;
 
   try {
     await prisma.contactSubmission.create({
       data: {
-        name: data.name.trim(),
-        email: data.email.trim().toLowerCase(),
-        message: data.message.trim(),
+        name: validatedData.name.trim(),
+        email: validatedData.email.trim().toLowerCase(),
+        message: validatedData.message.trim(),
       },
     });
 

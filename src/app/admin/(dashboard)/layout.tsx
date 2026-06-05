@@ -1,11 +1,19 @@
 import { ReactNode } from "react";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
+import { verifyAdminSession } from "@/lib/auth";
+import { redirect } from "next/navigation";
 
 interface Props {
   children: ReactNode;
 }
 
-export default function DashboardLayout({ children }: Props) {
+export default async function DashboardLayout({ children }: Props) {
+  try {
+    await verifyAdminSession();
+  } catch {
+    redirect("/admin");
+  }
+
   return (
     <div className="relative flex min-h-screen flex-col bg-[#0A0A0A] md:flex-row">
       {/* Sidebar */}

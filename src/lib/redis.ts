@@ -1,10 +1,15 @@
 import { Redis } from "@upstash/redis";
 
-// Initialize Upstash Redis Client
-// We use fallback dummy values to prevent crashing during build if env vars are missing
+const redisUrl = process.env.UPSTASH_REDIS_REST_URL;
+const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN;
+
+if (!redisUrl || !redisToken) {
+  throw new Error("Upstash Redis environment variables are not configured.");
+}
+
 export const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_URL || "https://dummy-url.upstash.io",
-  token: process.env.UPSTASH_REDIS_REST_TOKEN || "dummy-token",
+  url: redisUrl,
+  token: redisToken,
 });
 
 /**

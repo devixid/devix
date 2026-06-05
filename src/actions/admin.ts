@@ -2,39 +2,11 @@
 
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
-import { getSessionCookie } from "@/lib/auth";
+import { verifyAdminSession, verifyCsrfOrigin } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
-import { cachedQuery, invalidateCache } from "@/lib/redis";
-
-// Helper to verify admin session and whitelist status
-async function verifyAdminSession() {
-  const session = await getSessionCookie();
-
-  if (!session || !session.email) {
-    throw new Error("Unauthorized access. Session not found.");
-  }
-
-  // Check if email is whitelisted using cached query
-  const emailStr = session.email as string;
-  const dbUser = await cachedQuery(
-    `admin:whitelist:${emailStr}`,
-    async () => {
-      return prisma.user.findUnique({
-        where: { email: emailStr },
-        select: { email: true },
-      });
-    },
-    600, // Cache whitelist for 10 mins
-  );
-
-  if (!dbUser) {
-    throw new Error(
-      "Unauthorized access. Admin whitelist verification failed.",
-    );
-  }
-
-  return session;
-}
+import { invalidateCache } from "@/lib/redis";
+import { TestimonialSchema } from "@/lib/schemas";
+import { z } from "zod";
 
 // ----------------------------------------------------
 // 1. OVERVIEW ACTIONS
@@ -103,6 +75,7 @@ export async function getSubmissionById(id: string) {
 
 export async function markSubmissionAsRead(id: string, isRead: boolean) {
   await verifyAdminSession();
+  await verifyCsrfOrigin();
 
   const updated = await prisma.contactSubmission.update({
     where: { id },
@@ -116,6 +89,7 @@ export async function markSubmissionAsRead(id: string, isRead: boolean) {
 
 export async function deleteSubmission(id: string) {
   await verifyAdminSession();
+  await verifyCsrfOrigin();
 
   await prisma.contactSubmission.delete({
     where: { id },
@@ -135,54 +109,27 @@ export async function getTestimonials() {
   });
 }
 
-interface TestimonialInput {
-  clientName: string;
-  clientRole: string;
-  company: string;
-  content: string;
-  avatarUrl?: string | null;
-  isVisible?: boolean;
-  order?: number;
-}
-
-function validateTestimonialInput(data: TestimonialInput) {
-  if (!data.clientName || data.clientName.trim().length < 2) {
-    throw new Error("Client name must be at least 2 characters.");
-  }
-  if (!data.clientRole || data.clientRole.trim().length < 2) {
-    throw new Error("Client role must be at least 2 characters.");
-  }
-  if (!data.company || data.company.trim().length < 2) {
-    throw new Error("Company must be at least 2 characters.");
-  }
-  if (!data.content || data.content.trim().length < 10) {
-    throw new Error("Content must be at least 10 characters.");
-  }
-  if (data.avatarUrl && data.avatarUrl.trim().length > 0) {
-    try {
-      new URL(data.avatarUrl);
-    } catch (err) {
-      throw new Error(
-        "Avatar URL must be a valid absolute URL (e.g. https://example.com/avatar.jpg).",
-        { cause: err },
-      );
-    }
-  }
-}
+type TestimonialInput = z.infer<typeof TestimonialSchema>;
 
 export async function createTestimonial(data: TestimonialInput) {
   await verifyAdminSession();
-  validateTestimonialInput(data);
+  await verifyCsrfOrigin();
+
+  const parsed = TestimonialSchema.safeParse(data);
+  if (!parsed.success) {
+    throw new Error(parsed.error.issues[0].message);
+  }
+  const validatedData = parsed.data;
 
   const created = await prisma.testimonial.create({
     data: {
-      clientName: data.clientName.trim(),
-      clientRole: data.clientRole.trim(),
-      company: data.company.trim(),
-      content: data.content.trim(),
-      avatarUrl: data.avatarUrl?.trim() || null,
-      isVisible: data.isVisible ?? true,
-      order: data.order ?? 0,
+      clientName: validatedData.clientName.trim(),
+      clientRole: validatedData.clientRole.trim(),
+      company: validatedData.company.trim(),
+      content: validatedData.content.trim(),
+      avatarUrl: validatedData.avatarUrl?.trim() || null,
+      isVisible: validatedData.isVisible ?? true,
+      order: validatedData.order ?? 0,
     },
   });
 
@@ -194,18 +141,24 @@ export async function createTestimonial(data: TestimonialInput) {
 
 export async function updateTestimonial(id: string, data: TestimonialInput) {
   await verifyAdminSession();
-  validateTestimonialInput(data);
+  await verifyCsrfOrigin();
+
+  const parsed = TestimonialSchema.safeParse(data);
+  if (!parsed.success) {
+    throw new Error(parsed.error.issues[0].message);
+  }
+  const validatedData = parsed.data;
 
   const updated = await prisma.testimonial.update({
     where: { id },
     data: {
-      clientName: data.clientName.trim(),
-      clientRole: data.clientRole.trim(),
-      company: data.company.trim(),
-      content: data.content.trim(),
-      avatarUrl: data.avatarUrl?.trim() || null,
-      isVisible: data.isVisible ?? true,
-      order: data.order ?? 0,
+      clientName: validatedData.clientName.trim(),
+      clientRole: validatedData.clientRole.trim(),
+      company: validatedData.company.trim(),
+      content: validatedData.content.trim(),
+      avatarUrl: validatedData.avatarUrl?.trim() || null,
+      isVisible: validatedData.isVisible ?? true,
+      order: validatedData.order ?? 0,
     },
   });
 
@@ -220,6 +173,7 @@ export async function toggleTestimonialVisibility(
   isVisible: boolean,
 ) {
   await verifyAdminSession();
+  await verifyCsrfOrigin();
 
   const updated = await prisma.testimonial.update({
     where: { id },
@@ -234,6 +188,7 @@ export async function toggleTestimonialVisibility(
 
 export async function deleteTestimonial(id: string) {
   await verifyAdminSession();
+  await verifyCsrfOrigin();
 
   await prisma.testimonial.delete({
     where: { id },

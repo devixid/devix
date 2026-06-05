@@ -2,7 +2,7 @@
 
 import { TeamCardProps } from "@/interface";
 import Image from "next/image";
-import { Github, Linkedin } from "lucide-react";
+import { GitForkIcon, Link2Icon } from "lucide-react";
 
 export default function TeamCard({
   description,
@@ -34,7 +34,7 @@ export default function TeamCard({
             className="text-white/80 transition-colors hover:text-white"
             title={`${name}'s GitHub`}
           >
-            <Github className="h-5 w-5" />
+            <GitForkIcon className="h-5 w-5" />
           </a>
           <a
             href={socials.linkedin}
@@ -43,7 +43,7 @@ export default function TeamCard({
             className="text-white/80 transition-colors hover:text-white"
             title={`${name}'s LinkedIn`}
           >
-            <Linkedin className="h-5 w-5" />
+            <Link2Icon className="h-5 w-5" />
           </a>
         </div>
       </div>

@@ -5,6 +5,7 @@ import bcrypt from "bcryptjs";
 import { setSessionCookie, clearSessionCookie } from "@/lib/auth";
 import { headers } from "next/headers";
 import { authLimiter, registerLimiter, getClientIp } from "@/lib/rate-limit";
+import { RegisterSchema, LoginSchema } from "@/lib/schemas";
 
 export async function registerAdmin(formData: FormData) {
   const ip = getClientIp(await headers());
@@ -13,14 +14,18 @@ export async function registerAdmin(formData: FormData) {
     throw new Error("Too many registration attempts. Please try again later.");
   }
 
-  const email = formData.get("email") as string;
-  const password = formData.get("password") as string;
-  const firstName = formData.get("firstName") as string;
-  const lastName = formData.get("lastName") as string;
+  const parsed = RegisterSchema.safeParse({
+    email: formData.get("email"),
+    password: formData.get("password"),
+    firstName: formData.get("firstName"),
+    lastName: formData.get("lastName"),
+  });
 
-  if (!email || !password) {
-    throw new Error("Email and password are required.");
+  if (!parsed.success) {
+    throw new Error(parsed.error.issues[0].message);
   }
+
+  const { email, password, firstName, lastName } = parsed.data;
 
   // Hard limit: Maximum 4 users
   const userCount = await prisma.user.count();
@@ -61,12 +66,16 @@ export async function loginAdmin(formData: FormData) {
     throw new Error("Too many login attempts. Please try again later.");
   }
 
-  const email = formData.get("email") as string;
-  const password = formData.get("password") as string;
+  const parsed = LoginSchema.safeParse({
+    email: formData.get("email"),
+    password: formData.get("password"),
+  });
 
-  if (!email || !password) {
-    throw new Error("Email and password are required.");
+  if (!parsed.success) {
+    throw new Error(parsed.error.issues[0].message);
   }
+
+  const { email, password } = parsed.data;
 
   const user = await prisma.user.findUnique({
     where: { email },

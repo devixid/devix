@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { m } from "framer-motion";
 import { ProjectWithRelations } from "@/app/(public)/projects/ProjectsClient";
-import { Github, ExternalLink } from "lucide-react";
+import { ExternalLink, GitCommit } from "lucide-react";
 
 interface ProjectCardProps {
   project: ProjectWithRelations;
@@ -65,7 +65,7 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
               className="flex h-10 w-10 translate-y-4 items-center justify-center rounded-full bg-zinc-900 text-white transition-all duration-300 group-hover:translate-y-0 hover:scale-110"
               title="View Source Code"
             >
-              <Github size={18} />
+              <GitCommit size={18} />
             </a>
           )}
         </div>

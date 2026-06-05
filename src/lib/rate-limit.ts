@@ -49,16 +49,31 @@ export const apiLimiter = new Ratelimit({
   ephemeralCache: cache,
 });
 
+import net from "net";
+
 /**
  * Extracts the client IP address from a NextRequest or standard Headers object.
  */
 export function getClientIp(headers: Headers): string {
   const fallback = "127.0.0.1";
-  const forwardedFor = headers.get("x-forwarded-for");
 
+  // Vercel specific trusted proxy header
+  const vercelIp = headers.get("x-vercel-forwarded-for");
+  if (vercelIp && net.isIP(vercelIp)) return vercelIp;
+
+  // Fallback to standard forwarded-for, but be aware it can be spoofed outside of trusted proxy environments
+  const forwardedFor = headers.get("x-forwarded-for");
   if (forwardedFor) {
-    return forwardedFor.split(",")[0].trim();
+    const ip = forwardedFor.split(",")[0].trim();
+    if (net.isIP(ip)) {
+      return ip;
+    }
   }
 
-  return headers.get("x-real-ip") || fallback;
+  const realIp = headers.get("x-real-ip");
+  if (realIp && net.isIP(realIp)) {
+    return realIp;
+  }
+
+  return fallback;
 }

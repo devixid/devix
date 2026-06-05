@@ -15,6 +15,11 @@ export default async function handler(
     });
   }
 
+  const authHeader = req.headers.authorization;
+  if (authHeader !== `Bearer ${process.env.HEALTH_CHECK_SECRET}`) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
   try {
     // Cek koneksi Database via Prisma (lakukan query ringan)
     const dbStart = performance.now();
@@ -76,8 +81,7 @@ export default async function handler(
     res.status(503).json({
       status: "error",
       timestamp: new Date().toISOString(),
-      message: "Service Unavailable",
-      details: error instanceof Error ? error.message : "Unknown error",
+      message: "Internal Server Error",
     });
   }
 }
