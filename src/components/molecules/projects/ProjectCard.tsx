@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { m } from "framer-motion";
 import { ProjectWithRelations } from "@/app/(public)/projects/ProjectsClient";
 import { ExternalLink, GitCommit } from "lucide-react";
@@ -84,9 +85,11 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
           )}
         </div>
 
-        <h4 className="font-display mb-2 line-clamp-1 text-xl font-medium tracking-tight text-black group-hover:text-zinc-700">
-          {project.title}
-        </h4>
+        <Link href={`/projects/${project.slug}`} className="group/title inline-block">
+          <h4 className="font-display mb-2 line-clamp-1 text-xl font-medium tracking-tight text-black group-hover/title:text-accent transition-colors">
+            {project.title}
+          </h4>
+        </Link>
 
         <p className="mb-6 line-clamp-2 flex-1 text-sm leading-relaxed text-zinc-500">
           {project.description}

@@ -53,6 +53,7 @@ model Project {
   title       String
   slug        String   @unique
   description String   @db.Text
+  content     String?  @db.Text
   category    String
   imageUrl    String
   liveUrl     String?

@@ -75,3 +75,22 @@ export async function getFilterOptions() {
     600, // 10 minutes TTL
   );
 }
+
+export async function getProjectBySlug(slug: string) {
+  return cachedQuery(
+    `project:${slug}`,
+    async () => {
+      return prisma.project.findUnique({
+        where: {
+          slug,
+          isVisible: true,
+        },
+        include: {
+          techStacks: true,
+          developers: true,
+        },
+      });
+    },
+    300, // 5 minutes TTL
+  );
+}
