@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Redis } from "@upstash/redis";
 
 // Lazy initialization — tidak diinisialisasi saat module di-load,
@@ -5,7 +6,10 @@ import { Redis } from "@upstash/redis";
 let _redis: Redis | null = null;
 
 export function getRedisClient(): Redis | null {
-  if (!process.env.UPSTASH_REDIS_REST_URL || !process.env.UPSTASH_REDIS_REST_TOKEN) {
+  if (
+    !process.env.UPSTASH_REDIS_REST_URL ||
+    !process.env.UPSTASH_REDIS_REST_TOKEN
+  ) {
     return null;
   }
   if (!_redis) {
@@ -33,7 +37,14 @@ export async function cachedQuery<T>(
   try {
     const cachedData = await redis.get<T>(key);
     if (cachedData) return cachedData;
-  } catch (error) {
+  } catch (error: any) {
+    if (
+      error &&
+      (error.digest === "DYNAMIC_SERVER_USAGE" ||
+        error.message?.includes("Dynamic server usage"))
+    ) {
+      throw error;
+    }
     console.error(`[Redis] Error fetching key "${key}":`, error);
   }
 
@@ -41,7 +52,14 @@ export async function cachedQuery<T>(
 
   try {
     await redis.set(key, freshData, { ex: ttlSeconds });
-  } catch (error) {
+  } catch (error: any) {
+    if (
+      error &&
+      (error.digest === "DYNAMIC_SERVER_USAGE" ||
+        error.message?.includes("Dynamic server usage"))
+    ) {
+      throw error;
+    }
     console.error(`[Redis] Error setting key "${key}":`, error);
   }
 
@@ -53,7 +71,14 @@ export async function invalidateCache(...keys: string[]) {
   if (!redis || keys.length === 0) return;
   try {
     await redis.del(...keys);
-  } catch (error) {
+  } catch (error: any) {
+    if (
+      error &&
+      (error.digest === "DYNAMIC_SERVER_USAGE" ||
+        error.message?.includes("Dynamic server usage"))
+    ) {
+      throw error;
+    }
     console.error(`[Redis] Error invalidating keys ${keys.join(", ")}:`, error);
   }
 }
