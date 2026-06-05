@@ -2,59 +2,59 @@ import type { NextConfig } from "next";
 
 const isDev = process.env.NODE_ENV === "development";
 
-import crypto from "crypto";
+// import crypto from "crypto";
 
-const faqs = [
-  {
-    question: "What services and products do you offer?",
-    answer:
-      "We offer comprehensive custom web development (company profiles, e-commerce platforms, landing pages) and custom mobile applications tailored to your business needs.",
-  },
-  {
-    question: "How much experience do you have with IT projects?",
-    answer:
-      "Our team members have worked on various digital products for businesses across Indonesia, delivering highly optimized, secure, and production-ready applications.",
-  },
-  {
-    question: "How long does a typical project take?",
-    answer:
-      "A standard website project takes between 2 to 4 weeks depending on the complexity of requirements and design iterations.",
-  },
-  {
-    question: "Should I create a mobile or a web app?",
-    answer:
-      "It depends on your audience. Websites are perfect for discovery and broad reach, while mobile apps are ideal for retaining repeat customers and providing offline capabilities.",
-  },
-  {
-    question: "What technologies do you use in development?",
-    answer:
-      "We primarily develop websites using Next.js, React, TailwindCSS, and Node.js, and integrate databases using Supabase and Prisma for maximum speed and security.",
-  },
-  {
-    question: "What do I need to prepare before contacting you?",
-    answer:
-      "Just your business idea and goals! Having your brand guidelines, logo files, and content copy ready will help speed up the process, but we are happy to guide you from scratch.",
-  },
-];
+// const faqs = [
+//   {
+//     question: "What services and products do you offer?",
+//     answer:
+//       "We offer comprehensive custom web development (company profiles, e-commerce platforms, landing pages) and custom mobile applications tailored to your business needs.",
+//   },
+//   {
+//     question: "How much experience do you have with IT projects?",
+//     answer:
+//       "Our team members have worked on various digital products for businesses across Indonesia, delivering highly optimized, secure, and production-ready applications.",
+//   },
+//   {
+//     question: "How long does a typical project take?",
+//     answer:
+//       "A standard website project takes between 2 to 4 weeks depending on the complexity of requirements and design iterations.",
+//   },
+//   {
+//     question: "Should I create a mobile or a web app?",
+//     answer:
+//       "It depends on your audience. Websites are perfect for discovery and broad reach, while mobile apps are ideal for retaining repeat customers and providing offline capabilities.",
+//   },
+//   {
+//     question: "What technologies do you use in development?",
+//     answer:
+//       "We primarily develop websites using Next.js, React, TailwindCSS, and Node.js, and integrate databases using Supabase and Prisma for maximum speed and security.",
+//   },
+//   {
+//     question: "What do I need to prepare before contacting you?",
+//     answer:
+//       "Just your business idea and goals! Having your brand guidelines, logo files, and content copy ready will help speed up the process, but we are happy to guide you from scratch.",
+//   },
+// ];
 
-const faqJsonLd = JSON.stringify({
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: faqs.map((faq) => ({
-    "@type": "Question",
-    name: faq.question,
-    acceptedAnswer: {
-      "@type": "Answer",
-      text: faq.answer,
-    },
-  })),
-});
+// const faqJsonLd = JSON.stringify({
+//   "@context": "https://schema.org",
+//   "@type": "FAQPage",
+//   mainEntity: faqs.map((faq) => ({
+//     "@type": "Question",
+//     name: faq.question,
+//     acceptedAnswer: {
+//       "@type": "Answer",
+//       text: faq.answer,
+//     },
+//   })),
+// });
 
-const faqHash = crypto.createHash("sha256").update(faqJsonLd).digest("base64");
+// const faqHash = crypto.createHash("sha256").update(faqJsonLd).digest("base64");
 
 const cspHeader = `
   default-src 'self';
-  script-src 'self' 'unsafe-eval' 'unsafe-inline' 'sha256-${faqHash}';
+  script-src 'self' 'unsafe-eval' 'unsafe-inline';
   style-src 'self' 'unsafe-inline';
   img-src 'self' blob: data: https:;
   font-src 'self' data:;
@@ -76,7 +76,7 @@ for (const envVar of requiredEnvVars) {
   if (!process.env[envVar]) {
     throw new Error(
       `Missing required environment variable: ${envVar}\n` +
-      `Make sure it's set in your .env.local or deployment environment.`
+        `Make sure it's set in your .env.local or deployment environment.`,
     );
   }
 }
