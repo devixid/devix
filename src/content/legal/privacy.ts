@@ -46,7 +46,7 @@ These providers process data only as needed to deliver their services to us.`,
     },
     {
       heading: "Your rights",
-      body: `Depending on your location, you may have the right to access, correct, delete, or restrict processing of your personal data. To exercise these rights, contact us using the email on our website.`,
+      body: `Depending on your location, you may have rights regarding your personal data. These include:\n\n• **Right to access** — request a copy of the personal data we hold about you.\n• **Right to rectification** — ask us to correct inaccurate or incomplete data.\n• **Right to erasure** — request deletion of your personal data where we have no legal obligation to retain it.\n• **Right to restriction** — ask us to limit how we process your data in certain circumstances.\n• **Right to data portability** — receive your data in a structured, machine-readable format.\n• **Right to object** — object to processing based on legitimate interests.\n\nIf you are located in the European Economic Area (EEA), United Kingdom, or California, you may have additional rights under GDPR, UK GDPR, or CCPA respectively.\n\nTo exercise any of these rights, contact us at hello@devix.id. We will respond within 30 days.`,
     },
     {
       heading: "Contact",
