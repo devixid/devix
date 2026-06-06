@@ -11,7 +11,15 @@ import {
   deleteProject,
   duplicateProject,
 } from "@/actions/admin/projects";
-import { Eye, EyeOff, Star, Trash2, Edit, ExternalLink, Copy } from "lucide-react";
+import {
+  Eye,
+  EyeOff,
+  Star,
+  Trash2,
+  Edit,
+  ExternalLink,
+  Copy,
+} from "lucide-react";
 
 type ProjectWithRelations = Project & {
   techStacks: ProjectTechStack[];

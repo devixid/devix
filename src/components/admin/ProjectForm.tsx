@@ -254,7 +254,8 @@ export default function ProjectForm({ initialData }: ProjectFormProps) {
                 />
                 {initialData && (
                   <p className="mt-1 text-[11px] text-zinc-500">
-                    Slug is locked on edit. Use &quot;Regenerate from title&quot; to change it.
+                    Slug is locked on edit. Use &quot;Regenerate from
+                    title&quot; to change it.
                   </p>
                 )}
               </div>
@@ -324,7 +325,8 @@ export default function ProjectForm({ initialData }: ProjectFormProps) {
               Case Study Content
             </h2>
             <p className="mb-4 text-xs text-zinc-500">
-              Optional rich content shown below the overview on the project page.
+              Optional rich content shown below the overview on the project
+              page.
             </p>
             <RichTextEditor
               value={formData.content}

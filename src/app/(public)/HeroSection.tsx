@@ -3,7 +3,10 @@ import { Heading, ScrollDownButton } from "@/components";
 import { SlideUp } from "@/components/animations/SlideUp";
 import { FadeIn } from "@/components/animations/FadeIn";
 import { SmoothScrollLink } from "@/components/atoms/SmoothScrollLink";
-import { DEFAULT_SITE_SECTIONS, type HeroContent } from "@/lib/content-defaults";
+import {
+  DEFAULT_SITE_SECTIONS,
+  type HeroContent,
+} from "@/lib/content-defaults";
 
 export function HeroSection({ content }: { content?: HeroContent }) {
   const hero = content ?? DEFAULT_SITE_SECTIONS.HERO;
@@ -57,13 +60,13 @@ export function HeroSection({ content }: { content?: HeroContent }) {
           <div className="flex flex-wrap items-center gap-6">
             <Link
               href="/estimator"
-              className="hover:text-white inline-flex items-center border border-black-1/20 px-8 py-3 text-sm font-medium tracking-[0.15em] text-black uppercase transition-all duration-300 hover:bg-black-1"
+              className="border-black-1/20 hover:bg-black-1 inline-flex items-center border px-8 py-3 text-sm font-medium tracking-[0.15em] text-black uppercase transition-all duration-300 hover:text-white"
             >
               {hero.ctaPrimary}
             </Link>
             <SmoothScrollLink
               href="#cta"
-              className="group text-zinc-500 hover:text-black-1 inline-flex items-center gap-x-2 text-sm font-medium transition-colors duration-300"
+              className="group hover:text-black-1 inline-flex items-center gap-x-2 text-sm font-medium text-zinc-500 transition-colors duration-300"
             >
               <span className="relative">
                 {hero.ctaSecondary}
@@ -73,7 +76,6 @@ export function HeroSection({ content }: { content?: HeroContent }) {
             </SmoothScrollLink>
           </div>
         </SlideUp>
-
 
         {/* Scroll indicator */}
         <FadeIn

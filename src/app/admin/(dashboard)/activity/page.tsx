@@ -34,17 +34,25 @@ export default async function ActivityPage({ searchParams }: Props) {
 
       <div className="divide-y divide-zinc-900 border border-zinc-800 bg-[#0F0F0F]">
         {items.length === 0 ? (
-          <div className="p-12 text-center text-sm text-zinc-500">No activity yet.</div>
+          <div className="p-12 text-center text-sm text-zinc-500">
+            No activity yet.
+          </div>
         ) : (
           items.map((log) => (
-            <div key={log.id} className="flex flex-col gap-1 p-6 md:flex-row md:items-center md:justify-between">
+            <div
+              key={log.id}
+              className="flex flex-col gap-1 p-6 md:flex-row md:items-center md:justify-between"
+            >
               <div>
                 <p className="text-sm text-zinc-200">
                   <span className="text-[#C8A96E]">{log.action}</span>
                   {" · "}
                   <span className="text-zinc-500">{log.entityType}</span>
                   {log.entityId && (
-                    <span className="font-mono text-xs text-zinc-600"> #{log.entityId.slice(0, 8)}</span>
+                    <span className="font-mono text-xs text-zinc-600">
+                      {" "}
+                      #{log.entityId.slice(0, 8)}
+                    </span>
                   )}
                 </p>
                 <p className="text-xs text-zinc-500">by {log.actorEmail}</p>

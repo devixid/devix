@@ -51,8 +51,8 @@ export function StepContact({
             Schedule your consultation
           </h2>
           <p className="mt-2 text-zinc-500">
-            Share your details and we&apos;ll follow up within 24 hours. You can go
-            back anytime to adjust your estimate.
+            Share your details and we&apos;ll follow up within 24 hours. You can
+            go back anytime to adjust your estimate.
           </p>
           <div className="mt-6 w-full">
             <EstimatorSelectionRecap

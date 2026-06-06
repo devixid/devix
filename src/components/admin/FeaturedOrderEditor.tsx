@@ -134,7 +134,10 @@ export default function FeaturedOrderEditor({
         >
           <div className="space-y-2">
             {items.map((project) => (
-              <SortableItem key={project.id} project={project} />
+              <SortableItem
+                key={project.id}
+                project={project}
+              />
             ))}
           </div>
         </SortableContext>

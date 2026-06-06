@@ -13,7 +13,10 @@ export default async function TeamContentPage() {
       <TeamAdminPanel
         members={members.map((m) => ({
           ...m,
-          socialLinks: m.socialLinks as { github?: string; linkedin?: string } | null,
+          socialLinks: m.socialLinks as {
+            github?: string;
+            linkedin?: string;
+          } | null,
         }))}
       />
     </div>

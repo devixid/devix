@@ -179,7 +179,7 @@ function Header() {
       data-theme={isDarkSection ? "dark" : "light"}
       className={cn(
         "site-header fixed inset-x-0 top-0",
-        mobileMenuOpen ? "z-[110] bg-black-1" : "z-50 bg-transparent",
+        mobileMenuOpen ? "bg-black-1 z-[110]" : "z-50 bg-transparent",
       )}
     >
       <div className="mx-auto flex h-[72px] max-w-6xl items-center justify-between px-6 lg:px-10">
@@ -305,7 +305,7 @@ function Header() {
             {/* Solid backdrop — no opacity animation so background stays opaque */}
             <div
               className={cn(
-                "absolute inset-0 bg-black-1 transition-opacity duration-300",
+                "bg-black-1 absolute inset-0 transition-opacity duration-300",
                 mobileMenuOpen ? "opacity-100" : "opacity-0",
               )}
             />

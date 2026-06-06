@@ -36,7 +36,8 @@ export async function proxy(request: NextRequest) {
     // 2. Global Rate Limiting (Tier 1) for all non-API paths
     const globalLimiter = getGlobalLimiter();
     if (globalLimiter) {
-      const { success, limit, reset, remaining } = await globalLimiter.limit(ip);
+      const { success, limit, reset, remaining } =
+        await globalLimiter.limit(ip);
       if (!success) {
         return new NextResponse("Too Many Requests", {
           status: 429,

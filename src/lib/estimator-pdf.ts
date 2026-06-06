@@ -22,7 +22,10 @@ function slugify(value: string): string {
     .slice(0, 40);
 }
 
-function renderSummaryToPdf(summary: EstimatorSummary, doc: import("jspdf").jsPDF) {
+function renderSummaryToPdf(
+  summary: EstimatorSummary,
+  doc: import("jspdf").jsPDF,
+) {
   const pageWidth = doc.internal.pageSize.getWidth();
   const margin = 20;
   const contentWidth = pageWidth - margin * 2;

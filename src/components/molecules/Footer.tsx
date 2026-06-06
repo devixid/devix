@@ -3,7 +3,10 @@ import Link from "next/link";
 import type { Route } from "next";
 import { SmoothScrollLink } from "@/components/atoms/SmoothScrollLink";
 import { resolveFooterExploreLinks } from "@/constants/nav";
-import { DEFAULT_SITE_SECTIONS, type FooterContent } from "@/lib/content-defaults";
+import {
+  DEFAULT_SITE_SECTIONS,
+  type FooterContent,
+} from "@/lib/content-defaults";
 import type { SocialLinks } from "@/lib/site-settings";
 
 const companyMenus = [
@@ -49,7 +52,10 @@ function FooterLink({
 
   if (href.startsWith("#")) {
     return (
-      <SmoothScrollLink href={href} className={className}>
+      <SmoothScrollLink
+        href={href}
+        className={className}
+      >
         {children}
         <span className="bg-accent absolute bottom-0 left-0 h-[1px] w-0 transition-all duration-400 group-hover:w-full" />
       </SmoothScrollLink>
@@ -57,7 +63,10 @@ function FooterLink({
   }
 
   return (
-    <Link href={href as Route} className={className}>
+    <Link
+      href={href as Route}
+      className={className}
+    >
       {children}
       <span className="bg-accent absolute bottom-0 left-0 h-[1px] w-0 transition-all duration-400 group-hover:w-full" />
     </Link>
@@ -95,7 +104,10 @@ export default function Footer({
       <div className="mx-auto max-w-6xl px-6 py-16 md:py-20 lg:px-10">
         <div className="flex flex-col gap-y-12 md:flex-row md:items-start md:justify-between">
           <div className="flex flex-col gap-y-4">
-            <Link href="/" className="flex items-center gap-x-3">
+            <Link
+              href="/"
+              className="flex items-center gap-x-3"
+            >
               <Image
                 src="/devix_logo.white.png"
                 alt="Devix"
@@ -118,7 +130,10 @@ export default function Footer({
                 Explore
               </h4>
               {exploreMenus.map((menu) => (
-                <FooterLink key={menu.name} href={menu.route}>
+                <FooterLink
+                  key={menu.name}
+                  href={menu.route}
+                >
                   {menu.name}
                 </FooterLink>
               ))}
@@ -129,7 +144,10 @@ export default function Footer({
                 Company
               </h4>
               {companyMenus.map((menu) => (
-                <FooterLink key={menu.name} href={menu.route}>
+                <FooterLink
+                  key={menu.name}
+                  href={menu.route}
+                >
                   {menu.name}
                 </FooterLink>
               ))}
@@ -141,7 +159,11 @@ export default function Footer({
                   Social
                 </h4>
                 {socialMenus.map((menu) => (
-                  <FooterLink key={menu.name} href={menu.route} external>
+                  <FooterLink
+                    key={menu.name}
+                    href={menu.route}
+                    external
+                  >
                     {menu.name}
                   </FooterLink>
                 ))}
@@ -159,10 +181,16 @@ export default function Footer({
             >
               Privacy Policy
             </Link>
-            <span aria-hidden className="text-zinc-700">
+            <span
+              aria-hidden
+              className="text-zinc-700"
+            >
               ·
             </span>
-            <Link href="/terms" className="transition-colors hover:text-white">
+            <Link
+              href="/terms"
+              className="transition-colors hover:text-white"
+            >
               Terms of Service
             </Link>
           </div>

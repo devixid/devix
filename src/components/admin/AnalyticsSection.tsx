@@ -22,7 +22,9 @@ export async function AnalyticsSection() {
           <p className="text-xs text-zinc-500">Inquiries</p>
         </div>
         <div>
-          <p className="text-2xl font-light text-zinc-100">{analytics.totalLeads}</p>
+          <p className="text-2xl font-light text-zinc-100">
+            {analytics.totalLeads}
+          </p>
           <p className="text-xs text-zinc-500">Estimator leads</p>
         </div>
         <div>

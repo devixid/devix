@@ -41,8 +41,7 @@ const PROJECT_TYPES: {
     id: "ecommerce",
     label: PROJECT_TYPE_LABELS.ecommerce,
     icon: <ShoppingCart className="h-8 w-8" />,
-    description:
-      "An online store with product management, cart, and checkout.",
+    description: "An online store with product management, cart, and checkout.",
   },
   {
     id: "webapp",

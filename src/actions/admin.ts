@@ -136,7 +136,10 @@ export async function getSubmissionById(id: string) {
   });
 }
 
-export async function updateSubmissionStatus(id: string, status: InquiryStatus) {
+export async function updateSubmissionStatus(
+  id: string,
+  status: InquiryStatus,
+) {
   await verifyAdminSession();
   await verifyCsrfOrigin();
 

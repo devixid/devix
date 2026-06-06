@@ -89,7 +89,7 @@ export function EstimatorTierCard({
           <button
             type="button"
             onClick={() => setDetailOpen(true)}
-            className="inline-flex items-center gap-1.5 text-xs font-medium text-zinc-500 transition-colors hover:text-accent"
+            className="hover:text-accent inline-flex items-center gap-1.5 text-xs font-medium text-zinc-500 transition-colors"
           >
             <Info className="h-3.5 w-3.5" />
             View deliverables

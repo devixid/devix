@@ -41,7 +41,10 @@ function opt(id: string, label: string, deductionUsd: number): DeliverableItem {
 }
 
 function staticItem(label: string): DeliverableItem {
-  const id = label.toLowerCase().replace(/[^a-z0-9]+/g, "_").slice(0, 48);
+  const id = label
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "_")
+    .slice(0, 48);
   return { id, label, deductionUsd: 0, required: true };
 }
 
@@ -61,7 +64,11 @@ export const PROJECT_TYPE_DELIVERABLES: Record<
         "company_profile.core_pages",
         "Home, About, Services & Contact pages",
       ),
-      opt("company_profile.cms", "Content management system (CMS) for easy updates", 130),
+      opt(
+        "company_profile.cms",
+        "Content management system (CMS) for easy updates",
+        130,
+      ),
       opt(
         "company_profile.contact_form",
         "Contact form with email notifications",
@@ -92,11 +99,7 @@ export const PROJECT_TYPE_DELIVERABLES: Record<
         "Deployment & domain connection support",
         85,
       ),
-      opt(
-        "company_profile.support",
-        "30 days post-launch bug-fix support",
-        95,
-      ),
+      opt("company_profile.support", "30 days post-launch bug-fix support", 95),
     ],
     notIncluded: [
       "Copywriting & photography (can be quoted separately)",
@@ -108,14 +111,8 @@ export const PROJECT_TYPE_DELIVERABLES: Record<
     title: "E-Commerce",
     subtitle: "A fully functional online store ready to accept orders.",
     includes: [
-      req(
-        "ecommerce.catalog",
-        "Product catalog with categories & search",
-      ),
-      req(
-        "ecommerce.product_pages",
-        "Product detail pages with image gallery",
-      ),
+      req("ecommerce.catalog", "Product catalog with categories & search"),
+      req("ecommerce.product_pages", "Product detail pages with image gallery"),
       req("ecommerce.cart_checkout", "Shopping cart & checkout flow"),
       opt(
         "ecommerce.payment_gateway",
@@ -128,26 +125,11 @@ export const PROJECT_TYPE_DELIVERABLES: Record<
         "Admin panel for products, orders & inventory",
         220,
       ),
-      req(
-        "ecommerce.responsive",
-        "Responsive design across all devices",
-      ),
-      opt(
-        "ecommerce.seo",
-        "Basic SEO for product & category pages",
-        110,
-      ),
-      opt(
-        "ecommerce.ssl_checkout",
-        "SSL-ready secure checkout setup",
-        70,
-      ),
+      req("ecommerce.responsive", "Responsive design across all devices"),
+      opt("ecommerce.seo", "Basic SEO for product & category pages", 110),
+      opt("ecommerce.ssl_checkout", "SSL-ready secure checkout setup", 70),
       opt("ecommerce.deployment", "Deployment & launch support", 95),
-      opt(
-        "ecommerce.support",
-        "30 days post-launch bug-fix support",
-        100,
-      ),
+      opt("ecommerce.support", "30 days post-launch bug-fix support", 100),
     ],
     notIncluded: [
       "Product photography & descriptions",
@@ -159,15 +141,8 @@ export const PROJECT_TYPE_DELIVERABLES: Record<
     title: "Custom Web App",
     subtitle: "A tailored web application built around your business logic.",
     includes: [
-      req(
-        "webapp.ui_ux",
-        "Custom UI/UX design & interactive prototypes",
-      ),
-      opt(
-        "webapp.auth",
-        "User authentication & role-based access",
-        350,
-      ),
+      req("webapp.ui_ux", "Custom UI/UX design & interactive prototypes"),
+      opt("webapp.auth", "User authentication & role-based access", 350),
       req("webapp.dashboards", "Custom dashboards & data views"),
       opt("webapp.api", "REST or GraphQL API development", 400),
       opt("webapp.database", "Database design & implementation", 380),
@@ -185,21 +160,10 @@ export const PROJECT_TYPE_DELIVERABLES: Record<
         "webapp.responsive",
         "Responsive web app (desktop & mobile browsers)",
       ),
-      opt(
-        "webapp.testing",
-        "Automated testing for critical flows",
-        200,
-      ),
-      req(
-        "webapp.deployment",
-        "CI/CD pipeline & production deployment",
-      ),
+      opt("webapp.testing", "Automated testing for critical flows", 200),
+      req("webapp.deployment", "CI/CD pipeline & production deployment"),
       opt("webapp.documentation", "Technical documentation & handover", 150),
-      opt(
-        "webapp.support",
-        "30 days post-launch bug-fix support",
-        150,
-      ),
+      opt("webapp.support", "30 days post-launch bug-fix support", 150),
     ],
     notIncluded: [
       "Native mobile apps (available as separate tier)",
@@ -212,25 +176,15 @@ export const PROJECT_TYPE_DELIVERABLES: Record<
     subtitle: "A native or cross-platform app published to app stores.",
     includes: [
       req("mobile_app.ui_ux", "Custom mobile UI/UX design"),
-      req(
-        "mobile_app.development",
-        "Cross-platform or native development",
-      ),
-      req(
-        "mobile_app.auth",
-        "User authentication & secure sessions",
-      ),
+      req("mobile_app.development", "Cross-platform or native development"),
+      req("mobile_app.auth", "User authentication & secure sessions"),
       opt("mobile_app.push", "Push notification setup", 180),
       opt(
         "mobile_app.offline",
         "Offline-ready core flows (where applicable)",
         220,
       ),
-      opt(
-        "mobile_app.backend",
-        "Backend API & database (if required)",
-        450,
-      ),
+      opt("mobile_app.backend", "Backend API & database (if required)", 450),
       opt(
         "mobile_app.store_submission",
         "App Store & Google Play submission support",
@@ -251,11 +205,7 @@ export const PROJECT_TYPE_DELIVERABLES: Record<
         "Performance optimization for target devices",
         150,
       ),
-      opt(
-        "mobile_app.support",
-        "30 days post-launch bug-fix support",
-        150,
-      ),
+      opt("mobile_app.support", "30 days post-launch bug-fix support", 150),
     ],
     notIncluded: [
       "Apple Developer & Google Play account fees",
@@ -698,10 +648,7 @@ export function validateExcludedDeliverables(
     }
   }
 
-  if (
-    (type === "company_profile" || type === "ecommerce") &&
-    !designApproach
-  ) {
+  if ((type === "company_profile" || type === "ecommerce") && !designApproach) {
     return { valid: false, error: "Design approach required." };
   }
 

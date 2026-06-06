@@ -29,8 +29,7 @@ const TIMELINE_OPTIONS: {
     id: "standard",
     label: TIMELINE_LABELS.standard,
     icon: <Calendar className="h-8 w-8" />,
-    description:
-      "Normal pace. The ideal balance between speed and perfection.",
+    description: "Normal pace. The ideal balance between speed and perfection.",
   },
   {
     id: "rush",

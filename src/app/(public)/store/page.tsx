@@ -3,7 +3,8 @@ import CatalogClient from "@/components/organisms/CatalogClient";
 
 export const metadata = {
   title: "Store - Starter Kits & Templates",
-  description: "High-quality, production-ready starter kits and templates from Devix.",
+  description:
+    "High-quality, production-ready starter kits and templates from Devix.",
 };
 
 export const revalidate = 3600;

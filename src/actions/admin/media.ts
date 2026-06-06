@@ -1,17 +1,23 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { verifyAdminSession, verifyCsrfOrigin, getSessionCookie } from "@/lib/auth";
+import {
+  verifyAdminSession,
+  verifyCsrfOrigin,
+  getSessionCookie,
+} from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { logActivity } from "@/lib/activity-log";
 import type { StorageBucket } from "@/lib/supabase-storage";
 
 const PAGE_SIZE = 24;
 
-export async function listMediaAssets(params: {
-  page?: number;
-  mimeType?: string;
-} = {}) {
+export async function listMediaAssets(
+  params: {
+    page?: number;
+    mimeType?: string;
+  } = {},
+) {
   await verifyAdminSession();
   const page = Math.max(1, params.page ?? 1);
   const where = params.mimeType
@@ -78,13 +84,22 @@ export async function deleteMediaAsset(id: string) {
 
   const inUse =
     (await prisma.project.count({
-      where: { OR: [{ imageUrl: asset.publicUrl }, { content: { contains: asset.publicUrl } }] },
+      where: {
+        OR: [
+          { imageUrl: asset.publicUrl },
+          { content: { contains: asset.publicUrl } },
+        ],
+      },
     })) +
-    (await prisma.testimonial.count({ where: { avatarUrl: asset.publicUrl } })) +
+    (await prisma.testimonial.count({
+      where: { avatarUrl: asset.publicUrl },
+    })) +
     (await prisma.teamMember.count({ where: { imageUrl: asset.publicUrl } }));
 
   if (inUse > 0) {
-    throw new Error("Asset is still referenced. Remove it from content before deleting.");
+    throw new Error(
+      "Asset is still referenced. Remove it from content before deleting.",
+    );
   }
 
   await prisma.mediaAsset.delete({ where: { id } });

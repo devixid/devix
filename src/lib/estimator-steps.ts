@@ -139,7 +139,9 @@ export function clampStepKey(
 
   if (keys.includes(key)) {
     if (key === "contact" && !isEstimateComplete(state)) {
-      return isEstimateComplete(state) ? "result" : clampStepKey("result", state);
+      return isEstimateComplete(state)
+        ? "result"
+        : clampStepKey("result", state);
     }
     return key;
   }

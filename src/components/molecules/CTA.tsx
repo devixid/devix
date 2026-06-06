@@ -86,4 +86,3 @@ export default function CTA({ content }: { content?: CtaContent }) {
     </section>
   );
 }
-

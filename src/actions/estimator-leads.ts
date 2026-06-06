@@ -6,7 +6,10 @@ import { revalidatePath } from "next/cache";
 import { buildEstimatorLeadsWhereClause } from "@/lib/admin-leads-query";
 import type { EstimatorLeadStatus } from "@prisma/client";
 import type { CurrencyCode, EstimatorState } from "@/types/estimator";
-import { calculateEstimateUsd, supportsTemplateDesign } from "@/types/estimator";
+import {
+  calculateEstimateUsd,
+  supportsTemplateDesign,
+} from "@/types/estimator";
 import {
   calculateDeliverableSavings,
   resolveExcludedDeliverables,
@@ -22,16 +25,14 @@ function validateEstimatorLeadInput(state: EstimatorState) {
   if (!state.type || !state.scope || !state.complexity || !state.timeline) {
     return {
       ok: false as const,
-      error:
-        "Your estimate looks incomplete. Go back and complete all steps.",
+      error: "Your estimate looks incomplete. Go back and complete all steps.",
     };
   }
 
   if (supportsTemplateDesign(state.type) && !state.designApproach) {
     return {
       ok: false as const,
-      error:
-        "Your estimate looks incomplete. Go back and complete all steps.",
+      error: "Your estimate looks incomplete. Go back and complete all steps.",
     };
   }
 
@@ -157,12 +158,14 @@ export async function saveEstimatorLead(data: {
   return upsertEstimatorLead(data);
 }
 
-export async function getEstimatorLeads(params: {
-  status?: EstimatorLeadStatus | "all" | string;
-  query?: string;
-  dateFrom?: string;
-  dateTo?: string;
-} = {}) {
+export async function getEstimatorLeads(
+  params: {
+    status?: EstimatorLeadStatus | "all" | string;
+    query?: string;
+    dateFrom?: string;
+    dateTo?: string;
+  } = {},
+) {
   await verifyAdminSession();
 
   return prisma.estimatorLead.findMany({

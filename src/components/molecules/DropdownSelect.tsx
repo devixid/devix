@@ -31,7 +31,7 @@ function getTriggerClass(
   variant: DropdownSelectVariant,
   isOpen: boolean,
   compact: boolean,
-  disabled: boolean,
+  _disabled: boolean,
 ): string {
   const base =
     "inline-flex items-center justify-between gap-x-2 font-medium transition-all outline-none disabled:cursor-not-allowed disabled:opacity-50";

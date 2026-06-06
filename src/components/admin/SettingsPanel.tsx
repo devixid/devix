@@ -204,14 +204,19 @@ export default function SettingsPanel({
             >
               <div>
                 <p className="text-sm font-medium text-zinc-200">
-                  {[member.firstName, member.lastName].filter(Boolean).join(" ") ||
-                    "—"}
+                  {[member.firstName, member.lastName]
+                    .filter(Boolean)
+                    .join(" ") || "—"}
                 </p>
-                <p className="font-mono text-xs text-zinc-500">{member.email}</p>
+                <p className="font-mono text-xs text-zinc-500">
+                  {member.email}
+                </p>
               </div>
               <div className="flex items-center gap-3">
                 {!member.isActive && (
-                  <span className="text-[10px] text-zinc-600 uppercase">Inactive</span>
+                  <span className="text-[10px] text-zinc-600 uppercase">
+                    Inactive
+                  </span>
                 )}
                 <span className="text-[10px] tracking-wider text-zinc-600 uppercase">
                   Joined{" "}
@@ -230,7 +235,9 @@ export default function SettingsPanel({
                           router.refresh();
                         } catch (err) {
                           setInviteError(
-                            err instanceof Error ? err.message : "Deactivate failed.",
+                            err instanceof Error
+                              ? err.message
+                              : "Deactivate failed.",
                           );
                         }
                       })
@@ -248,7 +255,7 @@ export default function SettingsPanel({
 
       {/* Account Section */}
       <section className="border border-zinc-800 bg-[#0F0F0F] p-8">
-        <h2 className="mb-6 font-display text-xl font-light text-zinc-100">
+        <h2 className="font-display mb-6 text-xl font-light text-zinc-100">
           Change Password
         </h2>
         {passwordSuccess && (
@@ -322,7 +329,7 @@ export default function SettingsPanel({
       </section>
 
       <section className="border border-zinc-800 bg-[#0F0F0F] p-8">
-        <h2 className="mb-2 font-display text-xl font-light text-zinc-100">
+        <h2 className="font-display mb-2 text-xl font-light text-zinc-100">
           Notifications
         </h2>
         <p className="mb-6 text-sm text-zinc-500">

@@ -91,8 +91,11 @@ export default function ProjectCard({
           )}
         </div>
 
-        <Link href={`/projects/${project.slug}`} className="group/title inline-block">
-          <h4 className="font-display mb-2 line-clamp-1 text-xl font-medium tracking-tight text-black group-hover/title:text-accent transition-colors">
+        <Link
+          href={`/projects/${project.slug}`}
+          className="group/title inline-block"
+        >
+          <h4 className="font-display group-hover/title:text-accent mb-2 line-clamp-1 text-xl font-medium tracking-tight text-black transition-colors">
             {project.title}
           </h4>
         </Link>

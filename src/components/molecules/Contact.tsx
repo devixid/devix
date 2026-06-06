@@ -1,6 +1,9 @@
 import { Suspense } from "react";
 import ContactFormLazy from "./ContactFormLazy";
-import { DEFAULT_SITE_SECTIONS, type ContactContent } from "@/lib/content-defaults";
+import {
+  DEFAULT_SITE_SECTIONS,
+  type ContactContent,
+} from "@/lib/content-defaults";
 
 export default function Contact({ content }: { content?: ContactContent }) {
   const contact = content ?? DEFAULT_SITE_SECTIONS.CONTACT;

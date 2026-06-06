@@ -6,10 +6,7 @@ import { headers } from "next/headers";
 import { getContactLimiter, getClientIp } from "@/lib/rate-limit";
 
 import { ContactFormSchema } from "@/lib/schemas";
-import {
-  sendContactConfirmation,
-  sendInquiryNotification,
-} from "@/lib/email";
+import { sendContactConfirmation, sendInquiryNotification } from "@/lib/email";
 
 type ContactFormData = {
   name: string;

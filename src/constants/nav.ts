@@ -36,9 +36,7 @@ export function resolveFooterExploreLinks(
   cmsNavLinks?: FooterExploreLink[],
 ): FooterExploreLink[] {
   const links =
-    cmsNavLinks && cmsNavLinks.length > 0
-      ? cmsNavLinks
-      : FOOTER_EXPLORE_LINKS;
+    cmsNavLinks && cmsNavLinks.length > 0 ? cmsNavLinks : FOOTER_EXPLORE_LINKS;
 
   const hasEstimator = links.some((link) => link.href === "/estimator");
   if (hasEstimator) return links;

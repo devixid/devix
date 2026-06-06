@@ -13,7 +13,11 @@ import { invalidateCache } from "@/lib/redis";
 import { logActivity } from "@/lib/activity-log";
 import { revalidatePath } from "next/cache";
 import bcrypt from "bcryptjs";
-import { verifyAdminSession, verifyCsrfOrigin, getSessionCookie } from "@/lib/auth";
+import {
+  verifyAdminSession,
+  verifyCsrfOrigin,
+  getSessionCookie,
+} from "@/lib/auth";
 import { ChangePasswordSchema, RegisterSchema } from "@/lib/schemas";
 import { getRegisterLimiter, getClientIp } from "@/lib/rate-limit";
 import { headers } from "next/headers";
@@ -51,7 +55,9 @@ export async function inviteTeamMember(formData: FormData) {
   if (registerLimiter) {
     const { success } = await registerLimiter.limit(ip);
     if (!success) {
-      throw new Error("Too many registration attempts. Please try again later.");
+      throw new Error(
+        "Too many registration attempts. Please try again later.",
+      );
     }
   }
 
@@ -150,7 +156,10 @@ export async function updateNotificationEmail(email: string) {
   }
 
   await setNotificationEmail(trimmed || null);
-  await logActivity({ action: "settings.notification_email", entityType: "SiteSettings" });
+  await logActivity({
+    action: "settings.notification_email",
+    entityType: "SiteSettings",
+  });
   return { success: true };
 }
 

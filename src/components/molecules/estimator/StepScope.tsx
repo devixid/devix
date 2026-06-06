@@ -1,4 +1,3 @@
-import type { EstimatorState } from "@/types/estimator";
 import {
   getScopeHeading,
   getScopeOptions,
@@ -8,7 +7,7 @@ import { getScopeDeliverables } from "@/lib/estimator-deliverables";
 import { EstimatorTierCard } from "./EstimatorTierCard";
 import { FileText, Layers, Library } from "lucide-react";
 import type { ReactNode } from "react";
-import type { ProjectScope } from "@/types/estimator";
+import type { EstimatorState, ProjectScope } from "@/types/estimator";
 
 interface StepScopeProps {
   state: EstimatorState;

@@ -24,23 +24,50 @@ export default async function AdminPurchasesPage() {
 
       <div className="overflow-x-auto rounded-lg border border-zinc-800 bg-zinc-900/50">
         <table className="w-full text-left text-sm text-zinc-300">
-          <thead className="border-b border-zinc-800 bg-zinc-800/50 text-xs uppercase text-zinc-400">
+          <thead className="border-b border-zinc-800 bg-zinc-800/50 text-xs text-zinc-400 uppercase">
             <tr>
-              <th scope="col" className="px-6 py-4 font-medium">Buyer</th>
-              <th scope="col" className="px-6 py-4 font-medium">Product</th>
-              <th scope="col" className="px-6 py-4 font-medium">Date</th>
-              <th scope="col" className="px-6 py-4 font-medium">Token Status</th>
+              <th
+                scope="col"
+                className="px-6 py-4 font-medium"
+              >
+                Buyer
+              </th>
+              <th
+                scope="col"
+                className="px-6 py-4 font-medium"
+              >
+                Product
+              </th>
+              <th
+                scope="col"
+                className="px-6 py-4 font-medium"
+              >
+                Date
+              </th>
+              <th
+                scope="col"
+                className="px-6 py-4 font-medium"
+              >
+                Token Status
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-zinc-800">
             {purchases.map((purchase) => {
               const isExpired = purchase.tokenExpiresAt < new Date();
-              
+
               return (
-                <tr key={purchase.id} className="transition-colors hover:bg-zinc-800/50">
+                <tr
+                  key={purchase.id}
+                  className="transition-colors hover:bg-zinc-800/50"
+                >
                   <td className="px-6 py-4">
-                    <div className="font-medium text-zinc-100">{purchase.buyerName}</div>
-                    <div className="text-xs text-zinc-500">{purchase.buyerEmail}</div>
+                    <div className="font-medium text-zinc-100">
+                      {purchase.buyerName}
+                    </div>
+                    <div className="text-xs text-zinc-500">
+                      {purchase.buyerEmail}
+                    </div>
                   </td>
                   <td className="px-6 py-4 text-zinc-300">
                     {purchase.product.name}
@@ -54,11 +81,15 @@ export default async function AdminPurchasesPage() {
                         purchase.tokenUsed
                           ? "bg-blue-500/10 text-blue-400"
                           : isExpired
-                          ? "bg-red-500/10 text-red-400"
-                          : "bg-emerald-500/10 text-emerald-400"
+                            ? "bg-red-500/10 text-red-400"
+                            : "bg-emerald-500/10 text-emerald-400"
                       }`}
                     >
-                      {purchase.tokenUsed ? "Used" : isExpired ? "Expired" : "Active"}
+                      {purchase.tokenUsed
+                        ? "Used"
+                        : isExpired
+                          ? "Expired"
+                          : "Active"}
                     </span>
                   </td>
                 </tr>
@@ -66,7 +97,10 @@ export default async function AdminPurchasesPage() {
             })}
             {purchases.length === 0 && (
               <tr>
-                <td colSpan={4} className="px-6 py-8 text-center text-zinc-500">
+                <td
+                  colSpan={4}
+                  className="px-6 py-8 text-center text-zinc-500"
+                >
                   No purchases found.
                 </td>
               </tr>

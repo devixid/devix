@@ -56,10 +56,7 @@ export function StepCustomize({
     [state.excludedDeliverableIds],
   );
 
-  const savings = useMemo(
-    () => calculateDeliverableSavings(state),
-    [state],
-  );
+  const savings = useMemo(() => calculateDeliverableSavings(state), [state]);
 
   const removalCount = countRemovalSlots(state.excludedDeliverableIds);
 
@@ -77,7 +74,9 @@ export function StepCustomize({
     setLimitHint(false);
 
     if (shouldInclude) {
-      const next = state.excludedDeliverableIds.filter((itemId) => itemId !== id);
+      const next = state.excludedDeliverableIds.filter(
+        (itemId) => itemId !== id,
+      );
       updateState({ excludedDeliverableIds: next });
       return;
     }
@@ -141,9 +140,7 @@ export function StepCustomize({
             transition={{ duration: 0.28, ease: easeSmooth }}
             className="text-accent inline-block"
           >
-            {savings > 0
-              ? `−${formatSavings(savings)}`
-              : formatSavings(0)}
+            {savings > 0 ? `−${formatSavings(savings)}` : formatSavings(0)}
           </m.span>
         </p>
       </m.div>
@@ -204,7 +201,11 @@ export function StepCustomize({
               const dependent = isDependentOnly(item.id);
 
               return (
-                <m.li key={item.id} layout className="list-none">
+                <m.li
+                  key={item.id}
+                  layout
+                  className="list-none"
+                >
                   <m.div
                     role="button"
                     tabIndex={dependent ? -1 : 0}

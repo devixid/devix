@@ -4,7 +4,11 @@ import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { setSessionCookie, clearSessionCookie } from "@/lib/auth";
 import { headers } from "next/headers";
-import { getAuthLimiter, getRegisterLimiter, getClientIp } from "@/lib/rate-limit";
+import {
+  getAuthLimiter,
+  getRegisterLimiter,
+  getClientIp,
+} from "@/lib/rate-limit";
 import { RegisterSchema, LoginSchema } from "@/lib/schemas";
 
 export async function registerAdmin(formData: FormData) {
@@ -13,7 +17,9 @@ export async function registerAdmin(formData: FormData) {
   if (registerLimiter) {
     const { success } = await registerLimiter.limit(ip);
     if (!success) {
-      throw new Error("Too many registration attempts. Please try again later.");
+      throw new Error(
+        "Too many registration attempts. Please try again later.",
+      );
     }
   }
 

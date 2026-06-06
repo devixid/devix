@@ -90,52 +90,57 @@ export default async function InboxDetailPage({ params }: Props) {
           </p>
         </div>
 
-        {submission.estimatorLead && (() => {
-          const lead = submission.estimatorLead;
-          const excludedIds = Array.isArray(lead.excludedDeliverables)
-            ? (lead.excludedDeliverables as string[])
-            : [];
-          const excludedLabels = getExcludedLabelsForProjectType(
-            lead.projectType as ProjectType,
-            excludedIds,
-          );
+        {submission.estimatorLead &&
+          (() => {
+            const lead = submission.estimatorLead;
+            const excludedIds = Array.isArray(lead.excludedDeliverables)
+              ? (lead.excludedDeliverables as string[])
+              : [];
+            const excludedLabels = getExcludedLabelsForProjectType(
+              lead.projectType as ProjectType,
+              excludedIds,
+            );
 
-          return (
-            <div className="rounded border border-zinc-800 bg-zinc-900/30 p-4 text-sm text-zinc-400">
-              <p className="mb-2 text-[10px] tracking-wider text-zinc-500 uppercase">
-                Linked Estimator Data
-              </p>
-              <div className="grid grid-cols-2 gap-2 text-xs">
-                <span>Type: {lead.projectType}</span>
-                {lead.designApproach && (
-                  <span>
-                    Design:{" "}
-                    {lead.designApproach === "template" ? "Template" : "Custom"}
-                  </span>
-                )}
-                <span>Scope: {lead.scope}</span>
-                <span>Complexity: {lead.complexity}</span>
-                <span>Timeline: {lead.timeline}</span>
-                <span className="col-span-2">
-                  Budget: {lead.budgetDisplay}
-                </span>
-                {lead.deliverableSavingsUsd != null &&
-                  lead.deliverableSavingsUsd > 0 && (
-                    <span className="col-span-2">
-                      Package savings: −$
-                      {Math.round(lead.deliverableSavingsUsd).toLocaleString()}{" "}
-                      USD
+            return (
+              <div className="rounded border border-zinc-800 bg-zinc-900/30 p-4 text-sm text-zinc-400">
+                <p className="mb-2 text-[10px] tracking-wider text-zinc-500 uppercase">
+                  Linked Estimator Data
+                </p>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <span>Type: {lead.projectType}</span>
+                  {lead.designApproach && (
+                    <span>
+                      Design:{" "}
+                      {lead.designApproach === "template"
+                        ? "Template"
+                        : "Custom"}
                     </span>
                   )}
-                {excludedLabels.length > 0 && (
+                  <span>Scope: {lead.scope}</span>
+                  <span>Complexity: {lead.complexity}</span>
+                  <span>Timeline: {lead.timeline}</span>
                   <span className="col-span-2">
-                    Removed: {excludedLabels.join(" · ")}
+                    Budget: {lead.budgetDisplay}
                   </span>
-                )}
+                  {lead.deliverableSavingsUsd != null &&
+                    lead.deliverableSavingsUsd > 0 && (
+                      <span className="col-span-2">
+                        Package savings: −$
+                        {Math.round(
+                          lead.deliverableSavingsUsd,
+                        ).toLocaleString()}{" "}
+                        USD
+                      </span>
+                    )}
+                  {excludedLabels.length > 0 && (
+                    <span className="col-span-2">
+                      Removed: {excludedLabels.join(" · ")}
+                    </span>
+                  )}
+                </div>
               </div>
-            </div>
-          );
-        })()}
+            );
+          })()}
 
         <InboxDetailPanel
           id={submission.id}

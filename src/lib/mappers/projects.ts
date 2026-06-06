@@ -1,4 +1,8 @@
-import type { Project, ProjectDeveloper, ProjectTechStack } from "@prisma/client";
+import type {
+  Project,
+  ProjectDeveloper,
+  ProjectTechStack,
+} from "@prisma/client";
 import type { ProjectListItem } from "@/types/projects";
 
 type DateLike = Date | string;
@@ -14,7 +18,9 @@ function toIsoString(value: DateLike): string {
   return typeof value === "string" ? value : value.toISOString();
 }
 
-export function toProjectListItem(project: ProjectWithRelations): ProjectListItem {
+export function toProjectListItem(
+  project: ProjectWithRelations,
+): ProjectListItem {
   return {
     id: project.id,
     slug: project.slug,

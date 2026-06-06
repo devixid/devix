@@ -1,6 +1,10 @@
 import { getSiteSettingsPublic } from "@/lib/queries/site-content";
 
-export async function MaintenanceGate({ children }: { children: React.ReactNode }) {
+export async function MaintenanceGate({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const settings = await getSiteSettingsPublic();
 
   if (settings?.maintenanceMode) {

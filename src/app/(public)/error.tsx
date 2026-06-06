@@ -39,7 +39,11 @@ export default function Error({
           Server Error
         </SlideUp>
 
-        <SlideUp yOffset={40} duration={0.9} delay={0.3}>
+        <SlideUp
+          yOffset={40}
+          duration={0.9}
+          delay={0.3}
+        >
           <Heading.h1 className="max-w-4xl font-extralight">
             Something went wrong
           </Heading.h1>
@@ -52,7 +56,8 @@ export default function Error({
           className="mt-6 flex w-full flex-col items-center gap-y-10 md:mt-8"
         >
           <p className="max-w-md text-base leading-relaxed text-zinc-500 md:text-lg">
-            We encountered an unexpected error while processing your request. Our team has been notified.
+            We encountered an unexpected error while processing your request.
+            Our team has been notified.
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-6">

@@ -12,10 +12,10 @@ export const metadata: Metadata = {
 
 export default function EstimatorPage() {
   return (
-    <div className="grain-overlay relative min-h-screen bg-white text-black-1">
+    <div className="grain-overlay text-black-1 relative min-h-screen bg-white">
       {/* Decorative Glows */}
       <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
-        <div className="absolute -top-[10%] left-[10%] h-[600px] w-[600px] rounded-full bg-accent/10 blur-[150px]" />
+        <div className="bg-accent/10 absolute -top-[10%] left-[10%] h-[600px] w-[600px] rounded-full blur-[150px]" />
         <div className="absolute top-[30%] right-[5%] h-[500px] w-[500px] rounded-full bg-blue-500/5 blur-[120px]" />
       </div>
 

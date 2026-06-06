@@ -63,15 +63,19 @@ export async function updateSiteSettings(
   }
 
   const updateData: Prisma.SiteSettingsUpdateInput = {};
-  if (data.notificationEmail !== undefined) updateData.notificationEmail = data.notificationEmail;
+  if (data.notificationEmail !== undefined)
+    updateData.notificationEmail = data.notificationEmail;
   if (data.siteName !== undefined) updateData.siteName = data.siteName;
   if (data.siteUrl !== undefined) updateData.siteUrl = data.siteUrl;
-  if (data.metaDescription !== undefined) updateData.metaDescription = data.metaDescription;
+  if (data.metaDescription !== undefined)
+    updateData.metaDescription = data.metaDescription;
   if (data.socialLinks !== undefined) {
     updateData.socialLinks = data.socialLinks ?? undefined;
   }
-  if (data.maintenanceMode !== undefined) updateData.maintenanceMode = data.maintenanceMode;
-  if (data.maintenanceMessage !== undefined) updateData.maintenanceMessage = data.maintenanceMessage;
+  if (data.maintenanceMode !== undefined)
+    updateData.maintenanceMode = data.maintenanceMode;
+  if (data.maintenanceMessage !== undefined)
+    updateData.maintenanceMessage = data.maintenanceMessage;
 
   await delegate.upsert({
     where: { id: DEFAULT_SETTINGS_ID },
@@ -95,6 +99,8 @@ export async function getNotificationEmail(): Promise<string | null> {
   return process.env.RESEND_NOTIFY_TO || null;
 }
 
-export async function setNotificationEmail(email: string | null): Promise<void> {
+export async function setNotificationEmail(
+  email: string | null,
+): Promise<void> {
   await updateSiteSettings({ notificationEmail: email });
 }

@@ -14,9 +14,7 @@ export const CURRENCIES: {
   { code: "THB", symbol: "฿", name: "Thai Baht" },
 ];
 
-const VALID_CURRENCIES = new Set<CurrencyCode>(
-  CURRENCIES.map((c) => c.code),
-);
+const VALID_CURRENCIES = new Set<CurrencyCode>(CURRENCIES.map((c) => c.code));
 
 export function convertUsdToCurrency(
   amountUsd: number,
@@ -74,5 +72,7 @@ export function detectDefaultCurrency(): CurrencyCode {
 }
 
 export function isValidCurrencyCode(value: unknown): value is CurrencyCode {
-  return typeof value === "string" && VALID_CURRENCIES.has(value as CurrencyCode);
+  return (
+    typeof value === "string" && VALID_CURRENCIES.has(value as CurrencyCode)
+  );
 }

@@ -44,7 +44,11 @@ export function MediaPicker({
       <div className="max-h-[80vh] w-full max-w-3xl overflow-hidden border border-zinc-800 bg-[#0F0F0F]">
         <div className="flex items-center justify-between border-b border-zinc-800 px-6 py-4">
           <h2 className="text-sm font-medium text-zinc-200">Media Library</h2>
-          <button type="button" onClick={onClose} className="text-zinc-500 hover:text-white">
+          <button
+            type="button"
+            onClick={onClose}
+            className="text-zinc-500 hover:text-white"
+          >
             Close
           </button>
         </div>

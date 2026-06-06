@@ -7,12 +7,14 @@ import type { Prisma } from "@prisma/client";
 
 const PAGE_SIZE = 30;
 
-export async function getActivityLogs(params: {
-  page?: number;
-  entityType?: string;
-  dateFrom?: string;
-  dateTo?: string;
-} = {}) {
+export async function getActivityLogs(
+  params: {
+    page?: number;
+    entityType?: string;
+    dateFrom?: string;
+    dateTo?: string;
+  } = {},
+) {
   await verifyAdminSession();
 
   const page = Math.max(1, params.page ?? 1);

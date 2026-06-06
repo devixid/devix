@@ -30,7 +30,8 @@ export function LeadsSearch() {
         else params.delete("query");
       }
       if (updates.status !== undefined) {
-        if (updates.status && updates.status !== "all") params.set("status", updates.status);
+        if (updates.status && updates.status !== "all")
+          params.set("status", updates.status);
         else params.delete("status");
       }
       if (updates.dateFrom !== undefined) {

@@ -1,6 +1,5 @@
 import Link from "next/link";
 
-
 export default function DownloadInvalidPage() {
   return (
     <div className="flex min-h-[70vh] flex-col items-center justify-center px-4 text-center">
@@ -9,7 +8,8 @@ export default function DownloadInvalidPage() {
           Invalid Link
         </h1>
         <p className="text-zinc-600">
-          We couldn't find a valid download token. Please ensure you copied the entire link from your email correctly.
+          We couldn't find a valid download token. Please ensure you copied the
+          entire link from your email correctly.
         </p>
         <div className="pt-4">
           <Link

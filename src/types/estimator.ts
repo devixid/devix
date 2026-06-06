@@ -1,15 +1,29 @@
 import { getAdjustedBasePrice } from "@/lib/estimator-deliverables";
 
-export type ProjectType = "company_profile" | "ecommerce" | "webapp" | "mobile_app";
+export type ProjectType =
+  | "company_profile"
+  | "ecommerce"
+  | "webapp"
+  | "mobile_app";
 export type PlatformType = "android" | "ios" | "both";
 export type ProjectScope = "small" | "medium" | "large";
 export type ProjectComplexity = "basic" | "standard" | "premium";
 export type ProjectTimeline = "relaxed" | "standard" | "rush";
 export type DesignApproach = "custom" | "template";
 
-export type TemplateEligibleType = Extract<ProjectType, "company_profile" | "ecommerce">;
+export type TemplateEligibleType = Extract<
+  ProjectType,
+  "company_profile" | "ecommerce"
+>;
 
-export type CurrencyCode = "USD" | "IDR" | "MYR" | "SGD" | "BND" | "PHP" | "THB";
+export type CurrencyCode =
+  | "USD"
+  | "IDR"
+  | "MYR"
+  | "SGD"
+  | "BND"
+  | "PHP"
+  | "THB";
 
 export interface EstimatorState {
   type: ProjectType | null;

@@ -22,7 +22,10 @@ export default function FaQ({ faqs = DEFAULT_FAQ_ITEMS }: FaqProps) {
             <p className="mb-4 text-[13px] font-medium tracking-[0.2em] text-zinc-400 uppercase">
               FAQ
             </p>
-            <HeadingStatic level="h2" className="mb-4 font-extralight">
+            <HeadingStatic
+              level="h2"
+              className="mb-4 font-extralight"
+            >
               Frequently asked questions.
             </HeadingStatic>
             <p className="text-sm leading-relaxed text-zinc-500">

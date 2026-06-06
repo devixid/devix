@@ -52,7 +52,10 @@ const seoSchema = z.object({
   keywords: z.array(z.string()),
 });
 
-const sectionSchemas: Record<SiteSectionKey, z.ZodType<Record<string, unknown>>> = {
+const sectionSchemas: Record<
+  SiteSectionKey,
+  z.ZodType<Record<string, unknown>>
+> = {
   HERO: heroSchema,
   ABOUT: aboutSchema,
   SERVICES_INTRO: introSchema,
@@ -72,7 +75,9 @@ export function validateSiteSectionContent(
   const schema = sectionSchemas[key];
   const parsed = schema.safeParse(content);
   if (!parsed.success) {
-    throw new Error(parsed.error.issues[0]?.message ?? "Invalid section content.");
+    throw new Error(
+      parsed.error.issues[0]?.message ?? "Invalid section content.",
+    );
   }
   return parsed.data as Record<string, unknown>;
 }

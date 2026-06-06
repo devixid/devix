@@ -11,7 +11,10 @@ interface StoreProductCardProps {
   priority?: boolean;
 }
 
-export function StoreProductCard({ product, priority = false }: StoreProductCardProps) {
+export function StoreProductCard({
+  product,
+  priority = false,
+}: StoreProductCardProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -36,22 +39,26 @@ export function StoreProductCard({ product, priority = false }: StoreProductCard
                 stroke="currentColor"
                 strokeWidth={1}
               >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                />
               </svg>
             </div>
           )}
         </div>
-        
+
         <div className="flex flex-1 flex-col p-6">
           <div className="flex items-start justify-between gap-4">
-            <h3 className="font-syne text-xl font-bold text-zinc-900 line-clamp-2">
+            <h3 className="font-syne line-clamp-2 text-xl font-bold text-zinc-900">
               {product.name}
             </h3>
             <span className="shrink-0 bg-zinc-100 px-3 py-1 text-sm font-semibold text-zinc-900">
               ${product.price.toFixed(2)}
             </span>
           </div>
-          
+
           <p className="mt-3 line-clamp-3 text-sm text-zinc-600">
             {product.description}
           </p>
@@ -67,10 +74,10 @@ export function StoreProductCard({ product, priority = false }: StoreProductCard
         </div>
       </div>
 
-      <CheckoutModal 
-        isOpen={isOpen} 
-        onOpenChange={setIsOpen} 
-        product={product} 
+      <CheckoutModal
+        isOpen={isOpen}
+        onOpenChange={setIsOpen}
+        product={product}
       />
     </>
   );

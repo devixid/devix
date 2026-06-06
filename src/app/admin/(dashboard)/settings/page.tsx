@@ -12,12 +12,13 @@ export const metadata = {
 };
 
 export default async function SettingsPage() {
-  const [members, slotInfo, notificationEmail, siteSettings] = await Promise.all([
-    getTeamMembers(),
-    getTeamSlotInfo(),
-    getNotificationEmailSetting(),
-    getExtendedSiteSettings(),
-  ]);
+  const [members, slotInfo, notificationEmail, siteSettings] =
+    await Promise.all([
+      getTeamMembers(),
+      getTeamSlotInfo(),
+      getNotificationEmailSetting(),
+      getExtendedSiteSettings(),
+    ]);
 
   return (
     <div className="space-y-8">

@@ -240,6 +240,12 @@ export const DEFAULT_SITE_SECTIONS: SiteSectionContentMap = {
     title: "Devix — Professional Web Agency Indonesia",
     description:
       "Devix is a Jakarta-based web agency specializing in custom websites, e-commerce, and mobile applications for ambitious brands.",
-    keywords: ["web agency", "web development", "Indonesia", "Next.js", "Devix"],
+    keywords: [
+      "web agency",
+      "web development",
+      "Indonesia",
+      "Next.js",
+      "Devix",
+    ],
   },
 };

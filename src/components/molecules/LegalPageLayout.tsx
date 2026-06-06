@@ -43,7 +43,10 @@ export function LegalPageLayout({
         </div>
 
         <p className="mt-16 border-t border-zinc-200 pt-8 text-sm text-zinc-500">
-          <Link href="/" className="text-accent hover:text-accent-light">
+          <Link
+            href="/"
+            className="text-accent hover:text-accent-light"
+          >
             ← Back to home
           </Link>
         </p>

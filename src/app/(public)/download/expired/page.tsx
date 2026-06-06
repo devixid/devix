@@ -1,6 +1,5 @@
 import Link from "next/link";
 
-
 export default function DownloadExpiredPage() {
   return (
     <div className="flex min-h-[70vh] flex-col items-center justify-center px-4 text-center">
@@ -9,10 +8,12 @@ export default function DownloadExpiredPage() {
           Link Expired
         </h1>
         <p className="text-zinc-600">
-          This download link has expired. Download links are only valid for 24 hours after your request.
+          This download link has expired. Download links are only valid for 24
+          hours after your request.
         </p>
         <p className="text-sm text-zinc-500">
-          Please request a new download from the store if you still need the product.
+          Please request a new download from the store if you still need the
+          product.
         </p>
         <div className="pt-4">
           <Link

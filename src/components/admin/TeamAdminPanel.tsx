@@ -75,16 +75,20 @@ export function TeamAdminPanel({ members }: { members: TeamMember[] }) {
         <h2 className="text-sm font-medium text-zinc-200 md:col-span-2">
           {editing ? "Edit Member" : "Add Member"}
         </h2>
-        {(["name", "title", "imageUrl", "github", "linkedin"] as const).map((field) => (
-          <input
-            key={field}
-            required={field === "name" || field === "title" || field === "imageUrl"}
-            value={form[field]}
-            onChange={(e) => setForm({ ...form, [field]: e.target.value })}
-            placeholder={field}
-            className="border border-zinc-800 bg-zinc-900/50 px-4 py-2.5 text-sm text-white"
-          />
-        ))}
+        {(["name", "title", "imageUrl", "github", "linkedin"] as const).map(
+          (field) => (
+            <input
+              key={field}
+              required={
+                field === "name" || field === "title" || field === "imageUrl"
+              }
+              value={form[field]}
+              onChange={(e) => setForm({ ...form, [field]: e.target.value })}
+              placeholder={field}
+              className="border border-zinc-800 bg-zinc-900/50 px-4 py-2.5 text-sm text-white"
+            />
+          ),
+        )}
         <textarea
           required
           rows={3}
@@ -104,7 +108,10 @@ export function TeamAdminPanel({ members }: { members: TeamMember[] }) {
 
       <div className="divide-y divide-zinc-900 border border-zinc-800">
         {members.map((member) => (
-          <div key={member.id} className="flex justify-between gap-4 p-6">
+          <div
+            key={member.id}
+            className="flex justify-between gap-4 p-6"
+          >
             <div>
               <p className="text-sm font-medium text-zinc-200">{member.name}</p>
               <p className="text-xs text-zinc-500">{member.title}</p>

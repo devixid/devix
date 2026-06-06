@@ -15,7 +15,10 @@ const CONNECTOR_CLASS =
 
 const easeSmooth = [0.22, 1, 0.36, 1] as const;
 
-export function EstimatorProgress({ steps, currentKey }: EstimatorProgressProps) {
+export function EstimatorProgress({
+  steps,
+  currentKey,
+}: EstimatorProgressProps) {
   const currentIndex = getStepIndex(steps, currentKey);
   const currentStep = steps[currentIndex];
   const progressPct =
@@ -24,7 +27,10 @@ export function EstimatorProgress({ steps, currentKey }: EstimatorProgressProps)
   return (
     <div className="mb-8 md:mb-12">
       {/* Mobile: compact step indicator */}
-      <div className="md:hidden" aria-live="polite">
+      <div
+        className="md:hidden"
+        aria-live="polite"
+      >
         <p className="text-[13px] font-medium tracking-[0.2em] text-zinc-500 uppercase">
           Step {currentIndex + 1} of {steps.length}
         </p>

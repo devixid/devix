@@ -4,10 +4,22 @@ import { ContentSubNav } from "@/components/admin/ContentSubNav";
 export const metadata = { title: "Site Content — Devix Operations" };
 
 const sections = [
-  { href: "/admin/content/faq", label: "FAQ", desc: "Manage frequently asked questions" },
-  { href: "/admin/content/services", label: "Services", desc: "What We Do offerings" },
+  {
+    href: "/admin/content/faq",
+    label: "FAQ",
+    desc: "Manage frequently asked questions",
+  },
+  {
+    href: "/admin/content/services",
+    label: "Services",
+    desc: "What We Do offerings",
+  },
   { href: "/admin/content/team", label: "Team", desc: "Team member profiles" },
-  { href: "/admin/content/sections", label: "Page Sections", desc: "Hero, About, CTA, SEO, and more" },
+  {
+    href: "/admin/content/sections",
+    label: "Page Sections",
+    desc: "Hero, About, CTA, SEO, and more",
+  },
 ];
 
 export default function ContentHubPage() {

@@ -73,7 +73,10 @@ export function MediaLibraryPanel({
 
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-6">
         {initialAssets.map((asset) => (
-          <div key={asset.id} className="group relative border border-zinc-800">
+          <div
+            key={asset.id}
+            className="group relative border border-zinc-800"
+          >
             {asset.mimeType.startsWith("image/") ? (
               <Image
                 src={asset.publicUrl}

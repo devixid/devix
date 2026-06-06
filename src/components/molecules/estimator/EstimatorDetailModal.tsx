@@ -43,17 +43,17 @@ export function EstimatorDetailModal({
   if (!open || !mounted) return null;
 
   return createPortal(
-    <div
-      className="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 p-4 sm:p-6"
-      onClick={onClose}
-      role="presentation"
-    >
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 sm:p-6">
+      <div
+        className="absolute inset-0 bg-black/50"
+        onClick={onClose}
+        role="presentation"
+      />
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        className="flex max-h-[min(85vh,720px)] w-full max-w-lg flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-2xl"
-        onClick={(e) => e.stopPropagation()}
+        className="relative z-10 flex max-h-[min(85vh,720px)] w-full max-w-lg flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-2xl"
       >
         <div className="flex shrink-0 items-start justify-between gap-4 border-b border-zinc-100 px-6 py-5">
           <div className="min-w-0 pr-2">

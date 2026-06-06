@@ -1,7 +1,6 @@
 "use client";
 
 import { m, AnimatePresence } from "framer-motion";
-import type { ExchangeRates } from "@/hooks/useCurrencyRates";
 import type { EstimatorStepKey } from "@/lib/estimator-steps";
 import {
   formatDesignApproachLabel,
@@ -94,7 +93,10 @@ export function EstimatorLiveSummary({
           onChange={onCurrencyChange}
           compact
         />
-        <div className="text-right" aria-live="polite">
+        <div
+          className="text-right"
+          aria-live="polite"
+        >
           {ratesLoading ? (
             <span className="text-sm text-zinc-400">Loading rates…</span>
           ) : canEstimate ? (

@@ -40,14 +40,20 @@ export const getFilterOptions = cache(async () => {
           select: { category: true },
           distinct: ["category"],
         }),
-        prisma.projectTechStack.findMany({ select: { name: true }, distinct: ["name"] }),
-        prisma.projectDeveloper.findMany({ select: { name: true }, distinct: ["name"] }),
+        prisma.projectTechStack.findMany({
+          select: { name: true },
+          distinct: ["name"],
+        }),
+        prisma.projectDeveloper.findMany({
+          select: { name: true },
+          distinct: ["name"],
+        }),
       ]);
-      
-      return { 
-        categories: categories.map(c => c.category), 
-        techStacks: techStacks.map(t => t.name), 
-        developers: developers.map(d => d.name) 
+
+      return {
+        categories: categories.map((c) => c.category),
+        techStacks: techStacks.map((t) => t.name),
+        developers: developers.map((d) => d.name),
       };
     },
     PROJECTS_TTL,

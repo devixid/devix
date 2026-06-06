@@ -17,7 +17,10 @@ export async function deleteFromSupabaseStorage(
   }
 }
 
-export function getPublicUrlFromPath(bucket: StorageBucket, path: string): string {
+export function getPublicUrlFromPath(
+  bucket: StorageBucket,
+  path: string,
+): string {
   const supabase = createSupabaseBrowser();
   return supabase.storage.from(bucket).getPublicUrl(path).data.publicUrl;
 }

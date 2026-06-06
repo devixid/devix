@@ -19,7 +19,10 @@ export default async function MediaPage() {
           Upload and manage images used across the site.
         </p>
       </div>
-      <MediaLibraryPanel initialAssets={items} total={total} />
+      <MediaLibraryPanel
+        initialAssets={items}
+        total={total}
+      />
     </div>
   );
 }

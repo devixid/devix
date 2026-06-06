@@ -21,13 +21,13 @@ export interface CatalogItem {
   techStacks?: { id: string; name: string }[];
   developers?: { id: string; name: string }[];
   createdAt: string | Date;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;
 }
 
 // Import Cards
 import ProjectCard from "@/components/molecules/projects/ProjectCard";
 import { StoreProductCard } from "@/components/molecules/StoreProductCard";
-import { Product } from "@prisma/client";
 
 interface CatalogClientProps {
   title: string;
@@ -135,9 +135,7 @@ export default function CatalogClient({
   ]);
 
   // Pagination Logic
-  const totalPages = Math.ceil(
-    filteredAndSortedItems.length / ITEMS_PER_PAGE,
-  );
+  const totalPages = Math.ceil(filteredAndSortedItems.length / ITEMS_PER_PAGE);
   const paginatedItems = filteredAndSortedItems.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE,
@@ -174,7 +172,11 @@ export default function CatalogClient({
           >
             {eyebrow}
           </SlideUp>
-          <SlideUp yOffset={20} duration={0.8} delay={0.1}>
+          <SlideUp
+            yOffset={20}
+            duration={0.8}
+            delay={0.1}
+          >
             <HeadingStatic
               level="h1"
               className="text-5xl font-extralight text-black md:text-6xl"
@@ -208,7 +210,10 @@ export default function CatalogClient({
           )}
         </div>
         <div className="flex items-center lg:justify-end">
-          <SortDropdown value={sortBy} onChange={setSortBy} />
+          <SortDropdown
+            value={sortBy}
+            onChange={setSortBy}
+          />
         </div>
       </div>
 
@@ -289,6 +294,7 @@ export default function CatalogClient({
                   return (
                     <ProjectCard
                       key={item.id}
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
                       project={item as any}
                       index={idx}
                       priority={isPriority}
@@ -298,6 +304,7 @@ export default function CatalogClient({
                 return (
                   <StoreProductCard
                     key={item.id}
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     product={item as any}
                     index={idx}
                     priority={isPriority}

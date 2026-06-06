@@ -33,7 +33,11 @@ const PROJECT_TYPES = new Set<ProjectType>([
 const DESIGN_APPROACHES = new Set<DesignApproach>(["custom", "template"]);
 const PLATFORMS = new Set<PlatformType>(["android", "ios", "both"]);
 const SCOPES = new Set<ProjectScope>(["small", "medium", "large"]);
-const COMPLEXITIES = new Set<ProjectComplexity>(["basic", "standard", "premium"]);
+const COMPLEXITIES = new Set<ProjectComplexity>([
+  "basic",
+  "standard",
+  "premium",
+]);
 const TIMELINES = new Set<ProjectTimeline>(["relaxed", "standard", "rush"]);
 const STEP_KEYS = new Set<EstimatorStepKey>([
   "type",
@@ -51,7 +55,9 @@ function isNullableEnum<T extends string>(
   value: unknown,
   allowed: Set<T>,
 ): value is T | null {
-  return value === null || (typeof value === "string" && allowed.has(value as T));
+  return (
+    value === null || (typeof value === "string" && allowed.has(value as T))
+  );
 }
 
 function parseState(raw: unknown): EstimatorState | null {

@@ -60,7 +60,9 @@ export function ExtendedSettingsPanel({
   return (
     <div className="space-y-8">
       <section className="border border-zinc-800 bg-[#0F0F0F] p-8">
-        <h2 className="mb-6 font-display text-xl font-light text-zinc-100">Site</h2>
+        <h2 className="font-display mb-6 text-xl font-light text-zinc-100">
+          Site
+        </h2>
         {message && (
           <div className="mb-4 border-l border-green-500 bg-green-950/30 p-3 text-sm text-green-400">
             {message}
@@ -71,7 +73,10 @@ export function ExtendedSettingsPanel({
             {error}
           </div>
         )}
-        <form onSubmit={handleSave} className="grid max-w-2xl gap-4">
+        <form
+          onSubmit={handleSave}
+          className="grid max-w-2xl gap-4"
+        >
           {(
             [
               ["siteName", "Site Name"],
@@ -124,7 +129,9 @@ export function ExtendedSettingsPanel({
       </section>
 
       <section className="border border-zinc-800 bg-[#0F0F0F] p-8">
-        <h2 className="mb-4 font-display text-xl font-light text-zinc-100">Cache</h2>
+        <h2 className="font-display mb-4 text-xl font-light text-zinc-100">
+          Cache
+        </h2>
         <p className="mb-4 text-sm text-zinc-500">
           Clear Redis cache and revalidate public pages after content changes.
         </p>

@@ -27,7 +27,9 @@ export function SiteSectionsPanel({
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [activeKey, setActiveKey] = useState<SiteSectionKey>("HERO");
-  const sectionMap = Object.fromEntries(sections.map((s) => [s.key, s.content]));
+  const sectionMap = Object.fromEntries(
+    sections.map((s) => [s.key, s.content]),
+  );
   const currentContent =
     sectionMap[activeKey] ?? DEFAULT_SITE_SECTIONS[activeKey];
   const [jsonText, setJsonText] = useState(

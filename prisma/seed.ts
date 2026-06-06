@@ -11,8 +11,7 @@ function mergeFooterNavLinks(
   existing?: { label: string; href: string }[],
   defaults?: { label: string; href: string }[],
 ): { label: string; href: string }[] {
-  const base =
-    existing && existing.length > 0 ? existing : (defaults ?? []);
+  const base = existing && existing.length > 0 ? existing : (defaults ?? []);
   if (base.some((link) => link.href === "/estimator")) return base;
 
   const contactIndex = base.findIndex((link) => link.href === "#contact");

@@ -27,7 +27,11 @@ export function InboxSearch() {
     }) => {
       const params = new URLSearchParams(searchParams?.toString());
 
-      const setOrDelete = (key: string, value: string | undefined, skipValue?: string) => {
+      const setOrDelete = (
+        key: string,
+        value: string | undefined,
+        skipValue?: string,
+      ) => {
         if (value && value !== skipValue) {
           params.set(key, value);
         } else {
@@ -36,9 +40,12 @@ export function InboxSearch() {
       };
 
       if (updates.query !== undefined) setOrDelete("query", updates.query);
-      if (updates.status !== undefined) setOrDelete("status", updates.status, "all");
-      if (updates.source !== undefined) setOrDelete("source", updates.source, "all");
-      if (updates.dateFrom !== undefined) setOrDelete("dateFrom", updates.dateFrom);
+      if (updates.status !== undefined)
+        setOrDelete("status", updates.status, "all");
+      if (updates.source !== undefined)
+        setOrDelete("source", updates.source, "all");
+      if (updates.dateFrom !== undefined)
+        setOrDelete("dateFrom", updates.dateFrom);
       if (updates.dateTo !== undefined) setOrDelete("dateTo", updates.dateTo);
 
       startTransition(() => {

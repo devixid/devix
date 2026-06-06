@@ -17,8 +17,7 @@ export default async function PublicLayout({ children }: Props) {
     getSiteSection("FOOTER"),
     getSiteSettingsPublic(),
   ]);
-  const socialLinks =
-    (siteSettings?.socialLinks as SocialLinks | null) ?? null;
+  const socialLinks = (siteSettings?.socialLinks as SocialLinks | null) ?? null;
 
   // LazyMotionProvider: public routes only (Header, SlideUp, projects grid).
   // Estimator steps are code-split separately; hero keeps motion Heading.
@@ -33,7 +32,10 @@ export default async function PublicLayout({ children }: Props) {
         </a>
         <Header />
         <main id="main-content">{children}</main>
-        <Footer content={footerContent} socialLinks={socialLinks} />
+        <Footer
+          content={footerContent}
+          socialLinks={socialLinks}
+        />
       </MaintenanceGate>
     </LazyMotionProvider>
   );

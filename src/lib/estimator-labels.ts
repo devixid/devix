@@ -87,22 +87,17 @@ const SCOPE_DESCRIPTIONS_WEBSITE: Record<ProjectScope, string> = {
     "Perfect for startups and small businesses needing an online presence.",
   medium:
     "Ideal for growing companies with multiple services or product lines.",
-  large:
-    "For large organizations requiring comprehensive content management.",
+  large: "For large organizations requiring comprehensive content management.",
 };
 
 const SCOPE_DESCRIPTIONS_APP: Record<ProjectScope, string> = {
   small:
     "A focused MVP with essential screens and a single primary user journey.",
-  medium:
-    "Multiple modules, roles, or feature areas with moderate complexity.",
-  large:
-    "A full-featured product with many screens, flows, and integrations.",
+  medium: "Multiple modules, roles, or feature areas with moderate complexity.",
+  large: "A full-featured product with many screens, flows, and integrations.",
 };
 
-export function getScopeOptions(
-  type: ProjectType | null,
-): ScopeOptionConfig[] {
+export function getScopeOptions(type: ProjectType | null): ScopeOptionConfig[] {
   const labels = scopeLabelsForType(type);
   const descriptions = isAppType(type)
     ? SCOPE_DESCRIPTIONS_APP

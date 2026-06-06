@@ -18,7 +18,13 @@ interface Props {
 export default async function LeadsPage({ searchParams }: Props) {
   const { status, query, dateFrom, dateTo } = await searchParams;
   const leads = await getEstimatorLeads({
-    status: status as "NEW" | "CONTACTED" | "CONVERTED" | "CLOSED" | "all" | undefined,
+    status: status as
+      | "NEW"
+      | "CONTACTED"
+      | "CONVERTED"
+      | "CLOSED"
+      | "all"
+      | undefined,
     query,
     dateFrom,
     dateTo,

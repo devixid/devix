@@ -35,7 +35,7 @@ export function EstimatorCheckbox({
         if (isInteractive) onChange(!checked);
       }}
       whileTap={isInteractive ? { scale: 0.9 } : undefined}
-      className={`mt-0.5 shrink-0 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 focus-visible:ring-offset-2 ${
+      className={`focus-visible:ring-accent/40 mt-0.5 shrink-0 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${
         isInteractive ? "cursor-pointer" : "cursor-default"
       }`}
     >
@@ -48,11 +48,7 @@ export function EstimatorCheckbox({
               ? "#fafafa"
               : "#C8A96E"
             : "#ffffff",
-          borderColor: checked
-            ? locked
-              ? "#e4e4e7"
-              : "#C8A96E"
-            : "#d4d4d8",
+          borderColor: checked ? (locked ? "#e4e4e7" : "#C8A96E") : "#d4d4d8",
         }}
         transition={{
           backgroundColor: { duration: 0.22, ease: easeSmooth },

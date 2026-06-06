@@ -144,9 +144,7 @@ export default function InboxDetailPanel({
           >
             {isPending ? "Saving..." : "Save Notes"}
           </button>
-          {notesSaved && (
-            <span className="text-xs text-green-500">Saved</span>
-          )}
+          {notesSaved && <span className="text-xs text-green-500">Saved</span>}
         </div>
       </div>
 

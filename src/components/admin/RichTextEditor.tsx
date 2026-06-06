@@ -2,11 +2,11 @@
 
 import { useCallback, useRef } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
-import Heading from "@tiptap/extension-heading";
-import Link from "@tiptap/extension-link";
-import Image from "@tiptap/extension-image";
-import Placeholder from "@tiptap/extension-placeholder";
+import { StarterKit } from "@tiptap/starter-kit";
+import { Heading } from "@tiptap/extension-heading";
+import { Link } from "@tiptap/extension-link";
+import { Image } from "@tiptap/extension-image";
+import { Placeholder } from "@tiptap/extension-placeholder";
 import {
   Bold,
   Italic,
@@ -174,7 +174,10 @@ export default function RichTextEditor({
         >
           <Quote size={16} />
         </ToolbarButton>
-        <ToolbarButton title="Link" onClick={setLink}>
+        <ToolbarButton
+          title="Link"
+          onClick={setLink}
+        >
           <LinkIcon size={16} />
         </ToolbarButton>
         <ToolbarButton

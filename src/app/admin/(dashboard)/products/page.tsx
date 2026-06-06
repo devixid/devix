@@ -22,23 +22,44 @@ export default async function AdminProductsPage() {
 
       <div className="overflow-x-auto rounded-lg border border-zinc-800 bg-zinc-900/50">
         <table className="w-full text-left text-sm text-zinc-300">
-          <thead className="border-b border-zinc-800 bg-zinc-800/50 text-xs uppercase text-zinc-400">
+          <thead className="border-b border-zinc-800 bg-zinc-800/50 text-xs text-zinc-400 uppercase">
             <tr>
-              <th scope="col" className="px-6 py-4 font-medium">Name</th>
-              <th scope="col" className="px-6 py-4 font-medium">Price</th>
-              <th scope="col" className="px-6 py-4 font-medium">Visibility</th>
-              <th scope="col" className="px-6 py-4 font-medium">File Key</th>
+              <th
+                scope="col"
+                className="px-6 py-4 font-medium"
+              >
+                Name
+              </th>
+              <th
+                scope="col"
+                className="px-6 py-4 font-medium"
+              >
+                Price
+              </th>
+              <th
+                scope="col"
+                className="px-6 py-4 font-medium"
+              >
+                Visibility
+              </th>
+              <th
+                scope="col"
+                className="px-6 py-4 font-medium"
+              >
+                File Key
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-zinc-800">
             {products.map((product) => (
-              <tr key={product.id} className="transition-colors hover:bg-zinc-800/50">
+              <tr
+                key={product.id}
+                className="transition-colors hover:bg-zinc-800/50"
+              >
                 <td className="px-6 py-4 font-medium text-zinc-100">
                   {product.name}
                 </td>
-                <td className="px-6 py-4">
-                  ${product.price.toFixed(2)}
-                </td>
+                <td className="px-6 py-4">${product.price.toFixed(2)}</td>
                 <td className="px-6 py-4">
                   <span
                     className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
@@ -50,14 +71,17 @@ export default async function AdminProductsPage() {
                     {product.isVisible ? "Visible" : "Hidden"}
                   </span>
                 </td>
-                <td className="px-6 py-4 text-xs font-mono text-zinc-500">
+                <td className="px-6 py-4 font-mono text-xs text-zinc-500">
                   {product.fileKey}
                 </td>
               </tr>
             ))}
             {products.length === 0 && (
               <tr>
-                <td colSpan={4} className="px-6 py-8 text-center text-zinc-500">
+                <td
+                  colSpan={4}
+                  className="px-6 py-8 text-center text-zinc-500"
+                >
                   No products found.
                 </td>
               </tr>

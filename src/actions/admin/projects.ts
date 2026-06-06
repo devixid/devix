@@ -314,7 +314,10 @@ export async function updateProject(id: string, data: ProjectInput) {
     return updated;
   });
 
-  const slugKeys = new Set([`project:${current.slug}`, `project:${project.slug}`]);
+  const slugKeys = new Set([
+    `project:${current.slug}`,
+    `project:${project.slug}`,
+  ]);
   await invalidateCache(
     "projects:all",
     "projects:featured",

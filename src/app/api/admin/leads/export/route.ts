@@ -59,9 +59,7 @@ export async function GET(request: NextRequest) {
     lead.budgetUsd,
     lead.currency,
     lead.deliverableSavingsUsd ?? "",
-    lead.excludedDeliverables
-      ? JSON.stringify(lead.excludedDeliverables)
-      : "",
+    lead.excludedDeliverables ? JSON.stringify(lead.excludedDeliverables) : "",
     lead.contactSubmission?.name ?? "",
     lead.contactSubmission?.email ?? "",
     lead.contactSubmission?.createdAt?.toISOString() ?? "",

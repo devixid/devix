@@ -25,7 +25,7 @@ export default async function AdminOverviewPage() {
       </div>
 
       {/* Grid Stats */}
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4 lg:gap-8">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:gap-8 xl:grid-cols-4">
         {/* Inbox Stats Card */}
         <div className="flex flex-col justify-between border border-zinc-800 bg-[#0F0F0F] p-8 transition-all duration-300 hover:border-zinc-700">
           <div>

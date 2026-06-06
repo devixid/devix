@@ -19,7 +19,11 @@ export function ServicesAdminPanel({ items }: { items: ServiceItem[] }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [editing, setEditing] = useState<ServiceItem | null>(null);
-  const [form, setForm] = useState({ title: "", description: "", isVisible: true });
+  const [form, setForm] = useState({
+    title: "",
+    description: "",
+    isVisible: true,
+  });
 
   const resetForm = () => {
     setEditing(null);
@@ -69,7 +73,10 @@ export function ServicesAdminPanel({ items }: { items: ServiceItem[] }) {
 
       <div className="divide-y divide-zinc-900 border border-zinc-800">
         {items.map((item) => (
-          <div key={item.id} className="flex justify-between gap-4 p-6">
+          <div
+            key={item.id}
+            className="flex justify-between gap-4 p-6"
+          >
             <div>
               <p className="text-sm font-medium text-zinc-200">{item.title}</p>
               <p className="mt-1 text-xs text-zinc-500">{item.description}</p>

@@ -51,7 +51,8 @@ export async function sendInquiryNotification({
     return;
   }
 
-  const sourceLabel = source === "estimator" ? "Estimator Lead" : "Contact Form";
+  const sourceLabel =
+    source === "estimator" ? "Estimator Lead" : "Contact Form";
   const safeName = escapeHtml(name);
   const safeEmail = escapeHtml(email);
   const safeMessage = escapeHtml(message).replace(/\n/g, "<br />");
@@ -74,7 +75,10 @@ export async function sendInquiryNotification({
   });
 
   if (error) {
-    console.error("[Email] Failed to send inquiry notification:", error.message);
+    console.error(
+      "[Email] Failed to send inquiry notification:",
+      error.message,
+    );
   }
 }
 
@@ -114,7 +118,10 @@ export async function sendContactConfirmation({
   });
 
   if (error) {
-    console.error("[Email] Failed to send contact confirmation:", error.message);
+    console.error(
+      "[Email] Failed to send contact confirmation:",
+      error.message,
+    );
   }
 }
 
@@ -230,6 +237,9 @@ export async function sendPurchaseConfirmation({
   });
 
   if (error) {
-    console.error("[Email] Failed to send purchase confirmation:", error.message);
+    console.error(
+      "[Email] Failed to send purchase confirmation:",
+      error.message,
+    );
   }
 }

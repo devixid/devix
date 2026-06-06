@@ -231,7 +231,10 @@ export function TestimonialForm({ initialData, onCancel, onSuccess }: Props) {
                 </div>
               ) : (
                 <div className="flex h-14 w-14 items-center justify-center rounded-full border border-dashed border-zinc-700 bg-zinc-900/50">
-                  <UploadCloud size={20} className="text-zinc-600" />
+                  <UploadCloud
+                    size={20}
+                    className="text-zinc-600"
+                  />
                 </div>
               )}
               <div className="flex-1 space-y-2">

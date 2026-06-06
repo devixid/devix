@@ -1,6 +1,5 @@
 import Link from "next/link";
 
-
 export default function DownloadUsedPage() {
   return (
     <div className="flex min-h-[70vh] flex-col items-center justify-center px-4 text-center">
@@ -9,10 +8,12 @@ export default function DownloadUsedPage() {
           Link Already Used
         </h1>
         <p className="text-zinc-600">
-          For security reasons, download links are single-use only. It appears this link has already been used to download the product.
+          For security reasons, download links are single-use only. It appears
+          this link has already been used to download the product.
         </p>
         <p className="text-sm text-zinc-500">
-          If your download failed or you need another copy, please checkout the product again.
+          If your download failed or you need another copy, please checkout the
+          product again.
         </p>
         <div className="pt-4">
           <Link

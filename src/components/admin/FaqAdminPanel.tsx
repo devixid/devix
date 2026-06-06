@@ -20,7 +20,11 @@ export function FaqAdminPanel({ items }: { items: FaqItem[] }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [editing, setEditing] = useState<FaqItem | null>(null);
-  const [form, setForm] = useState({ question: "", answer: "", isVisible: true });
+  const [form, setForm] = useState({
+    question: "",
+    answer: "",
+    isVisible: true,
+  });
 
   const resetForm = () => {
     setEditing(null);
@@ -42,7 +46,10 @@ export function FaqAdminPanel({ items }: { items: FaqItem[] }) {
 
   return (
     <div className="space-y-8">
-      <form onSubmit={handleSubmit} className="space-y-4 border border-zinc-800 bg-[#0F0F0F] p-6">
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-4 border border-zinc-800 bg-[#0F0F0F] p-6"
+      >
         <h2 className="text-sm font-medium text-zinc-200">
           {editing ? "Edit FAQ" : "Add FAQ"}
         </h2>
@@ -78,7 +85,11 @@ export function FaqAdminPanel({ items }: { items: FaqItem[] }) {
             {isPending ? "Saving..." : editing ? "Update" : "Add"}
           </button>
           {editing && (
-            <button type="button" onClick={resetForm} className="text-xs text-zinc-500 uppercase">
+            <button
+              type="button"
+              onClick={resetForm}
+              className="text-xs text-zinc-500 uppercase"
+            >
               Cancel
             </button>
           )}
@@ -87,12 +98,21 @@ export function FaqAdminPanel({ items }: { items: FaqItem[] }) {
 
       <div className="divide-y divide-zinc-900 border border-zinc-800">
         {items.map((item) => (
-          <div key={item.id} className="flex items-start justify-between gap-4 p-6">
+          <div
+            key={item.id}
+            className="flex items-start justify-between gap-4 p-6"
+          >
             <div>
-              <p className="text-sm font-medium text-zinc-200">{item.question}</p>
-              <p className="mt-1 line-clamp-2 text-xs text-zinc-500">{item.answer}</p>
+              <p className="text-sm font-medium text-zinc-200">
+                {item.question}
+              </p>
+              <p className="mt-1 line-clamp-2 text-xs text-zinc-500">
+                {item.answer}
+              </p>
               {!item.isVisible && (
-                <span className="mt-2 inline-block text-[10px] text-zinc-600 uppercase">Hidden</span>
+                <span className="mt-2 inline-block text-[10px] text-zinc-600 uppercase">
+                  Hidden
+                </span>
               )}
             </div>
             <div className="flex shrink-0 gap-2">

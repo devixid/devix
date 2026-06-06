@@ -54,13 +54,15 @@ function LoginContent() {
   };
 
   return (
-    <div className="relative w-full max-w-md border border-zinc-200 bg-white p-8 pt-16 transition-all duration-300 md:p-12 md:pt-16 shadow-sm">
+    <div className="relative w-full max-w-md border border-zinc-200 bg-white p-8 pt-16 shadow-sm transition-all duration-300 md:p-12 md:pt-16">
       {/* Back to Home Button */}
       <Link
         href="/"
-        className="group absolute top-6 left-6 inline-flex items-center gap-x-1.5 text-xs text-zinc-500 hover:text-black-1 transition-colors duration-300"
+        className="group hover:text-black-1 absolute top-6 left-6 inline-flex items-center gap-x-1.5 text-xs text-zinc-500 transition-colors duration-300"
       >
-        <span className="text-[14px] font-medium transition-transform duration-300 group-hover:-translate-x-0.5">←</span>
+        <span className="text-[14px] font-medium transition-transform duration-300 group-hover:-translate-x-0.5">
+          ←
+        </span>
         <span>Back to Site</span>
       </Link>
 
@@ -153,4 +155,3 @@ export default function AdminLoginPage() {
     </div>
   );
 }
-

@@ -2,7 +2,10 @@ import { HeadingStatic } from "@/components/atoms/Heading/HeadingStatic";
 import { SlideUp } from "@/components/animations/SlideUp";
 import { SmoothScrollLink } from "@/components/atoms/SmoothScrollLink";
 
-import { DEFAULT_SITE_SECTIONS, type AboutContent } from "@/lib/content-defaults";
+import {
+  DEFAULT_SITE_SECTIONS,
+  type AboutContent,
+} from "@/lib/content-defaults";
 
 export default function About({ content }: { content?: AboutContent }) {
   const about = content ?? DEFAULT_SITE_SECTIONS.ABOUT;
@@ -24,7 +27,10 @@ export default function About({ content }: { content?: AboutContent }) {
             <p className="mb-4 text-[13px] font-medium tracking-[0.2em] text-zinc-400 uppercase">
               {about.eyebrow}
             </p>
-            <HeadingStatic level="h2" className="font-extralight">
+            <HeadingStatic
+              level="h2"
+              className="font-extralight"
+            >
               {about.headline}
             </HeadingStatic>
           </SlideUp>

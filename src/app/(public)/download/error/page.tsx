@@ -1,6 +1,5 @@
 import Link from "next/link";
 
-
 export default function DownloadErrorPage() {
   return (
     <div className="flex min-h-[70vh] flex-col items-center justify-center px-4 text-center">
@@ -9,10 +8,12 @@ export default function DownloadErrorPage() {
           Download Error
         </h1>
         <p className="text-zinc-600">
-          There was a problem preparing your download. The file might be temporarily unavailable or misconfigured.
+          There was a problem preparing your download. The file might be
+          temporarily unavailable or misconfigured.
         </p>
         <p className="text-sm text-zinc-500">
-          Please try again later. If the problem persists, please contact support.
+          Please try again later. If the problem persists, please contact
+          support.
         </p>
         <div className="pt-4">
           <Link

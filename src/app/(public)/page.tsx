@@ -71,7 +71,10 @@ export default async function Page() {
     getSiteSection("CTA"),
     getSiteSection("SEO"),
     getSiteSettingsPublic(),
-    prisma.product.findMany({ where: { isVisible: true }, orderBy: { order: "asc" } }),
+    prisma.product.findMany({
+      where: { isVisible: true },
+      orderBy: { order: "asc" },
+    }),
   ]);
 
   const faqs = faqItems.map((item) => ({
@@ -83,7 +86,10 @@ export default async function Page() {
     "@context": "https://schema.org",
     "@type": "ProfessionalService",
     name: settings?.siteName || "Devix",
-    url: settings?.siteUrl || process.env.NEXT_PUBLIC_SITE_URL || "https://devixid.vercel.app",
+    url:
+      settings?.siteUrl ||
+      process.env.NEXT_PUBLIC_SITE_URL ||
+      "https://devixid.vercel.app",
     logo: `${settings?.siteUrl || process.env.NEXT_PUBLIC_SITE_URL || "https://devixid.vercel.app"}/logo.png`,
     description: seo.description,
     address: {
@@ -101,18 +107,30 @@ export default async function Page() {
       />
 
       <HeroSection content={hero} />
-      <Offering services={serviceItems} intro={servicesIntro} />
+      <Offering
+        services={serviceItems}
+        intro={servicesIntro}
+      />
       <About content={about} />
-      <OurTeams members={teamMembers} intro={teamIntro} />
+      <OurTeams
+        members={teamMembers}
+        intro={teamIntro}
+      />
 
-      <section id="portfolio" className="scroll-mt-24 py-20 md:py-32">
+      <section
+        id="portfolio"
+        className="scroll-mt-24 py-20 md:py-32"
+      >
         <div className="mx-auto max-w-6xl px-6 lg:px-10">
           <div className="mb-16 flex items-end justify-between">
             <div className="max-w-xl">
               <p className="mb-4 text-[13px] font-medium tracking-[0.2em] text-zinc-400 uppercase">
                 {portfolioIntro.eyebrow}
               </p>
-              <HeadingStatic level="h2" className="font-extralight">
+              <HeadingStatic
+                level="h2"
+                className="font-extralight"
+              >
                 {portfolioIntro.headline}
               </HeadingStatic>
             </div>
@@ -158,14 +176,20 @@ export default async function Page() {
         </div>
       </section>
 
-      <section id="store" className="scroll-mt-24 bg-zinc-50/50 py-20 md:py-32">
+      <section
+        id="store"
+        className="scroll-mt-24 bg-zinc-50/50 py-20 md:py-32"
+      >
         <div className="mx-auto max-w-6xl px-6 lg:px-10">
           <div className="mb-16 flex items-end justify-between">
             <div className="max-w-xl">
               <p className="mb-4 text-[13px] font-medium tracking-[0.2em] text-zinc-400 uppercase">
                 Digital Products
               </p>
-              <HeadingStatic level="h2" className="font-extralight">
+              <HeadingStatic
+                level="h2"
+                className="font-extralight"
+              >
                 Accelerate your development with our premium resources.
               </HeadingStatic>
             </div>

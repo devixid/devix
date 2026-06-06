@@ -140,7 +140,10 @@ export default async function LeadDetailPage({ params }: Props) {
           </div>
         )}
 
-        <LeadStatusActions id={lead.id} status={lead.status} />
+        <LeadStatusActions
+          id={lead.id}
+          status={lead.status}
+        />
       </div>
     </div>
   );

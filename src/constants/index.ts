@@ -14,4 +14,3 @@ export const HeadingConstants = {
 export { NavMenu } from "./nav";
 export { FOOTER_EXPLORE_LINKS, resolveFooterExploreLinks } from "./nav";
 export type { FooterExploreLink, NavMenuItem } from "./nav";
-

@@ -38,20 +38,35 @@ export default function OurTeams({
   }));
 
   return (
-    <section id="team" className="scroll-mt-24 py-20 md:py-32">
+    <section
+      id="team"
+      className="scroll-mt-24 py-20 md:py-32"
+    >
       <div className="mx-auto max-w-6xl px-6 lg:px-10">
         <div className="mb-16 flex flex-col md:mb-20 md:flex-row md:gap-x-20">
-          <SlideUp yOffset={20} duration={0.8} className="mb-8 md:mb-0 md:w-1/3">
+          <SlideUp
+            yOffset={20}
+            duration={0.8}
+            className="mb-8 md:mb-0 md:w-1/3"
+          >
             <p className="mb-4 text-[13px] font-medium tracking-[0.2em] text-zinc-400 uppercase">
               {intro.eyebrow}
             </p>
-            <HeadingStatic level="h2" className="font-extralight">
+            <HeadingStatic
+              level="h2"
+              className="font-extralight"
+            >
               {intro.headline}
             </HeadingStatic>
           </SlideUp>
 
           {intro.subheading && (
-            <SlideUp yOffset={20} duration={0.8} delay={0.1} className="md:w-2/3">
+            <SlideUp
+              yOffset={20}
+              duration={0.8}
+              delay={0.1}
+              className="md:w-2/3"
+            >
               <p className="max-w-xl text-base leading-relaxed text-zinc-500 md:text-lg">
                 {intro.subheading}
               </p>
@@ -61,7 +76,12 @@ export default function OurTeams({
 
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
           {normalized.map((member, index) => (
-            <SlideUp key={member.name} yOffset={20} duration={0.7} delay={index * 0.1}>
+            <SlideUp
+              key={member.name}
+              yOffset={20}
+              duration={0.7}
+              delay={index * 0.1}
+            >
               <TeamCard {...member} />
             </SlideUp>
           ))}

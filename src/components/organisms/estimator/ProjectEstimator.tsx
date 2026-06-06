@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { AnimatePresence } from "framer-motion";
-import type { EstimatorState } from "@/types/estimator";
 import {
   StepType,
   StepDesign,
@@ -17,7 +16,7 @@ import {
 import { EstimatorProgress } from "@/components/molecules/estimator/EstimatorProgress";
 import { EstimatorLiveSummary } from "@/components/molecules/estimator/EstimatorLiveSummary";
 import { EstimatorStepTransition } from "@/components/molecules/estimator/EstimatorStepTransition";
-import type { CurrencyCode } from "@/types/estimator";
+import type { CurrencyCode, EstimatorState } from "@/types/estimator";
 import { detectDefaultCurrency } from "@/lib/estimator-format";
 import { useCurrencyRates } from "@/hooks/useCurrencyRates";
 import { useEstimatorPricing } from "@/hooks/useEstimatorPricing";
@@ -45,7 +44,11 @@ const INITIAL_STATE: EstimatorState = {
 };
 
 export default function ProjectEstimator() {
-  const { rates, isLoading: ratesLoading, error: ratesError } = useCurrencyRates();
+  const {
+    rates,
+    isLoading: ratesLoading,
+    error: ratesError,
+  } = useCurrencyRates();
 
   const [hydrated, setHydrated] = useState(false);
   const [showRestoredBanner, setShowRestoredBanner] = useState(false);
@@ -53,9 +56,7 @@ export default function ProjectEstimator() {
     useState<EstimatorStepKey>("type");
   const [slideDirection, setSlideDirection] = useState(1);
   const [contactLeadId, setContactLeadId] = useState<string | null>(null);
-  const [savedFingerprint, setSavedFingerprint] = useState<string | null>(
-    null,
-  );
+  const [savedFingerprint, setSavedFingerprint] = useState<string | null>(null);
   const [contactBudgetDisplay, setContactBudgetDisplay] = useState("");
   const [currency, setCurrency] = useState<CurrencyCode>("USD");
   const [state, setState] = useState<EstimatorState>(INITIAL_STATE);
@@ -99,7 +100,7 @@ export default function ProjectEstimator() {
 
   useEffect(() => {
     setCurrentStepKey((key) => clampStepKey(key, state));
-  }, [state.type]);
+  }, [state, state.type]);
 
   const updateState = (updates: Partial<EstimatorState>) => {
     if (updates.type !== undefined) {
@@ -160,8 +161,7 @@ export default function ProjectEstimator() {
     setCurrentStepKey((key) => getPrevStepKey(key, state) ?? key);
   };
 
-  const transitionVariant =
-    currentStepKey === "result" ? "reveal" : "slide";
+  const transitionVariant = currentStepKey === "result" ? "reveal" : "slide";
 
   if (!hydrated) {
     return (
@@ -191,7 +191,7 @@ export default function ProjectEstimator() {
       {showRestoredBanner && (
         <div
           role="status"
-          className="mb-6 flex items-center justify-between gap-4 rounded-xl border border-accent/25 bg-accent/5 px-4 py-3 text-sm text-zinc-700"
+          className="border-accent/25 bg-accent/5 mb-6 flex items-center justify-between gap-4 rounded-xl border px-4 py-3 text-sm text-zinc-700"
         >
           <span>We&apos;ve restored your progress from this session.</span>
           <button
@@ -204,7 +204,10 @@ export default function ProjectEstimator() {
         </div>
       )}
 
-      <EstimatorProgress steps={steps} currentKey={currentStepKey} />
+      <EstimatorProgress
+        steps={steps}
+        currentKey={currentStepKey}
+      />
 
       <EstimatorLiveSummary
         state={state}
@@ -218,7 +221,10 @@ export default function ProjectEstimator() {
       />
 
       <div className="relative min-h-[400px] overflow-x-hidden rounded-2xl border border-zinc-200 bg-zinc-50 p-6 backdrop-blur-sm md:p-10">
-        <AnimatePresence mode="wait" initial={false}>
+        <AnimatePresence
+          mode="wait"
+          initial={false}
+        >
           <EstimatorStepTransition
             key={currentStepKey}
             stepKey={currentStepKey}

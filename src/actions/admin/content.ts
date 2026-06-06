@@ -13,7 +13,11 @@ import {
 } from "@/lib/schemas/site-content";
 import type { Prisma, SiteSectionKey } from "@prisma/client";
 
-async function afterContentMutation(entityType: string, action: string, entityId?: string) {
+async function afterContentMutation(
+  entityType: string,
+  action: string,
+  entityId?: string,
+) {
   await invalidateContentCache();
   revalidatePath("/");
   revalidatePath("/admin/content");
@@ -88,7 +92,9 @@ export async function createServiceItem(data: unknown) {
   await verifyAdminSession();
   await verifyCsrfOrigin();
   const parsed = ServiceItemSchema.parse(data);
-  const maxOrder = await prisma.serviceItem.aggregate({ _max: { order: true } });
+  const maxOrder = await prisma.serviceItem.aggregate({
+    _max: { order: true },
+  });
   const created = await prisma.serviceItem.create({
     data: {
       title: parsed.title.trim(),
@@ -216,6 +222,10 @@ export async function updateSiteSection(key: SiteSectionKey, content: unknown) {
     create: { key, content: jsonContent },
     update: { content: jsonContent },
   });
-  await afterContentMutation("SiteSection", `section.${key.toLowerCase()}.updated`, updated.id);
+  await afterContentMutation(
+    "SiteSection",
+    `section.${key.toLowerCase()}.updated`,
+    updated.id,
+  );
   return updated;
 }

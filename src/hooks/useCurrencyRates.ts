@@ -40,9 +40,20 @@ export function useCurrencyRates() {
             const isFresh = Date.now() - cached.timestamp < CACHE_TTL_MS;
 
             // Simple validation that all expected currencies exist and are valid numbers
-            const currencies: CurrencyCode[] = ["USD", "IDR", "MYR", "SGD", "BND", "PHP", "THB"];
+            const currencies: CurrencyCode[] = [
+              "USD",
+              "IDR",
+              "MYR",
+              "SGD",
+              "BND",
+              "PHP",
+              "THB",
+            ];
             const isValid = currencies.every(
-              (code) => typeof cached.rates[code] === "number" && !isNaN(cached.rates[code]) && cached.rates[code] > 0
+              (code) =>
+                typeof cached.rates[code] === "number" &&
+                !isNaN(cached.rates[code]) &&
+                cached.rates[code] > 0,
             );
 
             if (isFresh && isValid) {
@@ -62,7 +73,9 @@ export function useCurrencyRates() {
       try {
         const response = await fetch("https://open.er-api.com/v6/latest/USD");
         if (!response.ok) {
-          throw new Error(`Failed to fetch exchange rates (status: ${response.status})`);
+          throw new Error(
+            `Failed to fetch exchange rates (status: ${response.status})`,
+          );
         }
 
         const data = await response.json();
@@ -78,13 +91,26 @@ export function useCurrencyRates() {
           };
 
           // Final safety validation check on fetched rates
-          const currencies: CurrencyCode[] = ["USD", "IDR", "MYR", "SGD", "BND", "PHP", "THB"];
+          const currencies: CurrencyCode[] = [
+            "USD",
+            "IDR",
+            "MYR",
+            "SGD",
+            "BND",
+            "PHP",
+            "THB",
+          ];
           const allValid = currencies.every(
-            (code) => typeof fetchedRates[code] === "number" && !isNaN(fetchedRates[code]) && fetchedRates[code] > 0
+            (code) =>
+              typeof fetchedRates[code] === "number" &&
+              !isNaN(fetchedRates[code]) &&
+              fetchedRates[code] > 0,
           );
 
           if (!allValid) {
-            throw new Error("Fetched rates validation failed: some rates were invalid or missing.");
+            throw new Error(
+              "Fetched rates validation failed: some rates were invalid or missing.",
+            );
           }
 
           if (typeof window !== "undefined") {
@@ -95,7 +121,10 @@ export function useCurrencyRates() {
               };
               localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
             } catch (e) {
-              console.warn("Failed to write currency rates to localStorage:", e);
+              console.warn(
+                "Failed to write currency rates to localStorage:",
+                e,
+              );
             }
           }
 
@@ -109,7 +138,8 @@ export function useCurrencyRates() {
       } catch (err: unknown) {
         console.error("Currency rates fetch error:", err);
         if (active) {
-          const errMsg = err instanceof Error ? err.message : "Failed to load current rates";
+          const errMsg =
+            err instanceof Error ? err.message : "Failed to load current rates";
           setError(errMsg);
           // Fall back to robust fallback rates
           setRates(DEFAULT_RATES);
