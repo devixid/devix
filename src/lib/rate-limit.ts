@@ -84,6 +84,21 @@ export function getApiLimiter() {
   return _apiLimiter;
 }
 
+let _purchaseLimiter: Ratelimit | null = null;
+export function getPurchaseLimiter() {
+  const redis = getRedisClient();
+  if (!redis) return null;
+  if (!_purchaseLimiter) {
+    _purchaseLimiter = new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(5, "1 h"),
+      prefix: "ratelimit:purchase",
+      ephemeralCache: cache,
+    });
+  }
+  return _purchaseLimiter;
+}
+
 import net from "net";
 
 /**

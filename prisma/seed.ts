@@ -153,6 +153,40 @@ async function main() {
   });
 
   console.log("Seed data for projects created.");
+
+  const productCount = await prisma.product.count();
+  if (productCount === 0) {
+    await prisma.product.createMany({
+      data: [
+        {
+          name: "Devix Starter Kit",
+          slug: "devix-starter-kit",
+          description:
+            "A production-ready Next.js 16 starter kit with Tailwind CSS v4, Supabase, Prisma, and Bun. Includes authentication, admin dashboard, and a clean component library.",
+          price: 49,
+          fileKey: "products/devix-starter-kit.zip",
+          previewUrl: null,
+          isVisible: true,
+          order: 1,
+        },
+        {
+          name: "Agency Landing Page",
+          slug: "agency-landing-page",
+          description:
+            "A premium agency landing page template with editorial design, Framer Motion animations, and HeroUI components. Ready to customize and deploy.",
+          price: 29,
+          fileKey: "products/agency-landing-page.zip",
+          previewUrl: null,
+          isVisible: true,
+          order: 2,
+        },
+      ],
+      skipDuplicates: true,
+    });
+    console.log("Seed data for products created.");
+  } else {
+    console.log("Products already exist, skipping product seed.");
+  }
 }
 
 async function seedSiteContent() {

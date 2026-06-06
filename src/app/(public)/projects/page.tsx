@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import { toProjectListItems } from "@/lib/mappers/projects";
 import { getFilterOptions, getProjects } from "@/lib/queries/projects";
-import ProjectsClient from "./ProjectsClient";
+import CatalogClient from "@/components/organisms/CatalogClient";
 
 export const metadata: Metadata = {
   title: "Projects | Devix",
@@ -19,9 +19,12 @@ export default async function ProjectsPage() {
 
   return (
     <div className="grain-overlay min-h-screen bg-white pt-[120px] pb-32">
-      <ProjectsClient
-        initialProjects={toProjectListItems(projects)}
+      <CatalogClient
+        title="Projects."
+        eyebrow="Our Work"
+        items={toProjectListItems(projects)}
         filterOptions={filterOptions}
+        cardType="project"
       />
     </div>
   );

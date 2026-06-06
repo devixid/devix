@@ -28,7 +28,7 @@
     "README.md": "${capture}.md",
     ".eslintrc.json": ".eslintcache, .eslintignore",
     ".prettierrc.json": ".prettierignore",
-    "package.json": "package-lock.json, yarn.lock, pnpm-lock.yaml, bun.lockb"
+    "package.json": "package-lock.json, yarn.lock, pnpm-lock.yaml, bun.lock"
   },
   "editor.wordWrap": "on"
 }

@@ -4,32 +4,54 @@ import { useState, useMemo } from "react";
 import { m, AnimatePresence } from "framer-motion";
 import { SlideUp } from "@/components/animations/SlideUp";
 import { HeadingStatic } from "@/components/atoms/Heading/HeadingStatic";
-import type { ProjectListItem } from "@/types/projects";
 
-// Import filter UI components that we'll build next
+// Import filter UI components
 import SearchInput from "@/components/molecules/projects/SearchInput";
 import CategoryTabs from "@/components/molecules/projects/CategoryTabs";
 import FilterChips from "@/components/molecules/projects/FilterChips";
 import ActiveFilters from "@/components/molecules/projects/ActiveFilters";
 import SortDropdown from "@/components/molecules/projects/SortDropdown";
-import ProjectCard from "@/components/molecules/projects/ProjectCard";
 import Pagination from "@/components/molecules/projects/Pagination";
 
-interface ProjectsClientProps {
-  initialProjects: ProjectListItem[];
-  filterOptions: {
-    categories: string[];
-    techStacks: string[];
-    developers: string[];
+export interface CatalogItem {
+  id: string;
+  title: string;
+  description: string;
+  category?: string;
+  techStacks?: { id: string; name: string }[];
+  developers?: { id: string; name: string }[];
+  createdAt: string | Date;
+  [key: string]: any;
+}
+
+// Import Cards
+import ProjectCard from "@/components/molecules/projects/ProjectCard";
+import { StoreProductCard } from "@/components/molecules/StoreProductCard";
+import { Product } from "@prisma/client";
+
+interface CatalogClientProps {
+  title: string;
+  eyebrow: string;
+  items: CatalogItem[];
+  filterOptions?: {
+    categories?: string[];
+    techStacks?: string[];
+    developers?: string[];
   };
+  cardType: "project" | "product";
+  emptyStateMessage?: string;
 }
 
 const ITEMS_PER_PAGE = 6;
 
-export default function ProjectsClient({
-  initialProjects,
+export default function CatalogClient({
+  title,
+  eyebrow,
+  items,
   filterOptions,
-}: ProjectsClientProps) {
+  cardType,
+  emptyStateMessage = "We couldn't find any items matching your current filters. Try adjusting your search or clearing some filters.",
+}: CatalogClientProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState<string>("All");
   const [activeTechStacks, setActiveTechStacks] = useState<string[]>([]);
@@ -45,8 +67,8 @@ export default function ProjectsClient({
     updater();
   };
 
-  const filteredAndSortedProjects = useMemo(() => {
-    let result = [...initialProjects];
+  const filteredAndSortedItems = useMemo(() => {
+    let result = [...items];
 
     // 1. Search Filter
     if (searchQuery.trim()) {
@@ -59,24 +81,24 @@ export default function ProjectsClient({
     }
 
     // 2. Category Filter
-    if (activeCategory !== "All") {
+    if (filterOptions?.categories && activeCategory !== "All") {
       result = result.filter((p) => p.category === activeCategory);
     }
 
     // 3. Tech Stack Filter
-    if (activeTechStacks.length > 0) {
+    if (filterOptions?.techStacks && activeTechStacks.length > 0) {
       result = result.filter((p) =>
         activeTechStacks.every((tech) =>
-          p.techStacks.some((t) => t.name === tech),
+          p.techStacks?.some((t) => t.name === tech),
         ),
       );
     }
 
     // 4. Developer Filter
-    if (activeDevelopers.length > 0) {
+    if (filterOptions?.developers && activeDevelopers.length > 0) {
       result = result.filter((p) =>
         activeDevelopers.every((dev) =>
-          p.developers.some((d) => d.name === dev),
+          p.developers?.some((d) => d.name === dev),
         ),
       );
     }
@@ -103,27 +125,28 @@ export default function ProjectsClient({
 
     return result;
   }, [
-    initialProjects,
+    items,
     searchQuery,
     activeCategory,
     activeTechStacks,
     activeDevelopers,
     sortBy,
+    filterOptions,
   ]);
 
   // Pagination Logic
   const totalPages = Math.ceil(
-    filteredAndSortedProjects.length / ITEMS_PER_PAGE,
+    filteredAndSortedItems.length / ITEMS_PER_PAGE,
   );
-  const paginatedProjects = filteredAndSortedProjects.slice(
+  const paginatedItems = filteredAndSortedItems.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE,
   );
 
   const hasActiveFilters =
-    activeCategory !== "All" ||
-    activeTechStacks.length > 0 ||
-    activeDevelopers.length > 0 ||
+    (filterOptions?.categories && activeCategory !== "All") ||
+    (filterOptions?.techStacks && activeTechStacks.length > 0) ||
+    (filterOptions?.developers && activeDevelopers.length > 0) ||
     searchQuery.trim() !== "";
 
   const clearAllFilters = () => {
@@ -135,6 +158,10 @@ export default function ProjectsClient({
     });
   };
 
+  const hasAdvancedFilters =
+    (filterOptions?.techStacks && filterOptions.techStacks.length > 0) ||
+    (filterOptions?.developers && filterOptions.developers.length > 0);
+
   return (
     <div className="mx-auto max-w-7xl px-6 lg:px-10">
       {/* Header & Search */}
@@ -145,18 +172,14 @@ export default function ProjectsClient({
             duration={0.7}
             className="mb-4 text-[13px] font-medium tracking-[0.2em] text-zinc-400 uppercase"
           >
-            Our Work
+            {eyebrow}
           </SlideUp>
-          <SlideUp
-            yOffset={20}
-            duration={0.8}
-            delay={0.1}
-          >
+          <SlideUp yOffset={20} duration={0.8} delay={0.1}>
             <HeadingStatic
               level="h1"
               className="text-5xl font-extralight text-black md:text-6xl"
             >
-              Projects.
+              {title}
             </HeadingStatic>
           </SlideUp>
         </div>
@@ -176,47 +199,52 @@ export default function ProjectsClient({
       {/* Filter Bar */}
       <div className="mb-10 grid grid-cols-1 gap-6 lg:grid-cols-4 lg:gap-8">
         <div className="lg:col-span-3">
-          <CategoryTabs
-            categories={["All", ...filterOptions.categories]}
-            activeCategory={activeCategory}
-            onChange={(c) => handleFilterChange(() => setActiveCategory(c))}
-          />
+          {filterOptions?.categories && filterOptions.categories.length > 0 && (
+            <CategoryTabs
+              categories={["All", ...filterOptions.categories]}
+              activeCategory={activeCategory}
+              onChange={(c) => handleFilterChange(() => setActiveCategory(c))}
+            />
+          )}
         </div>
         <div className="flex items-center lg:justify-end">
-          <SortDropdown
-            value={sortBy}
-            onChange={setSortBy}
-          />
+          <SortDropdown value={sortBy} onChange={setSortBy} />
         </div>
       </div>
 
       {/* Advanced Filters: Tech Stacks & Developers */}
-      <div className="mb-8 flex flex-col gap-y-6 rounded-xl border border-zinc-100 bg-zinc-50 p-6 md:flex-row md:gap-x-12">
-        <div className="flex-1">
-          <p className="mb-3 text-xs font-semibold tracking-wider text-zinc-500 uppercase">
-            Filter by Technology
-          </p>
-          <FilterChips
-            options={filterOptions.techStacks}
-            selected={activeTechStacks}
-            onChange={(selected) =>
-              handleFilterChange(() => setActiveTechStacks(selected))
-            }
-          />
+      {hasAdvancedFilters && (
+        <div className="mb-8 flex flex-col gap-y-6 rounded-xl border border-zinc-100 bg-zinc-50 p-6 md:flex-row md:gap-x-12">
+          {filterOptions?.techStacks && filterOptions.techStacks.length > 0 && (
+            <div className="flex-1">
+              <p className="mb-3 text-xs font-semibold tracking-wider text-zinc-500 uppercase">
+                Filter by Technology
+              </p>
+              <FilterChips
+                options={filterOptions.techStacks}
+                selected={activeTechStacks}
+                onChange={(selected) =>
+                  handleFilterChange(() => setActiveTechStacks(selected))
+                }
+              />
+            </div>
+          )}
+          {filterOptions?.developers && filterOptions.developers.length > 0 && (
+            <div className="flex-1">
+              <p className="mb-3 text-xs font-semibold tracking-wider text-zinc-500 uppercase">
+                Filter by Developer
+              </p>
+              <FilterChips
+                options={filterOptions.developers}
+                selected={activeDevelopers}
+                onChange={(selected) =>
+                  handleFilterChange(() => setActiveDevelopers(selected))
+                }
+              />
+            </div>
+          )}
         </div>
-        <div className="flex-1">
-          <p className="mb-3 text-xs font-semibold tracking-wider text-zinc-500 uppercase">
-            Filter by Developer
-          </p>
-          <FilterChips
-            options={filterOptions.developers}
-            selected={activeDevelopers}
-            onChange={(selected) =>
-              handleFilterChange(() => setActiveDevelopers(selected))
-            }
-          />
-        </div>
-      </div>
+      )}
 
       {/* Active Filters Badges */}
       {hasActiveFilters && (
@@ -240,14 +268,14 @@ export default function ProjectsClient({
             )
           }
           onClearAll={clearAllFilters}
-          resultsCount={filteredAndSortedProjects.length}
+          resultsCount={filteredAndSortedItems.length}
         />
       )}
 
       {/* Grid */}
       <div className="min-h-[500px]">
         <AnimatePresence mode="popLayout">
-          {paginatedProjects.length > 0 ? (
+          {paginatedItems.length > 0 ? (
             <m.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -255,14 +283,27 @@ export default function ProjectsClient({
               transition={{ duration: 0.5 }}
               className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 lg:gap-8"
             >
-              {paginatedProjects.map((project, idx) => (
-                <ProjectCard
-                  key={project.id}
-                  project={project}
-                  index={idx}
-                  priority={currentPage === 1 && idx === 0}
-                />
-              ))}
+              {paginatedItems.map((item, idx) => {
+                const isPriority = currentPage === 1 && idx === 0;
+                if (cardType === "project") {
+                  return (
+                    <ProjectCard
+                      key={item.id}
+                      project={item as any}
+                      index={idx}
+                      priority={isPriority}
+                    />
+                  );
+                }
+                return (
+                  <StoreProductCard
+                    key={item.id}
+                    product={item as any}
+                    index={idx}
+                    priority={isPriority}
+                  />
+                );
+              })}
             </m.div>
           ) : (
             <m.div
@@ -275,12 +316,9 @@ export default function ProjectsClient({
                 <span className="text-3xl">🔍</span>
               </div>
               <h3 className="font-display mb-2 text-2xl text-black">
-                No projects found
+                No items found
               </h3>
-              <p className="max-w-md text-zinc-500">
-                We couldn't find any projects matching your current filters. Try
-                adjusting your search or clearing some filters.
-              </p>
+              <p className="max-w-md text-zinc-500">{emptyStateMessage}</p>
               <button
                 onClick={clearAllFilters}
                 className="text-accent hover:text-accent-light mt-8 text-sm font-medium tracking-wider uppercase"

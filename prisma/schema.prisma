@@ -22,9 +22,9 @@ enum EstimatorLeadStatus {
 }
 
 model User {
-  id             String   @id @default(uuid()) @db.Uuid
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id        String   @id @default(uuid()) @db.Uuid
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   email          String  @unique
   hashedPassword String
@@ -39,18 +39,18 @@ model User {
 }
 
 model ContactSubmission {
-  id              String        @id @default(cuid())
+  id              String         @id @default(cuid())
   name            String
   email           String
-  message         String        @db.Text
-  isRead          Boolean       @default(false)
-  status          InquiryStatus @default(NEW)
-  internalNotes   String?       @db.Text
-  source          String        @default("contact")
-  estimatorLeadId String?       @unique
+  message         String         @db.Text
+  isRead          Boolean        @default(false)
+  status          InquiryStatus  @default(NEW)
+  internalNotes   String?        @db.Text
+  source          String         @default("contact")
+  estimatorLeadId String?        @unique
   estimatorLead   EstimatorLead? @relation(fields: [estimatorLeadId], references: [id], onDelete: SetNull)
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
 
   @@index([status])
   @@index([source])
@@ -58,22 +58,22 @@ model ContactSubmission {
 }
 
 model EstimatorLead {
-  id                String              @id @default(cuid())
-  projectType       String
-  designApproach    String?
-  platform          String?
-  scope             String
-  complexity        String
-  timeline          String
+  id                    String              @id @default(cuid())
+  projectType           String
+  designApproach        String?
+  platform              String?
+  scope                 String
+  complexity            String
+  timeline              String
   budgetUsd             Float
   budgetDisplay         String
   excludedDeliverables  Json?
   deliverableSavingsUsd Float?
   currency              String              @default("USD")
-  status            EstimatorLeadStatus @default(NEW)
-  contactSubmission ContactSubmission?
-  createdAt         DateTime            @default(now())
-  updatedAt         DateTime            @updatedAt
+  status                EstimatorLeadStatus @default(NEW)
+  contactSubmission     ContactSubmission?
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
 
   @@index([status])
   @@map("estimator_leads")
@@ -96,21 +96,21 @@ model Testimonial {
 }
 
 model Project {
-  id            String   @id @default(cuid())
+  id            String    @id @default(cuid())
   title         String
-  slug          String   @unique
-  description   String   @db.Text
-  content       String?  @db.Text
+  slug          String    @unique
+  description   String    @db.Text
+  content       String?   @db.Text
   category      String
   imageUrl      String
   liveUrl       String?
   githubUrl     String?
-  isFeatured    Boolean  @default(false)
-  isVisible     Boolean  @default(true)
-  featuredOrder Int      @default(0)
+  isFeatured    Boolean   @default(false)
+  isVisible     Boolean   @default(true)
+  featuredOrder Int       @default(0)
   completedAt   DateTime?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   techStacks ProjectTechStack[]
   developers ProjectDeveloper[]
@@ -122,7 +122,7 @@ model Project {
 }
 
 model ProjectTechStack {
-  id        String  @id @default(cuid())
+  id        String @id @default(cuid())
   name      String
   projectId String
 
@@ -160,15 +160,15 @@ enum SiteSectionKey {
 }
 
 model SiteSettings {
-  id                  String   @id @default("default")
-  notificationEmail   String?
-  siteName            String?
-  siteUrl             String?
-  metaDescription     String?
-  socialLinks         Json?
-  maintenanceMode     Boolean  @default(false)
-  maintenanceMessage  String?
-  updatedAt           DateTime @updatedAt
+  id                 String   @id @default("default")
+  notificationEmail  String?
+  siteName           String?
+  siteUrl            String?
+  metaDescription    String?
+  socialLinks        Json?
+  maintenanceMode    Boolean  @default(false)
+  maintenanceMessage String?
+  updatedAt          DateTime @updatedAt
 
   @@map("site_settings")
 }
@@ -239,6 +239,7 @@ model MediaAsset {
 
   @@index([createdAt])
   @@index([bucket])
+  @@index([uploadedById])
   @@map("media_assets")
 }
 
@@ -255,5 +256,40 @@ model ActivityLog {
 
   @@index([createdAt])
   @@index([entityType, entityId])
+  @@index([actorId])
   @@map("activity_logs")
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String   @db.Text
+  price       Float // in USD
+  fileKey     String // path in Supabase Storage, e.g., "products/devix-starter-kit.zip"
+  previewUrl  String? // screenshot or preview image URL
+  isVisible   Boolean  @default(true)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  purchases Purchase[]
+
+  @@map("products")
+}
+
+model Purchase {
+  id             String   @id @default(cuid())
+  productId      String
+  buyerName      String
+  buyerEmail     String
+  downloadToken  String   @unique @default(cuid()) // one-time token for download
+  tokenUsed      Boolean  @default(false) // true after link is clicked
+  tokenExpiresAt DateTime // 24 hours from purchase time
+  createdAt      DateTime @default(now())
+
+  product Product @relation(fields: [productId], references: [id])
+
+  @@index([productId])
+  @@map("purchases")
 }

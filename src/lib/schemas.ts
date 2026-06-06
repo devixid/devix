@@ -89,3 +89,9 @@ export const ProjectSchema = z.object({
     )
     .min(1),
 });
+
+export const PurchaseSchema = z.object({
+  productId: z.string().cuid("Invalid product ID."),
+  buyerName: z.string().min(2, "Name must be at least 2 characters.").max(100),
+  buyerEmail: z.string().email("Please enter a valid email address.").max(255),
+});

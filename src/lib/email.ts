@@ -192,3 +192,44 @@ export async function sendEstimatorLeadNotification(
     );
   }
 }
+
+export async function sendPurchaseConfirmation({
+  name,
+  email,
+  productName,
+  downloadToken,
+}: {
+  name: string;
+  email: string;
+  productName: string;
+  downloadToken: string;
+}) {
+  const config = getResendConfig();
+  if (!config) return;
+
+  const safeName = escapeHtml(name);
+  const siteUrl = getSiteUrl();
+  const downloadUrl = `${siteUrl}/download/${encodeURIComponent(downloadToken)}`;
+
+  const { error } = await config.resend.emails.send({
+    from: config.fromEmail,
+    to: [email],
+    subject: `Your download link: ${escapeHtml(productName)} — Devix`,
+    html: `
+      <h2>Hi ${safeName},</h2>
+      <p>Thank you for downloading <strong>${escapeHtml(productName)}</strong> from Devix.</p>
+      <p>Here is your unique download link. For security reasons, this link is valid for <strong>one-time use only</strong> and will expire in 24 hours.</p>
+      <p style="margin: 30px 0;">
+        <a href="${escapeHtml(downloadUrl)}" style="background-color: #000; color: #fff; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold;">Download ${escapeHtml(productName)}</a>
+      </p>
+      <p>If the button doesn't work, copy and paste this link into your browser:</p>
+      <p style="word-break: break-all; color: #666;">${escapeHtml(downloadUrl)}</p>
+      <hr style="border: none; border-top: 1px solid #eaeaea; margin: 30px 0;" />
+      <p style="color:#666;font-size:12px;">This is an automated message from Devix. Please do not share this link.</p>
+    `,
+  });
+
+  if (error) {
+    console.error("[Email] Failed to send purchase confirmation:", error.message);
+  }
+}
