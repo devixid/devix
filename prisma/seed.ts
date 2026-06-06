@@ -7,6 +7,26 @@ import {
 } from "../src/lib/content-defaults";
 import type { Prisma, SiteSectionKey } from "@prisma/client";
 
+function mergeFooterNavLinks(
+  existing?: { label: string; href: string }[],
+  defaults?: { label: string; href: string }[],
+): { label: string; href: string }[] {
+  const base =
+    existing && existing.length > 0 ? existing : (defaults ?? []);
+  if (base.some((link) => link.href === "/estimator")) return base;
+
+  const contactIndex = base.findIndex((link) => link.href === "#contact");
+  const estimator = { label: "Estimator", href: "/estimator" };
+  if (contactIndex >= 0) {
+    return [
+      ...base.slice(0, contactIndex),
+      estimator,
+      ...base.slice(contactIndex),
+    ];
+  }
+  return [...base, estimator];
+}
+
 async function main() {
   await seedSiteContent();
 
@@ -174,9 +194,43 @@ async function seedSiteContent() {
   }
 
   for (const [key, content] of Object.entries(DEFAULT_SITE_SECTIONS)) {
+    const sectionKey = key as SiteSectionKey;
+    if (sectionKey === "FOOTER") {
+      const existing = await prisma.siteSection.findUnique({
+        where: { key: sectionKey },
+      });
+      const existingContent = existing?.content as
+        | { navLinks?: { label: string; href: string }[] }
+        | undefined;
+      const defaultFooter = content as {
+        navLinks: { label: string; href: string }[];
+      };
+      const mergedNavLinks = mergeFooterNavLinks(
+        existingContent?.navLinks,
+        defaultFooter.navLinks,
+      );
+      const mergedContent = {
+        ...(existingContent ?? defaultFooter),
+        ...defaultFooter,
+        navLinks: mergedNavLinks,
+      };
+      await prisma.siteSection.upsert({
+        where: { key: sectionKey },
+        create: {
+          key: sectionKey,
+          content: mergedContent as Prisma.InputJsonValue,
+        },
+        update: { content: mergedContent as Prisma.InputJsonValue },
+      });
+      continue;
+    }
+
     await prisma.siteSection.upsert({
-      where: { key: key as SiteSectionKey },
-      create: { key: key as SiteSectionKey, content: content as Prisma.InputJsonValue },
+      where: { key: sectionKey },
+      create: {
+        key: sectionKey,
+        content: content as Prisma.InputJsonValue,
+      },
       update: {},
     });
   }

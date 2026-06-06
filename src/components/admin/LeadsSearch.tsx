@@ -101,13 +101,25 @@ export function LeadsSearch() {
         ))}
       </div>
 
-      <AdminDateRangeFilter
-        dateFrom={currentDateFrom}
-        dateTo={currentDateTo}
-        onDateFromChange={(value) => updateParams({ dateFrom: value })}
-        onDateToChange={(value) => updateParams({ dateTo: value })}
-        onClear={() => updateParams({ dateFrom: "", dateTo: "" })}
-      />
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <AdminDateRangeFilter
+          dateFrom={currentDateFrom}
+          dateTo={currentDateTo}
+          onDateFromChange={(value) => updateParams({ dateFrom: value })}
+          onDateToChange={(value) => updateParams({ dateTo: value })}
+          onClear={() => updateParams({ dateFrom: "", dateTo: "" })}
+        />
+
+        <a
+          href={`/api/admin/leads/export?${searchParams?.toString() ?? ""}`}
+          className={`inline-flex items-center gap-2 border border-zinc-700 px-4 py-2.5 text-xs tracking-[0.15em] text-zinc-300 uppercase transition-colors hover:border-[#C8A96E] hover:text-[#C8A96E] ${
+            isPending ? "pointer-events-none opacity-50" : ""
+          }`}
+          aria-label="Export filtered estimator leads as CSV"
+        >
+          Export CSV
+        </a>
+      </div>
     </div>
   );
 }

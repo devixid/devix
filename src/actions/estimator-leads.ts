@@ -3,8 +3,8 @@
 import { prisma } from "@/lib/prisma";
 import { verifyAdminSession, verifyCsrfOrigin } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
-import { parseDateRangeFilter } from "@/lib/admin-filters";
-import type { EstimatorLeadStatus, Prisma } from "@prisma/client";
+import { buildEstimatorLeadsWhereClause } from "@/lib/admin-leads-query";
+import type { EstimatorLeadStatus } from "@prisma/client";
 import type { CurrencyCode, EstimatorState } from "@/types/estimator";
 import { calculateEstimateUsd, supportsTemplateDesign } from "@/types/estimator";
 import {
@@ -165,38 +165,8 @@ export async function getEstimatorLeads(params: {
 } = {}) {
   await verifyAdminSession();
 
-  const { status, query, dateFrom, dateTo } = params;
-  const whereClause: Prisma.EstimatorLeadWhereInput = {};
-
-  const validStatuses: EstimatorLeadStatus[] = [
-    "NEW",
-    "CONTACTED",
-    "CONVERTED",
-    "CLOSED",
-  ];
-  if (
-    status &&
-    status !== "all" &&
-    validStatuses.includes(status as EstimatorLeadStatus)
-  ) {
-    whereClause.status = status as EstimatorLeadStatus;
-  }
-
-  const createdAtRange = parseDateRangeFilter(dateFrom, dateTo);
-  if (createdAtRange) {
-    whereClause.createdAt = createdAtRange;
-  }
-
-  if (query) {
-    whereClause.OR = [
-      { projectType: { contains: query, mode: "insensitive" } },
-      { scope: { contains: query, mode: "insensitive" } },
-      { budgetDisplay: { contains: query, mode: "insensitive" } },
-    ];
-  }
-
   return prisma.estimatorLead.findMany({
-    where: whereClause,
+    where: buildEstimatorLeadsWhereClause(params),
     include: { contactSubmission: true },
     orderBy: { createdAt: "desc" },
   });

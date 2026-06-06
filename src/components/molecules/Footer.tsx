@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { Route } from "next";
 import { SmoothScrollLink } from "@/components/atoms/SmoothScrollLink";
+import { resolveFooterExploreLinks } from "@/constants/nav";
 import { DEFAULT_SITE_SECTIONS, type FooterContent } from "@/lib/content-defaults";
 import type { SocialLinks } from "@/lib/site-settings";
 
@@ -81,10 +82,12 @@ export default function Footer({
   socialLinks?: SocialLinks | null;
 }) {
   const footer = content ?? DEFAULT_SITE_SECTIONS.FOOTER;
-  const exploreMenus = footer.navLinks.map((link) => ({
-    name: link.label,
-    route: link.href,
-  }));
+  const exploreMenus = resolveFooterExploreLinks(footer.navLinks).map(
+    (link) => ({
+      name: link.label,
+      route: link.href,
+    }),
+  );
   const socialMenus = buildSocialMenus(socialLinks);
 
   return (

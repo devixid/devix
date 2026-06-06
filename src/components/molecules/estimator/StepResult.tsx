@@ -1,5 +1,6 @@
 import { useMemo, useState, useTransition } from "react";
 import { upsertEstimatorLead } from "@/actions/estimator-leads";
+import { EstimatorExportActions } from "@/components/molecules/estimator/EstimatorExportActions";
 import { EstimatorSelectionRecap } from "@/components/molecules/estimator/EstimatorSelectionRecap";
 import { EstimatorCurrencySelect } from "@/components/molecules/estimator/EstimatorCurrencySelect";
 import { Loader2, ArrowRight, AlertCircle } from "lucide-react";
@@ -180,6 +181,15 @@ export function StepResult({
           feature requirements, integrations, and design revisions.
         </p>
       </div>
+
+      <EstimatorExportActions
+        state={state}
+        budgetDisplay={budgetDisplay}
+        currency={currency}
+        excludedLabels={excludedLabels}
+        packageSavings={packageSavings}
+        ratesError={ratesError}
+      />
 
       {saveError && (
         <div
