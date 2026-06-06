@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition, useEffect } from "react";
+import Link from "next/link";
 import { submitContactForm } from "@/actions/contact";
 import { buildEstimatorContactMessage } from "@/lib/estimator-contact";
 import { m, AnimatePresence } from "framer-motion";
@@ -183,6 +184,24 @@ export function ContactForm({
             {errorMsg && (
               <div className="font-body text-sm text-red-500">{errorMsg}</div>
             )}
+
+            <p className="font-body text-xs leading-relaxed text-zinc-500">
+              By submitting, you agree to our{" "}
+              <Link
+                href="/privacy"
+                className="text-zinc-700 underline-offset-2 hover:text-black hover:underline"
+              >
+                Privacy Policy
+              </Link>{" "}
+              and{" "}
+              <Link
+                href="/terms"
+                className="text-zinc-700 underline-offset-2 hover:text-black hover:underline"
+              >
+                Terms of Service
+              </Link>
+              .
+            </p>
 
             {/* Submit Button */}
             <button

@@ -6,7 +6,10 @@ import { headers } from "next/headers";
 import { getContactLimiter, getClientIp } from "@/lib/rate-limit";
 
 import { ContactFormSchema } from "@/lib/schemas";
-import { sendInquiryNotification } from "@/lib/email";
+import {
+  sendContactConfirmation,
+  sendInquiryNotification,
+} from "@/lib/email";
 
 type ContactFormData = {
   name: string;
@@ -65,10 +68,19 @@ export async function submitContactForm(
     }
 
     try {
+      const trimmedName = validatedData.name.trim();
+      const trimmedEmail = validatedData.email.trim();
+      const trimmedMessage = validatedData.message.trim();
+
       await sendInquiryNotification({
-        name: validatedData.name.trim(),
-        email: validatedData.email.trim(),
-        message: validatedData.message.trim(),
+        name: trimmedName,
+        email: trimmedEmail,
+        message: trimmedMessage,
+        source,
+      });
+      await sendContactConfirmation({
+        name: trimmedName,
+        email: trimmedEmail,
         source,
       });
     } catch (emailErr) {

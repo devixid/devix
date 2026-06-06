@@ -232,6 +232,7 @@ export const DEFAULT_SITE_SECTIONS: SiteSectionContentMap = {
       { label: "Services", href: "#services" },
       { label: "About", href: "#about" },
       { label: "Portfolio", href: "/projects" },
+      { label: "Estimator", href: "/estimator" },
       { label: "Contact", href: "#contact" },
     ],
   },

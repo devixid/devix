@@ -12,6 +12,7 @@ import {
   resolveExcludedDeliverables,
   validateExcludedDeliverables,
 } from "@/lib/estimator-deliverables";
+import { sendEstimatorLeadNotification } from "@/lib/email";
 
 export type SaveEstimatorLeadResult =
   | { ok: true; id: string; created?: boolean }
@@ -118,6 +119,23 @@ export async function upsertEstimatorLead(data: {
         status: "NEW",
       },
     });
+
+    try {
+      await sendEstimatorLeadNotification({
+        leadId: lead.id,
+        projectType: record.projectType,
+        designApproach: record.designApproach,
+        platform: record.platform,
+        scope: record.scope,
+        complexity: record.complexity,
+        timeline: record.timeline,
+        budgetDisplay: record.budgetDisplay,
+        currency: record.currency,
+        excludedDeliverables: record.excludedDeliverables,
+      });
+    } catch (emailErr) {
+      console.error("Estimator lead notification email failed:", emailErr);
+    }
 
     revalidatePath("/admin/leads");
     return { ok: true, id: lead.id, created: true };

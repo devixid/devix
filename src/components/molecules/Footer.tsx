@@ -3,22 +3,21 @@ import Link from "next/link";
 import type { Route } from "next";
 import { SmoothScrollLink } from "@/components/atoms/SmoothScrollLink";
 import { DEFAULT_SITE_SECTIONS, type FooterContent } from "@/lib/content-defaults";
-
-const exploreMenus = [
-  { name: "Our service", route: "#services" },
-  { name: "Projects", route: "/projects" },
-  { name: "Team", route: "#team" },
-];
+import type { SocialLinks } from "@/lib/site-settings";
 
 const companyMenus = [
   { name: "About us", route: "#about" },
   { name: "Contact", route: "#contact" },
 ];
 
-const socialMenus = [
-  { name: "Instagram", route: "https://instagram.com" },
-  { name: "LinkedIn", route: "https://linkedin.com" },
-  { name: "GitHub", route: "https://github.com" },
+const SOCIAL_LINK_CONFIG: {
+  key: keyof SocialLinks;
+  label: string;
+}[] = [
+  { key: "instagram", label: "Instagram" },
+  { key: "linkedin", label: "LinkedIn" },
+  { key: "github", label: "GitHub" },
+  { key: "twitter", label: "Twitter / X" },
 ];
 
 function FooterLink({
@@ -64,8 +63,29 @@ function FooterLink({
   );
 }
 
-export default function Footer({ content }: { content?: FooterContent }) {
+function buildSocialMenus(socialLinks?: SocialLinks | null) {
+  if (!socialLinks) return [];
+
+  return SOCIAL_LINK_CONFIG.flatMap(({ key, label }) => {
+    const url = socialLinks[key]?.trim();
+    if (!url) return [];
+    return [{ name: label, route: url }];
+  });
+}
+
+export default function Footer({
+  content,
+  socialLinks,
+}: {
+  content?: FooterContent;
+  socialLinks?: SocialLinks | null;
+}) {
   const footer = content ?? DEFAULT_SITE_SECTIONS.FOOTER;
+  const exploreMenus = footer.navLinks.map((link) => ({
+    name: link.label,
+    route: link.href,
+  }));
+  const socialMenus = buildSocialMenus(socialLinks);
 
   return (
     <footer className="bg-black-1 w-full border-t border-zinc-800 text-white">
@@ -112,21 +132,37 @@ export default function Footer({ content }: { content?: FooterContent }) {
               ))}
             </div>
 
-            <div className="flex flex-col gap-y-3">
-              <h4 className="mb-2 text-[11px] font-medium tracking-[0.2em] text-zinc-500 uppercase">
-                Social
-              </h4>
-              {socialMenus.map((menu) => (
-                <FooterLink key={menu.name} href={menu.route} external>
-                  {menu.name}
-                </FooterLink>
-              ))}
-            </div>
+            {socialMenus.length > 0 && (
+              <div className="flex flex-col gap-y-3">
+                <h4 className="mb-2 text-[11px] font-medium tracking-[0.2em] text-zinc-500 uppercase">
+                  Social
+                </h4>
+                {socialMenus.map((menu) => (
+                  <FooterLink key={menu.name} href={menu.route} external>
+                    {menu.name}
+                  </FooterLink>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
-        <div className="mt-16 border-t border-zinc-800 pt-8">
+        <div className="mt-16 flex flex-col gap-3 border-t border-zinc-800 pt-8 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-xs text-zinc-600">{footer.copyright}</p>
+          <div className="flex items-center gap-4 text-xs text-zinc-500">
+            <Link
+              href="/privacy"
+              className="transition-colors hover:text-white"
+            >
+              Privacy Policy
+            </Link>
+            <span aria-hidden className="text-zinc-700">
+              ·
+            </span>
+            <Link href="/terms" className="transition-colors hover:text-white">
+              Terms of Service
+            </Link>
+          </div>
         </div>
       </div>
     </footer>
