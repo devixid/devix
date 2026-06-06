@@ -14,6 +14,22 @@ export const LoginSchema = z.object({
   password: z.string().min(1, "Password is required."),
 });
 
+export const ChangePasswordSchema = z
+  .object({
+    currentPassword: z.string().min(1, "Current password is required."),
+    newPassword: z
+      .string()
+      .min(12, "Password must be at least 12 characters.")
+      .regex(/[A-Z]/, "Must contain at least one uppercase letter.")
+      .regex(/[0-9]/, "Must contain at least one number.")
+      .regex(/[^A-Za-z0-9]/, "Must contain at least one special character."),
+    confirmPassword: z.string().min(1, "Please confirm your new password."),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: "Passwords do not match.",
+    path: ["confirmPassword"],
+  });
+
 export const RegisterSchema = z.object({
   email: z.string().email("Invalid email address."),
   password: z
@@ -54,6 +70,15 @@ export const ProjectSchema = z.object({
   completedAt: z.coerce.date().optional().nullable(),
   isFeatured: z.boolean().optional().default(false),
   isVisible: z.boolean().optional().default(true),
+  content: z
+    .string()
+    .max(50000)
+    .optional()
+    .nullable()
+    .refine(
+      (val) => !val || val.replace(/<[^>]*>/g, "").trim().length >= 10,
+      "Case study content must be at least 10 characters when provided.",
+    ),
   techStacks: z.array(z.string().min(1).max(50)).min(1),
   developers: z
     .array(

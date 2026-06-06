@@ -1,7 +1,9 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { getSubmissionById, markSubmissionAsRead } from "@/actions/admin";
-import InboxActionButtons from "@/components/admin/InboxActionButtons";
+import { getSubmissionById } from "@/actions/admin";
+import InboxDetailPanel from "@/components/admin/InboxDetailPanel";
+import { getExcludedLabelsForProjectType } from "@/lib/estimator-deliverables";
+import type { ProjectType } from "@/types/estimator";
 
 interface Props {
   params: Promise<{
@@ -16,11 +18,6 @@ export default async function InboxDetailPage({ params }: Props) {
   const submission = await getSubmissionById(id);
   if (!submission) {
     notFound();
-  }
-
-  // Auto-mark as read if not already read
-  if (!submission.isRead) {
-    await markSubmissionAsRead(id, true);
   }
 
   return (
@@ -75,16 +72,11 @@ export default async function InboxDetailPage({ params }: Props) {
 
           <div>
             <span className="mb-1 block text-[10px] tracking-wider text-zinc-500 uppercase">
-              Status
+              Workflow Status
             </span>
-            <div className="mt-1 flex items-center gap-2">
-              <span
-                className={`h-2.5 w-2.5 ${submission.isRead ? "bg-zinc-700" : "bg-[#C8A96E]"}`}
-              />
-              <span className="text-xs font-medium tracking-wider text-zinc-400 uppercase">
-                {submission.isRead ? "Read" : "New Message"}
-              </span>
-            </div>
+            <span className="text-xs font-medium tracking-wider text-zinc-400 uppercase">
+              {submission.status.replace("_", " ")}
+            </span>
           </div>
         </div>
 
@@ -98,12 +90,62 @@ export default async function InboxDetailPage({ params }: Props) {
           </p>
         </div>
 
-        {/* Actions Controls */}
-        <InboxActionButtons
+        {submission.estimatorLead && (() => {
+          const lead = submission.estimatorLead;
+          const excludedIds = Array.isArray(lead.excludedDeliverables)
+            ? (lead.excludedDeliverables as string[])
+            : [];
+          const excludedLabels = getExcludedLabelsForProjectType(
+            lead.projectType as ProjectType,
+            excludedIds,
+          );
+
+          return (
+            <div className="rounded border border-zinc-800 bg-zinc-900/30 p-4 text-sm text-zinc-400">
+              <p className="mb-2 text-[10px] tracking-wider text-zinc-500 uppercase">
+                Linked Estimator Data
+              </p>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <span>Type: {lead.projectType}</span>
+                {lead.designApproach && (
+                  <span>
+                    Design:{" "}
+                    {lead.designApproach === "template" ? "Template" : "Custom"}
+                  </span>
+                )}
+                <span>Scope: {lead.scope}</span>
+                <span>Complexity: {lead.complexity}</span>
+                <span>Timeline: {lead.timeline}</span>
+                <span className="col-span-2">
+                  Budget: {lead.budgetDisplay}
+                </span>
+                {lead.deliverableSavingsUsd != null &&
+                  lead.deliverableSavingsUsd > 0 && (
+                    <span className="col-span-2">
+                      Package savings: −$
+                      {Math.round(lead.deliverableSavingsUsd).toLocaleString()}{" "}
+                      USD
+                    </span>
+                  )}
+                {excludedLabels.length > 0 && (
+                  <span className="col-span-2">
+                    Removed: {excludedLabels.join(" · ")}
+                  </span>
+                )}
+              </div>
+            </div>
+          );
+        })()}
+
+        <InboxDetailPanel
           id={submission.id}
           isRead={submission.isRead}
           email={submission.email}
           name={submission.name}
+          message={submission.message}
+          status={submission.status}
+          internalNotes={submission.internalNotes}
+          source={submission.source}
         />
       </div>
     </div>

@@ -3,8 +3,10 @@ import { Heading, ScrollDownButton } from "@/components";
 import { SlideUp } from "@/components/animations/SlideUp";
 import { FadeIn } from "@/components/animations/FadeIn";
 import { SmoothScrollLink } from "@/components/atoms/SmoothScrollLink";
+import { DEFAULT_SITE_SECTIONS, type HeroContent } from "@/lib/content-defaults";
 
-export function HeroSection() {
+export function HeroSection({ content }: { content?: HeroContent }) {
+  const hero = content ?? DEFAULT_SITE_SECTIONS.HERO;
   return (
     <section
       id="home"
@@ -16,7 +18,7 @@ export function HeroSection() {
         aria-hidden="true"
       >
         <span className="font-display text-[20vw] leading-none font-bold tracking-tighter text-black/[0.03]">
-          DEVIX
+          {hero.watermark}
         </span>
       </div>
 
@@ -28,7 +30,7 @@ export function HeroSection() {
           delay={0.3}
           className="mb-6 text-[11px] font-medium tracking-[0.3em] text-zinc-400 uppercase md:mb-8 md:text-[13px]"
         >
-          Web Agency · Est. 2022
+          {hero.eyebrow}
         </SlideUp>
 
         {/* Heading */}
@@ -38,7 +40,7 @@ export function HeroSection() {
           delay={0.5}
         >
           <Heading.h1 className="max-w-4xl font-extralight">
-            Professional website creation services
+            {hero.headline}
           </Heading.h1>
         </SlideUp>
 
@@ -50,22 +52,21 @@ export function HeroSection() {
           className="mt-8 flex w-full flex-col gap-y-8 md:mt-12 md:flex-row md:items-end md:justify-between"
         >
           <p className="max-w-md text-base leading-relaxed text-zinc-500 md:text-lg">
-            We design and build high-performance custom websites to grow your
-            business online.
+            {hero.subheading}
           </p>
           <div className="flex flex-wrap items-center gap-6">
             <Link
               href="/estimator"
               className="hover:text-white inline-flex items-center border border-black-1/20 px-8 py-3 text-sm font-medium tracking-[0.15em] text-black uppercase transition-all duration-300 hover:bg-black-1"
             >
-              Estimate Project
+              {hero.ctaPrimary}
             </Link>
             <SmoothScrollLink
               href="#cta"
               className="group text-zinc-500 hover:text-black-1 inline-flex items-center gap-x-2 text-sm font-medium transition-colors duration-300"
             >
               <span className="relative">
-                Get in touch
+                {hero.ctaSecondary}
                 <span className="bg-accent absolute bottom-0 left-0 h-[1px] w-full origin-left scale-x-0 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-x-100" />
               </span>
               <span className="text-lg">→</span>

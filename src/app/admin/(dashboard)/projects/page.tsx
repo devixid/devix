@@ -20,13 +20,21 @@ export default async function AdminProjectsPage() {
             Manage your project portfolio, tech stacks, and developers.
           </p>
         </div>
-        <Link
-          href="/admin/projects/create"
-          className="flex items-center gap-x-2 rounded-lg bg-[#C8A96E] px-4 py-2 text-sm font-medium text-black transition-colors hover:bg-[#D4B87A]"
-        >
-          <Plus size={16} />
-          Add Project
-        </Link>
+        <div className="flex flex-wrap gap-3">
+          <Link
+            href="/admin/projects/featured-order"
+            className="flex items-center gap-x-2 rounded-lg border border-zinc-700 px-4 py-2 text-sm font-medium text-zinc-300 transition-colors hover:border-zinc-500 hover:text-white"
+          >
+            Featured Order
+          </Link>
+          <Link
+            href="/admin/projects/create"
+            className="flex items-center gap-x-2 rounded-lg bg-[#C8A96E] px-4 py-2 text-sm font-medium text-black transition-colors hover:bg-[#D4B87A]"
+          >
+            <Plus size={16} />
+            Add Project
+          </Link>
+        </div>
       </div>
 
       <AdminProjectList initialProjects={projects} />

@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Project, ProjectDeveloper, ProjectTechStack } from "@prisma/client";
 import { m, AnimatePresence } from "framer-motion";
 import { SlideUp } from "@/components/animations/SlideUp";
-import { Heading } from "@/components/atoms";
+import { HeadingStatic } from "@/components/atoms/Heading/HeadingStatic";
+import type { ProjectListItem } from "@/types/projects";
 
 // Import filter UI components that we'll build next
 import SearchInput from "@/components/molecules/projects/SearchInput";
@@ -15,13 +15,8 @@ import SortDropdown from "@/components/molecules/projects/SortDropdown";
 import ProjectCard from "@/components/molecules/projects/ProjectCard";
 import Pagination from "@/components/molecules/projects/Pagination";
 
-export type ProjectWithRelations = Project & {
-  techStacks: ProjectTechStack[];
-  developers: ProjectDeveloper[];
-};
-
 interface ProjectsClientProps {
-  initialProjects: ProjectWithRelations[];
+  initialProjects: ProjectListItem[];
   filterOptions: {
     categories: string[];
     techStacks: string[];
@@ -157,9 +152,12 @@ export default function ProjectsClient({
             duration={0.8}
             delay={0.1}
           >
-            <Heading.h1 className="text-5xl font-extralight text-black md:text-6xl">
+            <HeadingStatic
+              level="h1"
+              className="text-5xl font-extralight text-black md:text-6xl"
+            >
               Projects.
-            </Heading.h1>
+            </HeadingStatic>
           </SlideUp>
         </div>
         <SlideUp
@@ -262,6 +260,7 @@ export default function ProjectsClient({
                   key={project.id}
                   project={project}
                   index={idx}
+                  priority={currentPage === 1 && idx === 0}
                 />
               ))}
             </m.div>

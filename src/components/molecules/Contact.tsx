@@ -1,6 +1,9 @@
-import { ContactForm } from "./ContactForm";
+import { Suspense } from "react";
+import ContactFormLazy from "./ContactFormLazy";
+import { DEFAULT_SITE_SECTIONS, type ContactContent } from "@/lib/content-defaults";
 
-export default function Contact() {
+export default function Contact({ content }: { content?: ContactContent }) {
+  const contact = content ?? DEFAULT_SITE_SECTIONS.CONTACT;
   return (
     <section
       id="contact"
@@ -12,22 +15,30 @@ export default function Contact() {
           <div className="flex flex-col justify-between lg:col-span-1">
             <div>
               <p className="mb-4 text-[13px] font-medium tracking-[0.2em] text-zinc-400 uppercase">
-                Get In Touch
+                {contact.eyebrow}
               </p>
               <h2 className="font-display text-4xl leading-[1.1] font-extralight tracking-tight md:text-5xl">
-                Let's build something world-class together.
+                {contact.headline}
               </h2>
             </div>
 
-            {/* Contact details */}
             <div className="font-body mt-12 space-y-2 text-sm text-zinc-500 lg:mt-0">
-              <p>Email: hello@devix.id</p>
-              <p>Timezone: UTC+7 (GMT+7)</p>
+              <p>Email: {contact.email}</p>
+              <p>Timezone: {contact.timezone}</p>
             </div>
           </div>
 
           {/* Right Column (Form Panel) */}
-          <ContactForm />
+          <Suspense
+            fallback={
+              <div
+                className="min-h-[400px] animate-pulse rounded-xl bg-zinc-100 lg:col-span-2"
+                aria-hidden
+              />
+            }
+          >
+            <ContactFormLazy />
+          </Suspense>
         </div>
       </div>
     </section>

@@ -3,13 +3,15 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Project, ProjectDeveloper, ProjectTechStack } from "@prisma/client";
 import {
   toggleProjectVisibility,
   toggleProjectFeatured,
   deleteProject,
+  duplicateProject,
 } from "@/actions/admin/projects";
-import { Eye, EyeOff, Star, Trash2, Edit } from "lucide-react";
+import { Eye, EyeOff, Star, Trash2, Edit, ExternalLink, Copy } from "lucide-react";
 
 type ProjectWithRelations = Project & {
   techStacks: ProjectTechStack[];
@@ -21,6 +23,7 @@ export default function AdminProjectList({
 }: {
   initialProjects: ProjectWithRelations[];
 }) {
+  const router = useRouter();
   const [projects, setProjects] = useState(initialProjects);
   const [loadingId, setLoadingId] = useState<string | null>(null);
 
@@ -53,6 +56,19 @@ export default function AdminProjectList({
     } catch (err) {
       console.error(err);
       alert("Failed to toggle featured status");
+    } finally {
+      setLoadingId(null);
+    }
+  };
+
+  const handleDuplicate = async (id: string) => {
+    setLoadingId(id);
+    try {
+      await duplicateProject(id);
+      router.refresh();
+    } catch (err) {
+      console.error(err);
+      alert("Failed to duplicate project");
     } finally {
       setLoadingId(null);
     }
@@ -181,17 +197,38 @@ export default function AdminProjectList({
               {project.description}
             </p>
 
-            <div className="mt-auto flex gap-x-2 border-t border-zinc-800/50 pt-4">
+            <div className="mt-auto flex flex-wrap gap-2 border-t border-zinc-800/50 pt-4">
               <Link
                 href={`/admin/projects/${project.id}`}
                 className="flex flex-1 items-center justify-center gap-x-2 rounded-lg bg-zinc-800 py-2 text-sm font-medium text-zinc-300 transition-colors hover:bg-zinc-700 hover:text-white"
               >
                 <Edit size={14} /> Edit
               </Link>
+              {project.isVisible && (
+                <a
+                  href={`/projects/${project.slug}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center rounded-lg border border-zinc-700 px-3 py-2 text-zinc-400 transition-colors hover:text-white"
+                  title="Preview"
+                >
+                  <ExternalLink size={16} />
+                </a>
+              )}
               <button
+                type="button"
+                onClick={() => handleDuplicate(project.id)}
+                disabled={loadingId === project.id}
+                className="flex items-center justify-center rounded-lg border border-zinc-700 px-3 py-2 text-zinc-400 transition-colors hover:text-white"
+                title="Duplicate"
+              >
+                <Copy size={16} />
+              </button>
+              <button
+                type="button"
                 onClick={() => handleDelete(project.id)}
                 disabled={loadingId === project.id}
-                className="flex items-center justify-center rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-2 text-red-500 transition-colors hover:bg-red-500/20"
+                className="flex items-center justify-center rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-red-500 transition-colors hover:bg-red-500/20"
                 title="Delete Project"
               >
                 <Trash2 size={16} />

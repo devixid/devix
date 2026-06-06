@@ -1,7 +1,10 @@
+import { cache } from "react";
 import { prisma } from "@/lib/prisma";
 import { cachedQuery } from "@/lib/redis";
 
-export async function getProjects() {
+const PROJECTS_TTL = 3600;
+
+export const getProjects = cache(async () => {
   return cachedQuery(
     "projects:all",
     () =>
@@ -10,24 +13,24 @@ export async function getProjects() {
         include: { techStacks: true, developers: true },
         orderBy: { createdAt: "desc" },
       }),
-    300,
+    PROJECTS_TTL,
   );
-}
+});
 
-export async function getFeaturedProjects() {
+export const getFeaturedProjects = cache(async () => {
   return cachedQuery(
     "projects:featured",
     () =>
       prisma.project.findMany({
         where: { isVisible: true, isFeatured: true },
         include: { techStacks: true, developers: true },
-        orderBy: { createdAt: "desc" },
+        orderBy: [{ featuredOrder: "asc" }, { createdAt: "desc" }],
       }),
-    300,
+    PROJECTS_TTL,
   );
-}
+});
 
-export async function getFilterOptions() {
+export const getFilterOptions = cache(async () => {
   return cachedQuery(
     "projects:filters",
     async () => {
@@ -47,11 +50,11 @@ export async function getFilterOptions() {
         developers: developers.map(d => d.name) 
       };
     },
-    300,
+    PROJECTS_TTL,
   );
-}
+});
 
-export async function getProjectBySlug(slug: string) {
+export const getProjectBySlug = cache(async (slug: string) => {
   return cachedQuery(
     `project:${slug}`,
     async () => {
@@ -66,6 +69,6 @@ export async function getProjectBySlug(slug: string) {
         },
       });
     },
-    300, // 5 minutes TTL
+    PROJECTS_TTL,
   );
-}
+});

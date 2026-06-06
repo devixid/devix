@@ -1,41 +1,14 @@
-import { Heading } from "@/components/atoms";
+import { HeadingStatic } from "@/components/atoms/Heading/HeadingStatic";
 import { SlideUp } from "@/components/animations/SlideUp";
 import { FaQAccordion } from "./FaQAccordion";
 
-const faqs = [
-  {
-    question: "What services and products do you offer?",
-    answer:
-      "We offer comprehensive custom web development (company profiles, e-commerce platforms, landing pages) and custom mobile applications tailored to your business needs.",
-  },
-  {
-    question: "How much experience do you have with IT projects?",
-    answer:
-      "Our team members have worked on various digital products for businesses across Indonesia, delivering highly optimized, secure, and production-ready applications.",
-  },
-  {
-    question: "How long does a typical project take?",
-    answer:
-      "A standard website project takes between 2 to 4 weeks depending on the complexity of requirements and design iterations.",
-  },
-  {
-    question: "Should I create a mobile or a web app?",
-    answer:
-      "It depends on your audience. Websites are perfect for discovery and broad reach, while mobile apps are ideal for retaining repeat customers and providing offline capabilities.",
-  },
-  {
-    question: "What technologies do you use in development?",
-    answer:
-      "We primarily develop websites using Next.js, React, TailwindCSS, and Node.js, and integrate databases using Supabase and Prisma for maximum speed and security.",
-  },
-  {
-    question: "What do I need to prepare before contacting you?",
-    answer:
-      "Just your business idea and goals! Having your brand guidelines, logo files, and content copy ready will help speed up the process, but we are happy to guide you from scratch.",
-  },
-];
+import { DEFAULT_FAQ_ITEMS } from "@/lib/content-defaults";
 
-export default function FaQ() {
+interface FaqProps {
+  faqs?: { question: string; answer: string }[];
+}
+
+export default function FaQ({ faqs = DEFAULT_FAQ_ITEMS }: FaqProps) {
   return (
     <section className="py-20 md:py-32">
       <div className="mx-auto max-w-6xl px-6 lg:px-10">
@@ -49,9 +22,9 @@ export default function FaQ() {
             <p className="mb-4 text-[13px] font-medium tracking-[0.2em] text-zinc-400 uppercase">
               FAQ
             </p>
-            <Heading.h2 className="mb-4 font-extralight">
+            <HeadingStatic level="h2" className="mb-4 font-extralight">
               Frequently asked questions.
-            </Heading.h2>
+            </HeadingStatic>
             <p className="text-sm leading-relaxed text-zinc-500">
               Everything you need to know about working with us. Can't find the
               answer you're looking for? Feel free to reach out.

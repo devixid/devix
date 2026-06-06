@@ -1,8 +1,16 @@
 import { getVisibleTestimonials } from "@/lib/testimonials";
 import TestimonialControls from "./TestimonialControls";
 import Image from "next/image";
+import {
+  DEFAULT_SITE_SECTIONS,
+  type SectionIntroContent,
+} from "@/lib/content-defaults";
 
-export default async function Testimonials() {
+export default async function Testimonials({
+  intro = DEFAULT_SITE_SECTIONS.TESTIMONIALS_INTRO,
+}: {
+  intro?: SectionIntroContent;
+}) {
   const testimonials = await getVisibleTestimonials();
 
   if (testimonials.length === 0) return null;
@@ -17,10 +25,10 @@ export default async function Testimonials() {
         <div className="mb-16 flex flex-col gap-y-6 md:flex-row md:items-end md:justify-between">
           <div className="max-w-xl">
             <p className="mb-4 text-[13px] font-medium tracking-[0.2em] text-zinc-500 uppercase">
-              Testimonials
+              {intro.eyebrow}
             </p>
             <h2 className="font-display text-4xl leading-[1.1] font-extralight tracking-tight text-white md:text-5xl lg:text-6xl">
-              What our clients say.
+              {intro.headline}
             </h2>
           </div>
           <div className="flex-shrink-0">

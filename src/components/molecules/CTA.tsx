@@ -1,10 +1,12 @@
 import Link from "next/link";
-import { Heading } from "@/components/atoms";
+import { HeadingStatic } from "@/components/atoms/Heading/HeadingStatic";
 import { SlideUp } from "@/components/animations/SlideUp";
 import { FadeIn } from "@/components/animations/FadeIn";
 import { SmoothScrollLink } from "@/components/atoms/SmoothScrollLink";
+import { DEFAULT_SITE_SECTIONS, type CtaContent } from "@/lib/content-defaults";
 
-export default function CTA() {
+export default function CTA({ content }: { content?: CtaContent }) {
+  const cta = content ?? DEFAULT_SITE_SECTIONS.CTA;
   return (
     <section
       id="cta"
@@ -25,7 +27,7 @@ export default function CTA() {
             </defs>
             <text className="fill-zinc-500 text-[11px] tracking-[0.25em] uppercase">
               <textPath href="#circlePath">
-                Available for projects · Available for projects ·{" "}
+                {cta.badgeText} · {cta.badgeText} ·{" "}
               </textPath>
             </text>
           </svg>
@@ -40,9 +42,12 @@ export default function CTA() {
           yOffset={30}
           duration={0.9}
         >
-          <Heading.h2 className="mb-6 text-4xl font-extralight text-white md:text-5xl lg:text-7xl">
-            Ready to work with us?
-          </Heading.h2>
+          <HeadingStatic
+            level="h2"
+            className="mb-6 text-4xl font-extralight text-white md:text-5xl lg:text-7xl"
+          >
+            {cta.headline}
+          </HeadingStatic>
         </SlideUp>
 
         <SlideUp
@@ -51,7 +56,7 @@ export default function CTA() {
           delay={0.15}
           className="mb-12 max-w-md text-base text-zinc-400 md:text-lg"
         >
-          Let's turn your vision into a stunning digital reality.
+          {cta.subheading}
         </SlideUp>
 
         <FadeIn
@@ -63,14 +68,14 @@ export default function CTA() {
               href="/estimator"
               className="hover:text-black-1 inline-flex items-center border border-white/30 px-10 py-4 text-sm font-medium tracking-[0.15em] text-white uppercase transition-all duration-400 hover:bg-white"
             >
-              Estimate Project
+              {cta.ctaPrimary}
             </Link>
             <SmoothScrollLink
               href="#contact"
               className="group inline-flex items-center gap-x-2 text-sm font-medium text-zinc-400 transition-colors duration-300 hover:text-white"
             >
               <span className="relative">
-                Contact us
+                {cta.ctaSecondary}
                 <span className="bg-accent absolute bottom-0 left-0 h-[1px] w-full origin-left scale-x-0 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-x-100" />
               </span>
               <span className="text-lg">→</span>

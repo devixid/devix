@@ -1,10 +1,13 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { jwtDecrypt } from "jose";
 import { getGlobalLimiter, getApiLimiter, getClientIp } from "@/lib/rate-limit";
-
-const secretKey = process.env.JWT_SECRET;
-if (!secretKey) throw new Error("JWT_SECRET environment variable is not set.");
-const secret = new TextEncoder().encode(secretKey);
+import {
+  verifySessionToken,
+  readSessionTokenFromCookies,
+  resolveSessionCookieName,
+  isSecureRequestUrl,
+  SESSION_COOKIE_DEV,
+  SESSION_COOKIE_PROD,
+} from "@/lib/session-token";
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -31,7 +34,6 @@ export async function proxy(request: NextRequest) {
     }
   } else {
     // 2. Global Rate Limiting (Tier 1) for all non-API paths
-    // Note: In production, you might want to exclude static assets if proxy runs on them
     const globalLimiter = getGlobalLimiter();
     if (globalLimiter) {
       const { success, limit, reset, remaining } = await globalLimiter.limit(ip);
@@ -49,17 +51,16 @@ export async function proxy(request: NextRequest) {
   }
 
   // 3. Admin Authentication Logic
-  // Only run auth middleware on /admin paths
   if (!pathname.startsWith("/admin")) {
     return NextResponse.next();
   }
 
-  // Allow static admin error page to always be accessible
   if (pathname === "/admin/error") {
     return NextResponse.next();
   }
 
-  const token = request.cookies.get("__Host-devix_session")?.value;
+  const isSecure = isSecureRequestUrl(request.nextUrl.protocol);
+  const token = readSessionTokenFromCookies(request.cookies, isSecure);
 
   if (!token) {
     if (pathname !== "/admin/login") {
@@ -69,22 +70,21 @@ export async function proxy(request: NextRequest) {
   }
 
   try {
-    // Verify the PBES2+AES-GCM JWE token
-    await jwtDecrypt(token, secret);
+    await verifySessionToken(token);
 
-    // User is logged in
     if (pathname === "/admin/login") {
       return NextResponse.redirect(new URL("/admin", request.url));
     }
 
     return NextResponse.next();
   } catch (_) {
-    // Invalid token
     if (pathname !== "/admin/login") {
       const response = NextResponse.redirect(
         new URL("/admin/login", request.url),
       );
-      response.cookies.delete("__Host-devix_session");
+      response.cookies.delete(resolveSessionCookieName(isSecure));
+      response.cookies.delete(SESSION_COOKIE_PROD);
+      response.cookies.delete(SESSION_COOKIE_DEV);
       return response;
     }
     return NextResponse.next();
@@ -92,6 +92,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // Apply middleware to all routes except static assets
   matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
 };

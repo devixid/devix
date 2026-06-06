@@ -1,0 +1,59 @@
+name: Performance
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "next.config.ts"
+      - "lighthouserc*.cjs"
+      - "package.json"
+      - "bun.lock"
+
+jobs:
+  bundle-and-lighthouse:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      DATABASE_URL: postgresql://user:pass@localhost:5432/devix
+      JWT_SECRET: ci-jwt-secret-min-32-chars-long!!
+      NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.placeholder
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: bunx prisma generate
+
+      - name: Production build
+        run: bun run build
+
+      - name: Measure client chunk sizes
+        run: |
+          node scripts/measure-chunks.mjs > chunk-report.txt
+          cat chunk-report.txt
+
+      - name: Lighthouse CI (mobile homepage)
+        run: bun run perf:lighthouse:mobile
+        continue-on-error: true
+
+      - name: Upload Lighthouse report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-report
+          path: .lighthouseci
+
+      - name: Upload chunk report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: chunk-report
+          path: chunk-report.txt

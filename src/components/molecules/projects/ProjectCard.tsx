@@ -3,15 +3,20 @@
 import Image from "next/image";
 import Link from "next/link";
 import { m } from "framer-motion";
-import { ProjectWithRelations } from "@/app/(public)/projects/ProjectsClient";
+import type { ProjectListItem } from "@/types/projects";
 import { ExternalLink, GitCommit } from "lucide-react";
 
 interface ProjectCardProps {
-  project: ProjectWithRelations;
+  project: ProjectListItem;
   index: number;
+  priority?: boolean;
 }
 
-export default function ProjectCard({ project, index }: ProjectCardProps) {
+export default function ProjectCard({
+  project,
+  index,
+  priority = false,
+}: ProjectCardProps) {
   return (
     <m.div
       layout
@@ -41,6 +46,7 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
           alt={project.title}
           src={project.imageUrl}
           fill
+          priority={priority}
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           className="object-cover transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.03]"
         />

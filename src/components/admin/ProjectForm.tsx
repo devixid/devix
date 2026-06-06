@@ -5,7 +5,9 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { createProject, updateProject } from "@/actions/admin/projects";
 import { Project, ProjectDeveloper, ProjectTechStack } from "@prisma/client";
-import { createSupabaseBrowser } from "@/lib/supabase-browser";
+import { uploadToSupabaseStorage } from "@/lib/supabase-storage";
+import RichTextEditor from "@/components/admin/RichTextEditor";
+import { MediaPicker } from "@/components/admin/MediaPicker";
 import { UploadCloud, X, Plus, Trash2, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
@@ -29,12 +31,14 @@ export default function ProjectForm({ initialData }: ProjectFormProps) {
     initialData?.imageUrl || "",
   );
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [mediaPickerOpen, setMediaPickerOpen] = useState(false);
 
   // Form State
   const [formData, setFormData] = useState({
     title: initialData?.title || "",
     slug: initialData?.slug || "",
     description: initialData?.description || "",
+    content: initialData?.content || "",
     category: initialData?.category || "E-Commerce",
     liveUrl: initialData?.liveUrl || "",
     githubUrl: initialData?.githubUrl || "",
@@ -74,24 +78,8 @@ export default function ProjectForm({ initialData }: ProjectFormProps) {
   };
 
   const uploadImageToSupabase = async (file: File): Promise<string> => {
-    const supabase = createSupabaseBrowser();
-    const fileExt = file.name.split(".").pop();
-    const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
-    const filePath = `projects/${fileName}`;
-
-    const { error: uploadError } = await supabase.storage
-      .from("portfolio") // Make sure this bucket exists and is public
-      .upload(filePath, file);
-
-    if (uploadError) {
-      throw new Error(`Image upload failed: ${uploadError.message}`);
-    }
-
-    const {
-      data: { publicUrl },
-    } = supabase.storage.from("portfolio").getPublicUrl(filePath);
-
-    return publicUrl;
+    const result = await uploadToSupabaseStorage(file, "portfolio", "projects");
+    return result.publicUrl;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -131,6 +119,7 @@ export default function ProjectForm({ initialData }: ProjectFormProps) {
             .replace(/[^a-z0-9]+/g, "-")
             .replace(/(^-|-$)+/g, ""),
         description: formData.description,
+        content: formData.content.trim() || null,
         category: formData.category,
         imageUrl: finalImageUrl,
         liveUrl: formData.liveUrl || null,
@@ -226,16 +215,32 @@ export default function ProjectForm({ initialData }: ProjectFormProps) {
               </div>
 
               <div>
-                <label
-                  htmlFor="slug"
-                  className="mb-1.5 block text-sm font-medium text-zinc-400"
-                >
-                  Slug (URL)
-                </label>
+                <div className="mb-1.5 flex items-center justify-between">
+                  <label
+                    htmlFor="slug"
+                    className="block text-sm font-medium text-zinc-400"
+                  >
+                    Slug (URL)
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const slug = formData.title
+                        .toLowerCase()
+                        .replace(/[^a-z0-9]+/g, "-")
+                        .replace(/(^-|-$)+/g, "");
+                      setFormData({ ...formData, slug });
+                    }}
+                    className="text-[10px] tracking-wider text-[#C8A96E] uppercase hover:underline"
+                  >
+                    Regenerate from title
+                  </button>
+                </div>
                 <input
                   id="slug"
                   required
                   type="text"
+                  readOnly={!!initialData}
                   value={formData.slug}
                   onChange={(e) =>
                     setFormData({
@@ -245,8 +250,13 @@ export default function ProjectForm({ initialData }: ProjectFormProps) {
                         .replace(/[^a-z0-9-]/g, ""),
                     })
                   }
-                  className="w-full rounded-lg border border-zinc-800 bg-zinc-900/50 px-4 py-2.5 text-white outline-none focus:border-[#C8A96E] focus:ring-1 focus:ring-[#C8A96E]"
+                  className={`w-full rounded-lg border border-zinc-800 bg-zinc-900/50 px-4 py-2.5 text-white outline-none focus:border-[#C8A96E] focus:ring-1 focus:ring-[#C8A96E] ${initialData ? "cursor-not-allowed opacity-70" : ""}`}
                 />
+                {initialData && (
+                  <p className="mt-1 text-[11px] text-zinc-500">
+                    Slug is locked on edit. Use &quot;Regenerate from title&quot; to change it.
+                  </p>
+                )}
               </div>
 
               <div>
@@ -307,6 +317,20 @@ export default function ProjectForm({ initialData }: ProjectFormProps) {
                 </div>
               </div>
             </div>
+          </div>
+
+          <div className="rounded-xl border border-zinc-800 bg-[#121212] p-6">
+            <h2 className="mb-2 text-lg font-medium text-white">
+              Case Study Content
+            </h2>
+            <p className="mb-4 text-xs text-zinc-500">
+              Optional rich content shown below the overview on the project page.
+            </p>
+            <RichTextEditor
+              value={formData.content}
+              onChange={(html) => setFormData({ ...formData, content: html })}
+              placeholder="Describe the challenge, solution, and results..."
+            />
           </div>
 
           {/* Links & Status */}
@@ -431,6 +455,13 @@ export default function ProjectForm({ initialData }: ProjectFormProps) {
                   />
                 </label>
               )}
+              <button
+                type="button"
+                onClick={() => setMediaPickerOpen(true)}
+                className="text-xs tracking-wider text-[#C8A96E] uppercase hover:underline"
+              >
+                Choose from library
+              </button>
             </div>
             {uploadingImage && (
               <p className="text-center text-xs text-[#C8A96E]">
@@ -561,6 +592,15 @@ export default function ProjectForm({ initialData }: ProjectFormProps) {
               : "Create Project"}
         </button>
       </div>
+
+      <MediaPicker
+        open={mediaPickerOpen}
+        onClose={() => setMediaPickerOpen(false)}
+        onSelect={(url) => {
+          setImageFile(null);
+          setImagePreview(url);
+        }}
+      />
     </form>
   );
 }

@@ -1,27 +1,20 @@
 import { SlideUp } from "@/components/animations/SlideUp";
 
-const services = [
-  {
-    num: "01",
-    title: "Custom Web Development",
-    description:
-      "High-performance websites designed from scratch to deliver speed, security, and premium aesthetics for your business.",
-  },
-  {
-    num: "02",
-    title: "E-Commerce Solutions",
-    description:
-      "Tailored online shops with seamless checkout flows, secure payment integrations, and easy product management systems.",
-  },
-  {
-    num: "03",
-    title: "Landing Page Optimization",
-    description:
-      "High-converting single-page sites built specifically to drive leads, showcase product launches, and maximize marketing ROI.",
-  },
-];
+import {
+  DEFAULT_SERVICE_ITEMS,
+  DEFAULT_SITE_SECTIONS,
+  type SectionIntroContent,
+} from "@/lib/content-defaults";
 
-export default function Offering() {
+interface OfferingProps {
+  services?: { title: string; description: string }[];
+  intro?: SectionIntroContent;
+}
+
+export default function Offering({
+  services = DEFAULT_SERVICE_ITEMS,
+  intro = DEFAULT_SITE_SECTIONS.SERVICES_INTRO,
+}: OfferingProps) {
   return (
     <section
       id="services"
@@ -37,7 +30,7 @@ export default function Offering() {
               duration={0.7}
               className="mb-6 text-[13px] font-medium tracking-[0.2em] text-zinc-500 uppercase"
             >
-              What We Do
+              {intro.eyebrow}
             </SlideUp>
             <SlideUp
               yOffset={30}
@@ -45,7 +38,7 @@ export default function Offering() {
               delay={0.1}
               className="font-display max-w-2xl text-4xl leading-[1.1] font-extralight tracking-tight text-white md:text-5xl lg:text-6xl"
             >
-              We offer website creation tailored to your unique business needs.
+              {intro.headline}
             </SlideUp>
           </div>
 
@@ -53,7 +46,7 @@ export default function Offering() {
           <div className="flex flex-col lg:w-1/3">
             {services.map((service, index) => (
               <SlideUp
-                key={service.num}
+                key={`${service.title}-${index}`}
                 yOffset={20}
                 duration={0.7}
                 delay={index * 0.12}
@@ -61,7 +54,7 @@ export default function Offering() {
               >
                 {/* Decorative number */}
                 <span className="font-display pointer-events-none absolute top-4 right-0 text-6xl leading-none font-bold text-white/[0.08] select-none">
-                  {service.num}
+                  {String(index + 1).padStart(2, "0")}
                 </span>
 
                 <h3 className="group-hover:text-accent relative z-10 mb-3 text-lg font-medium text-white transition-colors duration-300">

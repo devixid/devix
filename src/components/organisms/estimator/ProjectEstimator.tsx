@@ -1,50 +1,180 @@
 "use client";
 
-import { useState } from "react";
-import { m, AnimatePresence } from "framer-motion";
-import { StepType } from "../../molecules/estimator/StepType";
-import { StepResult } from "../../molecules/estimator/StepResult";
+import { useState, useEffect, useMemo } from "react";
+import { AnimatePresence } from "framer-motion";
 import type { EstimatorState } from "@/types/estimator";
-import { StepScope } from "@/components/molecules/estimator/StepScope";
-import { StepComplexity } from "@/components/molecules/estimator/StepComplexity";
-import { StepTimeline } from "@/components/molecules/estimator/StepTimeline";
-import { StepPlatform } from "../../molecules/estimator/StepPlatform";
+import {
+  StepType,
+  StepDesign,
+  StepPlatform,
+  StepScope,
+  StepComplexity,
+  StepTimeline,
+  StepCustomize,
+  StepResult,
+  StepContact,
+} from "./estimator-steps-dynamic";
+import { EstimatorProgress } from "@/components/molecules/estimator/EstimatorProgress";
+import { EstimatorLiveSummary } from "@/components/molecules/estimator/EstimatorLiveSummary";
+import { EstimatorStepTransition } from "@/components/molecules/estimator/EstimatorStepTransition";
+import type { CurrencyCode } from "@/types/estimator";
+import { detectDefaultCurrency } from "@/lib/estimator-format";
+import { useCurrencyRates } from "@/hooks/useCurrencyRates";
+import { useEstimatorPricing } from "@/hooks/useEstimatorPricing";
+import {
+  clearEstimatorSession,
+  loadEstimatorSession,
+  useEstimatorSessionPersistence,
+} from "@/hooks/useEstimatorSession";
+import {
+  buildEstimatorSteps,
+  clampStepKey,
+  getNextStepKey,
+  getPrevStepKey,
+  type EstimatorStepKey,
+} from "@/lib/estimator-steps";
+
+const INITIAL_STATE: EstimatorState = {
+  type: null,
+  designApproach: null,
+  platform: null,
+  scope: null,
+  complexity: null,
+  timeline: null,
+  excludedDeliverableIds: [],
+};
 
 export default function ProjectEstimator() {
-  const [currentStep, setCurrentStep] = useState(1);
-  const [state, setState] = useState<EstimatorState>({
-    type: null,
-    scope: null,
-    complexity: null,
-    timeline: null,
-  });
+  const { rates, isLoading: ratesLoading, error: ratesError } = useCurrencyRates();
+
+  const [hydrated, setHydrated] = useState(false);
+  const [showRestoredBanner, setShowRestoredBanner] = useState(false);
+  const [currentStepKey, setCurrentStepKey] =
+    useState<EstimatorStepKey>("type");
+  const [slideDirection, setSlideDirection] = useState(1);
+  const [contactLeadId, setContactLeadId] = useState<string | null>(null);
+  const [savedFingerprint, setSavedFingerprint] = useState<string | null>(
+    null,
+  );
+  const [contactBudgetDisplay, setContactBudgetDisplay] = useState("");
+  const [currency, setCurrency] = useState<CurrencyCode>("USD");
+  const [state, setState] = useState<EstimatorState>(INITIAL_STATE);
+  const [contactSuccess, setContactSuccess] = useState(false);
+
+  const steps = buildEstimatorSteps(state);
+
+  const { canEstimate, budgetDisplay } = useEstimatorPricing(
+    state,
+    rates,
+    currency,
+  );
+
+  const sessionSnapshot = useMemo(
+    () => ({
+      state,
+      currentStepKey,
+      currency,
+      contactLeadId,
+      savedFingerprint,
+    }),
+    [state, currentStepKey, currency, contactLeadId, savedFingerprint],
+  );
+
+  useEstimatorSessionPersistence(sessionSnapshot, hydrated && !contactSuccess);
+
+  useEffect(() => {
+    const session = loadEstimatorSession();
+    if (session) {
+      setState(session.state);
+      setCurrentStepKey(clampStepKey(session.currentStepKey, session.state));
+      setCurrency(session.currency);
+      setContactLeadId(session.contactLeadId);
+      setSavedFingerprint(session.savedFingerprint);
+      setShowRestoredBanner(true);
+    } else {
+      setCurrency(detectDefaultCurrency());
+    }
+    setHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    setCurrentStepKey((key) => clampStepKey(key, state));
+  }, [state.type]);
 
   const updateState = (updates: Partial<EstimatorState>) => {
+    if (updates.type !== undefined) {
+      setSlideDirection(-1);
+      setCurrentStepKey("type");
+      setContactLeadId(null);
+      setSavedFingerprint(null);
+      setContactSuccess(false);
+    }
+
     setState((prev) => {
       const next = { ...prev, ...updates };
-      if (updates.type && updates.type !== "mobile_app") {
-        next.platform = null;
+      if (updates.type) {
+        if (updates.type !== "mobile_app") {
+          next.platform = null;
+        }
+        next.designApproach = null;
+        next.excludedDeliverableIds = [];
       }
       return next;
     });
   };
 
-  const steps = [
-    { key: "type", title: "Project Type" },
-    ...(state.type === "mobile_app" ? [{ key: "platform", title: "Platform" }] : []),
-    { key: "scope", title: "Scope" },
-    { key: "complexity", title: "Complexity" },
-    { key: "timeline", title: "Timeline" },
-    { key: "result", title: "Estimation" },
-  ].map((step, idx) => ({ ...step, id: idx + 1 }));
+  const handleScheduleConsultation = (data: {
+    leadId: string;
+    budgetDisplay: string;
+    currency: CurrencyCode;
+    fingerprint: string;
+  }) => {
+    setContactLeadId(data.leadId);
+    setContactBudgetDisplay(data.budgetDisplay);
+    setCurrency(data.currency);
+    setSavedFingerprint(data.fingerprint);
+    setSlideDirection(1);
+    setCurrentStepKey("contact");
+  };
 
-  const nextStep = () => setCurrentStep((prev) => Math.min(prev + 1, steps.length));
-  const prevStep = () => setCurrentStep((prev) => Math.max(prev - 1, 1));
+  const handleContactSuccess = () => {
+    setContactSuccess(true);
+    clearEstimatorSession();
+    setContactLeadId(null);
+    setSavedFingerprint(null);
+  };
 
-  const currentStepKey = steps[currentStep - 1]?.key;
+  const handleAdjustEstimate = () => {
+    setContactSuccess(false);
+    setSlideDirection(-1);
+    setCurrentStepKey("result");
+  };
+
+  const nextStep = () => {
+    setSlideDirection(1);
+    setCurrentStepKey((key) => getNextStepKey(key, state) ?? key);
+  };
+
+  const prevStep = () => {
+    setSlideDirection(-1);
+    setCurrentStepKey((key) => getPrevStepKey(key, state) ?? key);
+  };
+
+  const transitionVariant =
+    currentStepKey === "result" ? "reveal" : "slide";
+
+  if (!hydrated) {
+    return (
+      <div className="mx-auto w-full max-w-6xl px-6 py-12 md:py-20 lg:px-10">
+        <div className="flex min-h-[200px] items-center justify-center text-sm text-zinc-400">
+          Loading estimator…
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-12 md:py-20">
+    <div className="mx-auto w-full max-w-6xl px-6 py-12 md:py-20 lg:px-10">
       <div className="mb-12 text-center">
         <p className="mb-4 text-[13px] font-medium tracking-[0.2em] text-zinc-500 uppercase">
           Pricing Calculator
@@ -58,140 +188,132 @@ export default function ProjectEstimator() {
         </p>
       </div>
 
-      {/* Progress Bar */}
-      <div className="mb-12">
-        <div className="relative flex justify-between">
-          {/* Connecting line */}
-          <div className="absolute top-1/2 left-0 h-[2px] w-full -translate-y-1/2 bg-zinc-200" />
-          <div
-            className="bg-accent absolute top-1/2 left-0 h-[2px] -translate-y-1/2 transition-all duration-500 ease-in-out"
-            style={{
-              width: `${((currentStep - 1) / (steps.length - 1)) * 100}%`,
-            }}
-          />
-
-          {steps.map((step) => (
-            <div
-              key={step.id}
-              className="relative z-10 flex flex-col items-center gap-2"
-            >
-              <div
-                className={`flex h-8 w-8 items-center justify-center rounded-full border-2 transition-colors duration-300 ${
-                  currentStep >= step.id
-                    ? "border-accent bg-accent text-white"
-                    : "border-zinc-200 bg-white text-zinc-400"
-                }`}
-              >
-                <span className="text-sm font-medium">{step.id}</span>
-              </div>
-              <span
-                className={`hidden text-xs transition-colors duration-300 md:block ${
-                  currentStep >= step.id ? "text-zinc-800" : "text-zinc-400"
-                }`}
-              >
-                {step.title}
-              </span>
-            </div>
-          ))}
+      {showRestoredBanner && (
+        <div
+          role="status"
+          className="mb-6 flex items-center justify-between gap-4 rounded-xl border border-accent/25 bg-accent/5 px-4 py-3 text-sm text-zinc-700"
+        >
+          <span>We&apos;ve restored your progress from this session.</span>
+          <button
+            type="button"
+            onClick={() => setShowRestoredBanner(false)}
+            className="shrink-0 text-xs font-medium text-zinc-500 underline-offset-2 hover:text-zinc-800 hover:underline"
+          >
+            Dismiss
+          </button>
         </div>
-      </div>
+      )}
 
-      {/* Step Content Wrapper */}
-      <div className="relative min-h-[400px] overflow-hidden rounded-2xl border border-zinc-200 bg-zinc-50 p-6 backdrop-blur-sm md:p-10">
-        <AnimatePresence mode="wait">
-          {currentStepKey === "type" && (
-            <m.div
-              key="step-type"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3 }}
-            >
+      <EstimatorProgress steps={steps} currentKey={currentStepKey} />
+
+      <EstimatorLiveSummary
+        state={state}
+        currentStepKey={currentStepKey}
+        currency={currency}
+        onCurrencyChange={setCurrency}
+        ratesLoading={ratesLoading}
+        ratesError={ratesError}
+        canEstimate={canEstimate}
+        budgetDisplay={budgetDisplay}
+      />
+
+      <div className="relative min-h-[400px] overflow-x-hidden rounded-2xl border border-zinc-200 bg-zinc-50 p-6 backdrop-blur-sm md:p-10">
+        <AnimatePresence mode="wait" initial={false}>
+          <EstimatorStepTransition
+            key={currentStepKey}
+            stepKey={currentStepKey}
+            direction={slideDirection}
+            variant={transitionVariant}
+          >
+            {currentStepKey === "type" && (
               <StepType
                 state={state}
+                currency={currency}
+                rates={rates}
                 updateState={updateState}
                 onNext={nextStep}
               />
-            </m.div>
-          )}
-          {currentStepKey === "platform" && (
-            <m.div
-              key="step-platform"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3 }}
-            >
+            )}
+            {currentStepKey === "design" && (
+              <StepDesign
+                state={state}
+                currency={currency}
+                rates={rates}
+                updateState={updateState}
+                onNext={nextStep}
+                onBack={prevStep}
+              />
+            )}
+            {currentStepKey === "platform" && (
               <StepPlatform
                 state={state}
                 updateState={updateState}
                 onNext={nextStep}
                 onBack={prevStep}
               />
-            </m.div>
-          )}
-          {currentStepKey === "scope" && (
-            <m.div
-              key="step-scope"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3 }}
-            >
+            )}
+            {currentStepKey === "scope" && (
               <StepScope
                 state={state}
                 updateState={updateState}
                 onNext={nextStep}
                 onBack={prevStep}
               />
-            </m.div>
-          )}
-          {currentStepKey === "complexity" && (
-            <m.div
-              key="step-complexity"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3 }}
-            >
+            )}
+            {currentStepKey === "complexity" && (
               <StepComplexity
                 state={state}
                 updateState={updateState}
                 onNext={nextStep}
                 onBack={prevStep}
               />
-            </m.div>
-          )}
-          {currentStepKey === "timeline" && (
-            <m.div
-              key="step-timeline"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3 }}
-            >
+            )}
+            {currentStepKey === "timeline" && (
               <StepTimeline
                 state={state}
                 updateState={updateState}
                 onNext={nextStep}
                 onBack={prevStep}
               />
-            </m.div>
-          )}
-          {currentStepKey === "result" && (
-            <m.div
-              key="step-result"
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              transition={{ duration: 0.4 }}
-            >
-              <StepResult
+            )}
+            {currentStepKey === "customize" && (
+              <StepCustomize
                 state={state}
+                currency={currency}
+                rates={rates}
+                updateState={updateState}
+                onNext={nextStep}
                 onBack={prevStep}
               />
-            </m.div>
-          )}
+            )}
+            {currentStepKey === "result" && (
+              <StepResult
+                state={state}
+                currency={currency}
+                onCurrencyChange={setCurrency}
+                budgetDisplay={budgetDisplay}
+                rates={rates}
+                ratesLoading={ratesLoading}
+                ratesError={ratesError}
+                contactLeadId={contactLeadId}
+                savedFingerprint={savedFingerprint}
+                onBack={prevStep}
+                onScheduleConsultation={handleScheduleConsultation}
+              />
+            )}
+            {currentStepKey === "contact" && (
+              <StepContact
+                state={state}
+                budgetDisplay={contactBudgetDisplay || budgetDisplay}
+                currency={currency}
+                leadId={contactLeadId}
+                contactSuccess={contactSuccess}
+                onBack={prevStep}
+                onContactSuccess={handleContactSuccess}
+                onAdjustEstimate={handleAdjustEstimate}
+              />
+            )}
+          </EstimatorStepTransition>
         </AnimatePresence>
       </div>
     </div>

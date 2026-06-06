@@ -2,33 +2,81 @@
 
 import { useState, useTransition, useEffect } from "react";
 import { submitContactForm } from "@/actions/contact";
+import { buildEstimatorContactMessage } from "@/lib/estimator-contact";
 import { m, AnimatePresence } from "framer-motion";
 import { Loader2, Check } from "lucide-react";
 
-export function ContactForm() {
+interface ContactFormProps {
+  initialMessage?: string;
+  estimatorLeadId?: string | null;
+  /** When false, only uses props for prefill (estimator inline form) */
+  fillFromUrlParams?: boolean;
+  variant?: "default" | "estimator";
+  onEstimatorSuccess?: () => void;
+  onSuccess?: () => void;
+  className?: string;
+}
+
+export function ContactForm({
+  initialMessage,
+  estimatorLeadId: estimatorLeadIdProp = null,
+  fillFromUrlParams = true,
+  variant = "default",
+  onEstimatorSuccess,
+  onSuccess,
+  className,
+}: ContactFormProps = {}) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState(initialMessage ?? "");
   const [errorMsg, setErrorMsg] = useState("");
   const [success, setSuccess] = useState(false);
+  const [estimatorLeadId, setEstimatorLeadId] = useState<string | null>(
+    estimatorLeadIdProp,
+  );
   const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
-    // Safely parse URL params on client mount to prefill form from estimator
-    if (typeof window !== "undefined") {
-      const params = new URLSearchParams(window.location.search);
-      const type = params.get("type") || "Not specified";
-      const scope = params.get("scope") || "Not specified";
-      const complexity = params.get("complexity") || "Not specified";
-      const timeline = params.get("timeline") || "Not specified";
-      const budget = params.get("budget");
+    setEstimatorLeadId(estimatorLeadIdProp);
+  }, [estimatorLeadIdProp]);
 
-      if (type !== "Not specified" || budget) {
-        const prefilledMessage = `Hi Devix Team,\n\nI would like to inquire about a new project based on my estimator results:\n\n- Project Type: ${type}\n- Scope: ${scope}\n- Complexity: ${complexity}\n- Timeline: ${timeline}\n- Estimated Budget: ${budget || "Not specified"}\n\nHere are some additional details about my project: `;
-        setMessage(prefilledMessage);
-      }
+  useEffect(() => {
+    if (initialMessage) {
+      setMessage(initialMessage);
     }
-  }, []);
+  }, [initialMessage]);
+
+  useEffect(() => {
+    if (!fillFromUrlParams || typeof window === "undefined") return;
+
+    const params = new URLSearchParams(window.location.search);
+    const leadId = params.get("leadId");
+    if (leadId) setEstimatorLeadId(leadId);
+
+    const type = params.get("type") || "Not specified";
+    const scope = params.get("scope") || "Not specified";
+    const complexity = params.get("complexity") || "Not specified";
+    const timeline = params.get("timeline") || "Not specified";
+    const design = params.get("design");
+    const platform = params.get("platform");
+    const excluded = params.get("excluded");
+    const budget = params.get("budget");
+
+    if (type !== "Not specified" || budget) {
+      setMessage(
+        buildEstimatorContactMessage({
+          type,
+          scope,
+          complexity,
+          timeline,
+          design,
+          platform,
+          budget: budget ?? undefined,
+          excludedLabels: excluded ? excluded.split("|") : [],
+        }),
+      );
+    }
+  }, [fillFromUrlParams]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -56,6 +104,7 @@ export function ContactForm() {
         name,
         email,
         message,
+        estimatorLeadId,
       });
 
       if (result.success) {
@@ -63,6 +112,7 @@ export function ContactForm() {
         setName("");
         setEmail("");
         setMessage("");
+        onSuccess?.();
       } else {
         setErrorMsg(result.error || "An unexpected error occurred.");
       }
@@ -70,7 +120,9 @@ export function ContactForm() {
   };
 
   return (
-    <div className="relative min-h-[400px] lg:col-span-2">
+    <div
+      className={`relative w-full ${variant === "estimator" ? "min-h-[320px]" : "min-h-[400px] lg:col-span-2"} ${className ?? ""}`}
+    >
       <AnimatePresence mode="wait">
         {!success ? (
           <m.form
@@ -148,6 +200,42 @@ export function ContactForm() {
               )}
             </button>
           </m.form>
+        ) : variant === "estimator" ? (
+          <m.div
+            key="success-estimator"
+            className="flex h-full flex-col items-start justify-center space-y-6"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <div className="border-accent text-accent flex h-16 w-16 items-center justify-center rounded-full border-2">
+              <Check className="h-6 w-6" />
+            </div>
+            <div>
+              <h3 className="font-display mb-2 text-2xl font-light">
+                Consultation request received.
+              </h3>
+              <p className="font-body text-base text-zinc-500">
+                We&apos;ve saved your estimate and will follow up within 24
+                hours to discuss your project.
+              </p>
+            </div>
+            <div className="mt-2 flex flex-wrap gap-3">
+              <button
+                type="button"
+                onClick={() => onEstimatorSuccess?.()}
+                className="inline-flex items-center justify-center rounded-full bg-black px-8 py-3 text-sm font-medium text-white transition-colors hover:bg-zinc-800"
+              >
+                Adjust your estimate
+              </button>
+              <a
+                href="/projects"
+                className="inline-flex items-center justify-center rounded-full border border-zinc-200 bg-transparent px-8 py-3 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-50 hover:text-black"
+              >
+                View portfolio
+              </a>
+            </div>
+          </m.div>
         ) : (
           <m.div
             key="success-message"
@@ -164,8 +252,8 @@ export function ContactForm() {
                 Thank you for reaching out.
               </h3>
               <p className="font-body text-base text-zinc-500">
-                We've received your submission and will get back to you within
-                24 hours.
+                We&apos;ve received your submission and will get back to you
+                within 24 hours.
               </p>
             </div>
             <button

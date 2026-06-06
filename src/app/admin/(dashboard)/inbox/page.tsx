@@ -1,5 +1,9 @@
 import Link from "next/link";
-import { getInboxSubmissions } from "@/actions/admin";
+import {
+  getInboxSubmissions,
+  type InboxFilterStatus,
+  type InboxSourceFilter,
+} from "@/actions/admin";
 import InboxSearch from "@/components/admin/InboxSearch";
 
 export const metadata = {
@@ -9,16 +13,24 @@ export const metadata = {
 interface Props {
   searchParams: Promise<{
     query?: string;
-    status?: "all" | "unread" | "read";
+    status?: string;
+    source?: string;
+    dateFrom?: string;
+    dateTo?: string;
   }>;
 }
 
 export default async function InboxPage({ searchParams }: Props) {
   const resolvedSearchParams = await searchParams;
-  const query = resolvedSearchParams.query;
-  const status = resolvedSearchParams.status;
+  const { query, status, source, dateFrom, dateTo } = resolvedSearchParams;
 
-  const submissions = await getInboxSubmissions({ query, status });
+  const submissions = await getInboxSubmissions({
+    query,
+    status: status as InboxFilterStatus | undefined,
+    source: source as InboxSourceFilter | undefined,
+    dateFrom,
+    dateTo,
+  });
 
   return (
     <div className="space-y-10">
@@ -52,13 +64,20 @@ export default async function InboxPage({ searchParams }: Props) {
               className="group flex flex-col justify-between gap-4 p-6 transition-colors duration-300 hover:bg-[#121212] md:flex-row md:items-center"
             >
               <div className="max-w-2xl min-w-0 space-y-1.5">
-                <div className="flex items-center gap-3">
-                  {/* Unread indicator dot */}
+                <div className="flex flex-wrap items-center gap-2">
                   {!sub.isRead && (
                     <span
                       className="h-2 w-2 shrink-0 bg-[#C8A96E]"
                       title="Unread"
                     />
+                  )}
+                  <span className="bg-zinc-800 px-2 py-0.5 text-[9px] font-medium tracking-wider text-zinc-400 uppercase">
+                    {sub.status.replace("_", " ")}
+                  </span>
+                  {sub.source === "estimator" && (
+                    <span className="bg-[#C8A96E]/10 px-2 py-0.5 text-[9px] font-medium tracking-wider text-[#C8A96E] uppercase">
+                      Estimator
+                    </span>
                   )}
                   <h3 className="truncate font-sans text-sm font-medium text-zinc-200 transition-colors duration-300 group-hover:text-[#C8A96E]">
                     {sub.name}

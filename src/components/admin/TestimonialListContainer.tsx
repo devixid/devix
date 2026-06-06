@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import TestimonialCard from "@/components/admin/TestimonialCard";
 import TestimonialForm from "@/components/admin/TestimonialForm";
+import SortableTestimonialList from "@/components/admin/SortableTestimonialList";
 
 interface TestimonialType {
   id: string;
@@ -79,24 +79,20 @@ export function TestimonialListContainer({ testimonials }: Props) {
         </div>
       )}
 
-      {/* Grid of Testimonials */}
       {formMode === "none" && (
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <>
           {testimonials.length === 0 ? (
-            <div className="col-span-full border border-zinc-800 bg-[#0F0F0F] p-12 text-center font-sans text-sm text-zinc-500">
+            <div className="border border-zinc-800 bg-[#0F0F0F] p-12 text-center text-sm text-zinc-500">
               No testimonials available. Create one to display on the landing
               page.
             </div>
           ) : (
-            testimonials.map((testimonial) => (
-              <TestimonialCard
-                key={testimonial.id}
-                testimonial={testimonial}
-                onEdit={handleStartEdit}
-              />
-            ))
+            <SortableTestimonialList
+              testimonials={testimonials}
+              onEdit={handleStartEdit}
+            />
           )}
-        </div>
+        </>
       )}
     </div>
   );

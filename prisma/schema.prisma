@@ -8,6 +8,19 @@ datasource db {
   relationMode = "prisma"
 }
 
+enum InquiryStatus {
+  NEW
+  IN_PROGRESS
+  CLOSED
+}
+
+enum EstimatorLeadStatus {
+  NEW
+  CONTACTED
+  CONVERTED
+  CLOSED
+}
+
 model User {
   id             String   @id @default(uuid()) @db.Uuid
   createdAt      DateTime @default(now())
@@ -17,20 +30,53 @@ model User {
   hashedPassword String
   firstName      String?
   lastName       String?
+  isActive       Boolean @default(true)
+
+  mediaAssets  MediaAsset[]
+  activityLogs ActivityLog[]
 
   @@map("users")
 }
 
 model ContactSubmission {
-  id        String   @id @default(cuid())
-  name      String
-  email     String
-  message   String   @db.Text
-  isRead    Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id              String        @id @default(cuid())
+  name            String
+  email           String
+  message         String        @db.Text
+  isRead          Boolean       @default(false)
+  status          InquiryStatus @default(NEW)
+  internalNotes   String?       @db.Text
+  source          String        @default("contact")
+  estimatorLeadId String?       @unique
+  estimatorLead   EstimatorLead? @relation(fields: [estimatorLeadId], references: [id], onDelete: SetNull)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
 
+  @@index([status])
+  @@index([source])
   @@map("contact_submissions")
+}
+
+model EstimatorLead {
+  id                String              @id @default(cuid())
+  projectType       String
+  designApproach    String?
+  platform          String?
+  scope             String
+  complexity        String
+  timeline          String
+  budgetUsd             Float
+  budgetDisplay         String
+  excludedDeliverables  Json?
+  deliverableSavingsUsd Float?
+  currency              String              @default("USD")
+  status            EstimatorLeadStatus @default(NEW)
+  contactSubmission ContactSubmission?
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+
+  @@index([status])
+  @@map("estimator_leads")
 }
 
 model Testimonial {
@@ -50,26 +96,28 @@ model Testimonial {
 }
 
 model Project {
-  id          String   @id @default(cuid())
-  title       String
-  slug        String   @unique
-  description String   @db.Text
-  content     String?  @db.Text
-  category    String
-  imageUrl    String
-  liveUrl     String?
-  githubUrl   String?
-  isFeatured  Boolean  @default(false)
-  isVisible   Boolean  @default(true)
-  completedAt DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id            String   @id @default(cuid())
+  title         String
+  slug          String   @unique
+  description   String   @db.Text
+  content       String?  @db.Text
+  category      String
+  imageUrl      String
+  liveUrl       String?
+  githubUrl     String?
+  isFeatured    Boolean  @default(false)
+  isVisible     Boolean  @default(true)
+  featuredOrder Int      @default(0)
+  completedAt   DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
-  techStacks  ProjectTechStack[]
-  developers  ProjectDeveloper[]
+  techStacks ProjectTechStack[]
+  developers ProjectDeveloper[]
 
   @@index([isVisible])
   @@index([isFeatured])
+  @@index([featuredOrder])
   @@map("projects")
 }
 
@@ -78,7 +126,7 @@ model ProjectTechStack {
   name      String
   projectId String
 
-  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   @@unique([projectId, name])
   @@index([projectId])
@@ -91,9 +139,121 @@ model ProjectDeveloper {
   role      String?
   projectId String
 
-  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   @@unique([projectId, name])
   @@index([projectId])
   @@map("project_developers")
+}
+
+enum SiteSectionKey {
+  HERO
+  ABOUT
+  SERVICES_INTRO
+  TEAM_INTRO
+  PORTFOLIO_INTRO
+  TESTIMONIALS_INTRO
+  CTA
+  CONTACT
+  FOOTER
+  SEO
+}
+
+model SiteSettings {
+  id                  String   @id @default("default")
+  notificationEmail   String?
+  siteName            String?
+  siteUrl             String?
+  metaDescription     String?
+  socialLinks         Json?
+  maintenanceMode     Boolean  @default(false)
+  maintenanceMessage  String?
+  updatedAt           DateTime @updatedAt
+
+  @@map("site_settings")
+}
+
+model FaqItem {
+  id        String   @id @default(cuid())
+  question  String
+  answer    String   @db.Text
+  order     Int      @default(0)
+  isVisible Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isVisible])
+  @@map("faq_items")
+}
+
+model ServiceItem {
+  id          String   @id @default(cuid())
+  title       String
+  description String   @db.Text
+  order       Int      @default(0)
+  isVisible   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([isVisible])
+  @@map("service_items")
+}
+
+model TeamMember {
+  id          String   @id @default(cuid())
+  name        String
+  title       String
+  description String   @db.Text
+  imageUrl    String
+  socialLinks Json?
+  order       Int      @default(0)
+  isVisible   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([isVisible])
+  @@map("team_members")
+}
+
+model SiteSection {
+  id        String         @id @default(cuid())
+  key       SiteSectionKey @unique
+  content   Json
+  updatedAt DateTime       @updatedAt
+
+  @@map("site_sections")
+}
+
+model MediaAsset {
+  id           String   @id @default(cuid())
+  bucket       String
+  path         String
+  publicUrl    String
+  filename     String
+  mimeType     String
+  sizeBytes    Int
+  alt          String?
+  uploadedById String?  @db.Uuid
+  uploadedBy   User?    @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
+  createdAt    DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([bucket])
+  @@map("media_assets")
+}
+
+model ActivityLog {
+  id         String   @id @default(cuid())
+  actorId    String?  @db.Uuid
+  actor      User?    @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  actorEmail String
+  action     String
+  entityType String
+  entityId   String?
+  metadata   Json?
+  createdAt  DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([entityType, entityId])
+  @@map("activity_logs")
 }

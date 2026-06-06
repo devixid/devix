@@ -1,8 +1,11 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { createTestimonial, updateTestimonial } from "@/actions/admin";
+import { uploadToSupabaseStorage } from "@/lib/supabase-storage";
+import { UploadCloud } from "lucide-react";
 
 interface TestimonialType {
   id: string;
@@ -36,6 +39,30 @@ export function TestimonialForm({ initialData, onCancel, onSuccess }: Props) {
   const [avatarUrl, setAvatarUrl] = useState(initialData?.avatarUrl || "");
   const [order, setOrder] = useState(initialData?.order || 0);
   const [isVisible, setIsVisible] = useState(initialData?.isVisible ?? true);
+  const [avatarPreview, setAvatarPreview] = useState(
+    initialData?.avatarUrl || "",
+  );
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingAvatar(true);
+    setError(null);
+    try {
+      const { publicUrl } = await uploadToSupabaseStorage(
+        file,
+        "testimonials",
+        "avatars",
+      );
+      setAvatarUrl(publicUrl);
+      setAvatarPreview(publicUrl);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Avatar upload failed.");
+    } finally {
+      setUploadingAvatar(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -186,23 +213,52 @@ export function TestimonialForm({ initialData, onCancel, onSuccess }: Props) {
             />
           </div>
 
-          {/* Avatar URL */}
-          <div className="space-y-1.5">
-            <label
-              htmlFor="avatarUrl"
-              className="text-[10px] font-medium tracking-wider text-zinc-400 uppercase"
-            >
-              Avatar URL (Optional)
-            </label>
-            <input
-              id="avatarUrl"
-              type="url"
-              value={avatarUrl}
-              onChange={(e) => setAvatarUrl(e.target.value)}
-              disabled={isPending}
-              placeholder="https://example.com/avatar.jpg"
-              className="w-full rounded-none border border-zinc-800 bg-[#141414] px-4 py-2.5 text-xs text-white placeholder-zinc-700 transition-colors focus:border-[#C8A96E] focus:outline-none"
-            />
+          {/* Avatar */}
+          <div className="space-y-1.5 md:col-span-2">
+            <span className="text-[10px] font-medium tracking-wider text-zinc-400 uppercase">
+              Avatar (Optional)
+            </span>
+            <div className="flex items-center gap-4">
+              {avatarPreview ? (
+                <div className="relative h-14 w-14 overflow-hidden rounded-full border border-zinc-800">
+                  <Image
+                    src={avatarPreview}
+                    alt="Avatar preview"
+                    fill
+                    className="object-cover"
+                    sizes="56px"
+                  />
+                </div>
+              ) : (
+                <div className="flex h-14 w-14 items-center justify-center rounded-full border border-dashed border-zinc-700 bg-zinc-900/50">
+                  <UploadCloud size={20} className="text-zinc-600" />
+                </div>
+              )}
+              <div className="flex-1 space-y-2">
+                <label className="inline-flex cursor-pointer items-center gap-2 border border-zinc-800 px-4 py-2 text-xs text-zinc-400 hover:border-zinc-600 hover:text-white">
+                  {uploadingAvatar ? "Uploading..." : "Upload image"}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    disabled={isPending || uploadingAvatar}
+                    onChange={handleAvatarUpload}
+                  />
+                </label>
+                <input
+                  id="avatarUrl"
+                  type="url"
+                  value={avatarUrl}
+                  onChange={(e) => {
+                    setAvatarUrl(e.target.value);
+                    setAvatarPreview(e.target.value);
+                  }}
+                  disabled={isPending}
+                  placeholder="Or paste image URL"
+                  className="w-full rounded-none border border-zinc-800 bg-[#141414] px-4 py-2 text-xs text-white placeholder-zinc-700 focus:border-[#C8A96E] focus:outline-none"
+                />
+              </div>
+            </div>
           </div>
         </div>
 

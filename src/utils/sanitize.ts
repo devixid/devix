@@ -34,7 +34,19 @@ export function sanitizeRichHtml(html: string): string {
       "blockquote",
       "pre",
       "code",
+      "img",
+      "hr",
     ],
-    ALLOWED_ATTR: ["href", "target", "rel", "class"],
+    ALLOWED_ATTR: [
+      "href",
+      "target",
+      "rel",
+      "class",
+      "src",
+      "alt",
+      "width",
+      "height",
+      "loading",
+    ],
   });
 }

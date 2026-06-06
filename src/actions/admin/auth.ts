@@ -87,7 +87,7 @@ export async function loginAdmin(formData: FormData) {
     where: { email },
   });
 
-  if (!user || !user.hashedPassword) {
+  if (!user || !user.hashedPassword || !user.isActive) {
     throw new Error("Invalid email or password.");
   }
 

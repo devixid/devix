@@ -1,6 +1,14 @@
-import type { EstimatorState, ProjectScope } from "@/types/estimator";
+import type { EstimatorState } from "@/types/estimator";
+import {
+  getScopeHeading,
+  getScopeOptions,
+  getScopeSubheading,
+} from "@/lib/estimator-labels";
+import { getScopeDeliverables } from "@/lib/estimator-deliverables";
+import { EstimatorTierCard } from "./EstimatorTierCard";
 import { FileText, Layers, Library } from "lucide-react";
 import type { ReactNode } from "react";
+import type { ProjectScope } from "@/types/estimator";
 
 interface StepScopeProps {
   state: EstimatorState;
@@ -9,81 +17,65 @@ interface StepScopeProps {
   onBack: () => void;
 }
 
-const SCOPE_OPTIONS: { id: ProjectScope; label: string; icon: ReactNode; description: string }[] = [
-  {
-    id: "small",
-    label: "1 - 5 Pages",
-    icon: <FileText className="h-8 w-8" />,
-    description: "Perfect for startups and small businesses needing an online presence.",
-  },
-  {
-    id: "medium",
-    label: "5 - 15 Pages",
-    icon: <Layers className="h-8 w-8" />,
-    description: "Ideal for growing companies with multiple services or product lines.",
-  },
-  {
-    id: "large",
-    label: "15+ Pages",
-    icon: <Library className="h-8 w-8" />,
-    description: "For large organizations requiring comprehensive content management.",
-  },
-];
+const SCOPE_ICONS: Record<ProjectScope, ReactNode> = {
+  small: <FileText className="h-8 w-8" />,
+  medium: <Layers className="h-8 w-8" />,
+  large: <Library className="h-8 w-8" />,
+};
 
-export function StepScope({ state, updateState, onNext, onBack }: StepScopeProps) {
+export function StepScope({
+  state,
+  updateState,
+  onNext,
+  onBack,
+}: StepScopeProps) {
+  const projectType = state.type;
+  const scopeOptions = getScopeOptions(projectType);
+
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex h-full flex-col">
       <div className="mb-8">
-        <h2 className="text-2xl font-light text-zinc-900">How large is your project?</h2>
-        <p className="mt-2 text-zinc-500">Estimate the number of unique pages or views required.</p>
+        <h2 className="text-2xl font-light text-zinc-900">
+          {getScopeHeading(projectType)}
+        </h2>
+        <p className="mt-2 text-zinc-500">{getScopeSubheading(projectType)}</p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-3 mb-8">
-        {SCOPE_OPTIONS.map((option) => {
-          const isSelected = state.scope === option.id;
-          return (
-            <button
-              key={option.id}
-              onClick={() => updateState({ scope: option.id })}
-              className={`group relative flex flex-col items-start rounded-xl border p-6 text-left transition-all duration-300 ${
-                isSelected
-                  ? "border-accent bg-accent/10 shadow-[0_0_20px_rgba(var(--color-accent),0.05)]"
-                  : "border-zinc-200 bg-white hover:border-zinc-300 hover:bg-zinc-50"
-              }`}
-            >
-              <div className={`mb-4 rounded-lg p-3 transition-colors ${isSelected ? "bg-accent text-white" : "bg-zinc-100 text-zinc-500 group-hover:text-zinc-700"}`}>
-                {option.icon}
-              </div>
-              <h3 className={`text-lg font-medium ${isSelected ? "text-accent" : "text-zinc-900"}`}>
-                {option.label}
-              </h3>
-              <p className="mt-2 text-sm text-zinc-500 leading-relaxed">
-                {option.description}
-              </p>
-              
-              {isSelected && (
-                <div className="absolute top-4 right-4 h-3 w-3 rounded-full bg-accent animate-pulse" />
-              )}
-            </button>
-          );
-        })}
+      <div className="mb-8 grid gap-4 sm:grid-cols-1 md:grid-cols-3">
+        {scopeOptions.map((option) => (
+          <EstimatorTierCard
+            key={option.id}
+            isSelected={state.scope === option.id}
+            onSelect={() => updateState({ scope: option.id })}
+            icon={SCOPE_ICONS[option.id]}
+            label={option.label}
+            description={option.description}
+            detail={getScopeDeliverables(projectType, option.id)}
+          />
+        ))}
       </div>
 
       <div className="mt-auto flex justify-between">
         <button
+          type="button"
           onClick={onBack}
           className="group relative inline-flex items-center gap-x-2 rounded-full border border-zinc-200 bg-transparent px-8 py-3 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-50 hover:text-black"
         >
-          <span className="transition-transform duration-300 group-hover:-translate-x-1">←</span>
+          <span className="transition-transform duration-300 group-hover:-translate-x-1">
+            ←
+          </span>
           <span>Back</span>
         </button>
         <button
+          type="button"
           onClick={onNext}
           disabled={!state.scope}
-          className="group relative inline-flex items-center gap-x-2 rounded-full bg-black px-8 py-3 text-sm font-medium text-white transition-transform disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 active:scale-95 hover:bg-zinc-800"
+          className="group relative inline-flex items-center gap-x-2 rounded-full bg-black px-8 py-3 text-sm font-medium text-white transition-transform hover:scale-105 hover:bg-zinc-800 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
         >
           <span>Continue</span>
-          <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
+          <span className="transition-transform duration-300 group-hover:translate-x-1">
+            →
+          </span>
         </button>
       </div>
     </div>

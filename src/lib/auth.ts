@@ -1,39 +1,37 @@
-import { EncryptJWT, jwtDecrypt } from "jose";
 import { cookies, headers } from "next/headers";
+import {
+  createSessionToken,
+  verifySessionToken,
+  resolveSessionCookieName,
+  isSecureRequestFromHeaders,
+  SESSION_COOKIE_DEV,
+  SESSION_COOKIE_PROD,
+} from "@/lib/session-token";
 
-const secretKey = process.env.JWT_SECRET;
-if (!secretKey) throw new Error("JWT_SECRET environment variable is not set.");
-const secret = new TextEncoder().encode(secretKey);
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function encryptSession(payload: any) {
-  return new EncryptJWT(payload)
-    .setProtectedHeader({
-      // PBES2-HS256+A256KW: Uses PBKDF2 with HMAC SHA-256 for key derivation
-      alg: "PBES2-HS256+A256KW",
-      // A256GCM: AES-256-GCM encryption which uses an Initialization Vector (IV) and produces an Auth Tag
-      enc: "A256GCM",
-    })
-    .setIssuedAt()
-    .setExpirationTime("8h")
-    .encrypt(secret);
+export async function encryptSession(payload: {
+  userId: string;
+  email: string;
+}) {
+  return createSessionToken(payload);
 }
 
 export async function decryptSession(token: string) {
   try {
-    const { payload } = await jwtDecrypt(token, secret);
-    return payload;
+    return await verifySessionToken(token);
   } catch (_) {
     return null;
   }
 }
 
 export async function setSessionCookie(userId: string, email: string) {
-  const token = await encryptSession({ userId, email });
+  const token = await createSessionToken({ userId, email });
+  const headersList = await headers();
+  const isSecure = isSecureRequestFromHeaders(headersList);
+  const cookieName = resolveSessionCookieName(isSecure);
 
-  (await cookies()).set("__Host-devix_session", token, {
+  (await cookies()).set(cookieName, token, {
     httpOnly: true,
-    secure: true,
+    secure: isSecure,
     sameSite: "strict",
     path: "/",
     maxAge: 60 * 60 * 8, // 8 hours
@@ -41,11 +39,20 @@ export async function setSessionCookie(userId: string, email: string) {
 }
 
 export async function clearSessionCookie() {
-  (await cookies()).delete("__Host-devix_session");
+  const cookieStore = await cookies();
+  cookieStore.delete(SESSION_COOKIE_PROD);
+  cookieStore.delete(SESSION_COOKIE_DEV);
 }
 
 export async function getSessionCookie() {
-  const token = (await cookies()).get("__Host-devix_session")?.value;
+  const headersList = await headers();
+  const isSecure = isSecureRequestFromHeaders(headersList);
+  const cookieName = resolveSessionCookieName(isSecure);
+  const token =
+    (await cookies()).get(cookieName)?.value ??
+    (await cookies()).get(SESSION_COOKIE_PROD)?.value ??
+    (await cookies()).get(SESSION_COOKIE_DEV)?.value;
+
   if (!token) return null;
   return await decryptSession(token);
 }
@@ -54,8 +61,20 @@ export async function getSessionCookie() {
 export async function verifyCsrfOrigin() {
   const headersList = await headers();
   const origin = headersList.get("origin");
-  const allowedOrigin = process.env.NEXT_PUBLIC_SITE_URL;
-  if (origin && origin !== allowedOrigin) {
+  if (!origin) return;
+
+  const allowedOrigins = new Set<string>();
+  if (process.env.NEXT_PUBLIC_SITE_URL) {
+    allowedOrigins.add(process.env.NEXT_PUBLIC_SITE_URL);
+  }
+
+  const host = headersList.get("host");
+  if (host) {
+    allowedOrigins.add(`http://${host}`);
+    allowedOrigins.add(`https://${host}`);
+  }
+
+  if (!allowedOrigins.has(origin)) {
     throw new Error("Invalid request origin.");
   }
 }
@@ -68,12 +87,9 @@ export async function verifyAdminSession() {
     throw new Error("Unauthorized access. Session not found.");
   }
 
-  // Use dynamic import or lazy load for prisma & redis if needed,
-  // or just import at the top of the file
   const { prisma } = await import("@/lib/prisma");
   const { cachedQuery } = await import("@/lib/redis");
 
-  // Check if email is whitelisted using cached query
   const emailStr = session.email as string;
   const dbUser = await cachedQuery(
     `admin:whitelist:${emailStr}`,
@@ -83,7 +99,7 @@ export async function verifyAdminSession() {
         select: { email: true },
       });
     },
-    600, // Cache whitelist for 10 mins
+    600,
   );
 
   if (!dbUser) {

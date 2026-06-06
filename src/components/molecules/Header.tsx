@@ -1,10 +1,17 @@
 "use client";
 
 import { m } from "framer-motion";
-import { memo, useState, useEffect, useCallback } from "react";
+import {
+  memo,
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  type MouseEvent,
+} from "react";
+import { createPortal } from "react-dom";
 import { cn } from "@/utils";
 import { NavMenu } from "@/constants";
-import { useWindow } from "@/hooks";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -42,8 +49,20 @@ function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("");
   const [isDarkSection, setIsDarkSection] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
-  const { scrollPosition } = useWindow();
+  const [mounted, setMounted] = useState(false);
+  const headerRef = useRef<HTMLElement>(null);
+  const isDarkRef = useRef(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    document.body.style.overflow = mobileMenuOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [mobileMenuOpen]);
 
   useEffect(() => {
     if (pathname !== "/") {
@@ -98,28 +117,38 @@ function Header() {
   }, [pathname]);
 
   useEffect(() => {
-    setIsScrolled(scrollPosition.y > 60);
-  }, [scrollPosition.y]);
+    const headerEl = headerRef.current;
+    if (!headerEl) return;
 
-  useEffect(() => {
-    // Sample color from center of header height, offset right to avoid header DOM elements
-    const x = window.innerWidth * 0.5;
-    const y = 32;
+    const updateHeaderOnScroll = () => {
+      headerEl.classList.toggle("header-scrolled", window.scrollY > 60);
 
-    // Temporarily hide header to get element behind it
-    const headerEl = document.querySelector("header");
-    if (headerEl) {
+      const x = window.innerWidth * 0.5;
+      const y = 32;
       const prevPointerEvents = headerEl.style.pointerEvents;
       headerEl.style.pointerEvents = "none";
       const element = document.elementFromPoint(x, y);
       headerEl.style.pointerEvents = prevPointerEvents;
-      const bgColor = getElementBackgroundColor(element);
-      setIsDarkSection(isDarkColor(bgColor));
-    }
-  }, [scrollPosition.y, pathname]);
+
+      const dark = isDarkColor(getElementBackgroundColor(element));
+      if (dark !== isDarkRef.current) {
+        isDarkRef.current = dark;
+        setIsDarkSection(dark);
+      }
+    };
+
+    updateHeaderOnScroll();
+    window.addEventListener("scroll", updateHeaderOnScroll, { passive: true });
+    window.addEventListener("resize", updateHeaderOnScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", updateHeaderOnScroll);
+      window.removeEventListener("resize", updateHeaderOnScroll);
+    };
+  }, [pathname]);
 
   const handleNavClick = useCallback(
-    (e: React.MouseEvent<HTMLAnchorElement>, targetPath: string) => {
+    (e: MouseEvent<HTMLAnchorElement>, targetPath: string) => {
       setMobileMenuOpen(false);
 
       if (targetPath.startsWith("#")) {
@@ -141,23 +170,16 @@ function Header() {
     [pathname],
   );
 
-  // Color scheme based on background detection
-  const textColor = isDarkSection ? "text-white" : "text-black-1";
-  const borderColor = isDarkSection
-    ? "border-zinc-700/60"
-    : "border-zinc-200/60";
-  const bgBlur = isScrolled
-    ? isDarkSection
-      ? "bg-black-1/80 backdrop-blur-md"
-      : "bg-white/80 backdrop-blur-md"
-    : "bg-transparent";
-
+  const menuOpenTheme = mobileMenuOpen;
+  const useDarkHeaderTheme = menuOpenTheme || isDarkSection;
+  const textColor = useDarkHeaderTheme ? "text-white" : "text-black-1";
   return (
     <header
+      ref={headerRef}
+      data-theme={isDarkSection ? "dark" : "light"}
       className={cn(
-        "fixed inset-x-0 top-0 z-50 transition-all duration-500",
-        bgBlur,
-        isScrolled && `border-b ${borderColor}`,
+        "site-header fixed inset-x-0 top-0",
+        mobileMenuOpen ? "z-[110] bg-black-1" : "z-50 bg-transparent",
       )}
     >
       <div className="mx-auto flex h-[72px] max-w-6xl items-center justify-between px-6 lg:px-10">
@@ -168,12 +190,16 @@ function Header() {
         >
           <Image
             src={
-              isDarkSection ? "/devix_logo.white.png" : "/devix_logo.dark.png"
+              useDarkHeaderTheme
+                ? "/devix_logo.white.png"
+                : "/devix_logo.dark.png"
             }
             alt="Devix"
             width={32}
             height={38}
             quality={100}
+            priority
+            sizes="32px"
           />
           <span
             className={cn(
@@ -241,7 +267,7 @@ function Header() {
         <button
           type="button"
           aria-label="Toggle menu"
-          className="z-[60] flex h-8 w-8 cursor-pointer flex-col items-center justify-center gap-[5px] md:hidden"
+          className="relative z-[110] flex h-8 w-8 cursor-pointer flex-col items-center justify-center gap-[5px] md:hidden"
           onClick={() => setMobileMenuOpen((prev) => !prev)}
         >
           <m.span
@@ -251,11 +277,7 @@ function Header() {
             transition={{ duration: 0.25 }}
             className={cn(
               "block h-[1.5px] w-6 transition-colors duration-300",
-              mobileMenuOpen
-                ? "bg-white"
-                : isDarkSection
-                  ? "bg-white"
-                  : "bg-black-1",
+              useDarkHeaderTheme ? "bg-white" : "bg-black-1",
             )}
           />
           <m.span
@@ -265,72 +287,88 @@ function Header() {
             transition={{ duration: 0.25 }}
             className={cn(
               "block h-[1.5px] w-6 transition-colors duration-300",
-              mobileMenuOpen
-                ? "bg-white"
-                : isDarkSection
-                  ? "bg-white"
-                  : "bg-black-1",
+              useDarkHeaderTheme ? "bg-white" : "bg-black-1",
             )}
           />
         </button>
       </div>
 
-      {/* Mobile overlay */}
-      <m.div
-        initial={false}
-        animate={mobileMenuOpen ? { opacity: 1, y: 0 } : { opacity: 0, y: -20 }}
-        transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-        className={cn(
-          "bg-black-1 fixed inset-0 top-0 z-50 flex flex-col items-center justify-center gap-y-8 md:hidden",
-          mobileMenuOpen ? "pointer-events-auto" : "pointer-events-none",
-        )}
-      >
-        {NavMenu.map((menu, index) => {
-          const isActive = activeSection === menu.id;
-          const isHash = menu.id.startsWith("#");
-          const href = isHash ? "/" : menu.id;
-
-          return (
-            <m.div
-              key={menu.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={
-                mobileMenuOpen ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }
-              }
-              transition={{
-                duration: 0.4,
-                delay: index * 0.08,
-                ease: [0.16, 1, 0.3, 1],
-              }}
-            >
-              <Link
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                href={href as any}
-                onClick={(e) => handleNavClick(e, menu.id)}
-                className={cn(
-                  "font-display inline-block text-3xl font-light tracking-tight transition-colors",
-                  isActive ? "text-accent" : "text-zinc-400 hover:text-white",
-                )}
-              >
-                {menu.title}
-              </Link>
-            </m.div>
-          );
-        })}
-        <m.div
-          initial={{ opacity: 0 }}
-          animate={mobileMenuOpen ? { opacity: 1 } : { opacity: 0 }}
-          transition={{ duration: 0.4, delay: 0.4 }}
-        >
-          <Link
-            href="/"
-            onClick={(e) => handleNavClick(e, "#cta")}
-            className="hover:text-black-1 mt-4 inline-block border border-white/30 px-8 py-3 text-sm tracking-[0.2em] text-white uppercase transition-all duration-300 hover:bg-white"
+      {mounted &&
+        createPortal(
+          <div
+            aria-hidden={!mobileMenuOpen}
+            className={cn(
+              "fixed inset-0 z-[100] md:hidden",
+              mobileMenuOpen ? "pointer-events-auto" : "pointer-events-none",
+            )}
           >
-            Get in touch
-          </Link>
-        </m.div>
-      </m.div>
+            {/* Solid backdrop — no opacity animation so background stays opaque */}
+            <div
+              className={cn(
+                "absolute inset-0 bg-black-1 transition-opacity duration-300",
+                mobileMenuOpen ? "opacity-100" : "opacity-0",
+              )}
+            />
+
+            <div
+              className={cn(
+                "relative flex h-full flex-col items-center justify-center gap-y-8 px-6 transition-opacity duration-300",
+                mobileMenuOpen ? "opacity-100" : "opacity-0",
+              )}
+            >
+              {NavMenu.map((menu, index) => {
+                const isActive = activeSection === menu.id;
+                const isHash = menu.id.startsWith("#");
+                const href = isHash ? "/" : menu.id;
+
+                return (
+                  <m.div
+                    key={menu.id}
+                    initial={false}
+                    animate={
+                      mobileMenuOpen
+                        ? { opacity: 1, y: 0 }
+                        : { opacity: 0, y: 20 }
+                    }
+                    transition={{
+                      duration: 0.4,
+                      delay: mobileMenuOpen ? index * 0.08 : 0,
+                      ease: [0.16, 1, 0.3, 1],
+                    }}
+                  >
+                    <Link
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      href={href as any}
+                      onClick={(e) => handleNavClick(e, menu.id)}
+                      className={cn(
+                        "font-display inline-block text-3xl font-light tracking-tight transition-colors",
+                        isActive
+                          ? "text-accent"
+                          : "text-zinc-400 hover:text-white",
+                      )}
+                    >
+                      {menu.title}
+                    </Link>
+                  </m.div>
+                );
+              })}
+              <m.div
+                initial={false}
+                animate={mobileMenuOpen ? { opacity: 1 } : { opacity: 0 }}
+                transition={{ duration: 0.4, delay: mobileMenuOpen ? 0.4 : 0 }}
+              >
+                <Link
+                  href="/"
+                  onClick={(e) => handleNavClick(e, "#cta")}
+                  className="hover:text-black-1 mt-4 inline-block border border-white/30 px-8 py-3 text-sm tracking-[0.2em] text-white uppercase transition-all duration-300 hover:bg-white"
+                >
+                  Get in touch
+                </Link>
+              </m.div>
+            </div>
+          </div>,
+          document.body,
+        )}
     </header>
   );
 }

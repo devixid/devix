@@ -1,6 +1,15 @@
 import { prisma } from "../src/lib/prisma";
+import {
+  DEFAULT_FAQ_ITEMS,
+  DEFAULT_SERVICE_ITEMS,
+  DEFAULT_TEAM_MEMBERS,
+  DEFAULT_SITE_SECTIONS,
+} from "../src/lib/content-defaults";
+import type { Prisma, SiteSectionKey } from "@prisma/client";
 
 async function main() {
+  await seedSiteContent();
+
   await prisma.testimonial.createMany({
     data: [
       {
@@ -32,6 +41,12 @@ async function main() {
   });
 
   console.log("Seed data for testimonials created.");
+
+  const projectCount = await prisma.project.count();
+  if (projectCount > 0) {
+    console.log("Projects already exist, skipping project seed.");
+    return;
+  }
 
   // Create Projects
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -118,6 +133,66 @@ async function main() {
   });
 
   console.log("Seed data for projects created.");
+}
+
+async function seedSiteContent() {
+  const faqCount = await prisma.faqItem.count();
+  if (faqCount === 0) {
+    await prisma.faqItem.createMany({
+      data: DEFAULT_FAQ_ITEMS.map((item, index) => ({
+        ...item,
+        order: index,
+      })),
+    });
+    console.log("FAQ items seeded.");
+  }
+
+  const serviceCount = await prisma.serviceItem.count();
+  if (serviceCount === 0) {
+    await prisma.serviceItem.createMany({
+      data: DEFAULT_SERVICE_ITEMS.map((item, index) => ({
+        ...item,
+        order: index,
+      })),
+    });
+    console.log("Service items seeded.");
+  }
+
+  const teamCount = await prisma.teamMember.count();
+  if (teamCount === 0) {
+    await prisma.teamMember.createMany({
+      data: DEFAULT_TEAM_MEMBERS.map((item, index) => ({
+        name: item.name,
+        title: item.title,
+        description: item.description,
+        imageUrl: item.imageUrl,
+        socialLinks: item.socialLinks,
+        order: index,
+      })),
+    });
+    console.log("Team members seeded.");
+  }
+
+  for (const [key, content] of Object.entries(DEFAULT_SITE_SECTIONS)) {
+    await prisma.siteSection.upsert({
+      where: { key: key as SiteSectionKey },
+      create: { key: key as SiteSectionKey, content: content as Prisma.InputJsonValue },
+      update: {},
+    });
+  }
+  console.log("Site sections seeded.");
+
+  await prisma.siteSettings.upsert({
+    where: { id: "default" },
+    create: {
+      id: "default",
+      siteName: "Devix",
+      siteUrl: process.env.NEXT_PUBLIC_SITE_URL || "https://devix.id",
+      metaDescription: DEFAULT_SITE_SECTIONS.SEO.description,
+    },
+    update: {},
+  });
+  console.log("Site settings initialized.");
 }
 
 main()

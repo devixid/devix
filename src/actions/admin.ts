@@ -1,11 +1,13 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { Prisma } from "@prisma/client";
+import { InquiryStatus, Prisma } from "@prisma/client";
 import { verifyAdminSession, verifyCsrfOrigin } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { invalidateCache } from "@/lib/redis";
 import { TestimonialSchema } from "@/lib/schemas";
+import { parseDateRangeFilter } from "@/lib/admin-filters";
+import { logActivity } from "@/lib/activity-log";
 import { z } from "zod";
 
 // ----------------------------------------------------
@@ -19,11 +21,21 @@ export async function getOverviewStats() {
     unreadSubmissions,
     totalTestimonials,
     visibleTestimonials,
+    totalProjects,
+    visibleProjects,
+    featuredProjects,
+    totalEstimatorLeads,
+    newEstimatorLeads,
   ] = await Promise.all([
     prisma.contactSubmission.count(),
     prisma.contactSubmission.count({ where: { isRead: false } }),
     prisma.testimonial.count(),
     prisma.testimonial.count({ where: { isVisible: true } }),
+    prisma.project.count(),
+    prisma.project.count({ where: { isVisible: true } }),
+    prisma.project.count({ where: { isFeatured: true, isVisible: true } }),
+    prisma.estimatorLead.count(),
+    prisma.estimatorLead.count({ where: { status: "NEW" } }),
   ]);
 
   return {
@@ -31,18 +43,50 @@ export async function getOverviewStats() {
     unreadSubmissions,
     totalTestimonials,
     visibleTestimonials,
+    totalProjects,
+    visibleProjects,
+    featuredProjects,
+    totalEstimatorLeads,
+    newEstimatorLeads,
   };
+}
+
+export async function getNavBadges() {
+  await verifyAdminSession();
+
+  const [unreadSubmissions, newEstimatorLeads] = await Promise.all([
+    prisma.contactSubmission.count({ where: { isRead: false } }),
+    prisma.estimatorLead.count({ where: { status: "NEW" } }),
+  ]);
+
+  return { unreadSubmissions, newEstimatorLeads };
 }
 
 // ----------------------------------------------------
 // 2. INBOX ACTIONS
 // ----------------------------------------------------
+export type InboxFilterStatus =
+  | "all"
+  | "unread"
+  | "read"
+  | "NEW"
+  | "IN_PROGRESS"
+  | "CLOSED";
+
+export type InboxSourceFilter = "all" | "contact" | "estimator";
+
 export async function getInboxSubmissions(
-  params: { query?: string; status?: "all" | "unread" | "read" } = {},
+  params: {
+    query?: string;
+    status?: InboxFilterStatus;
+    source?: InboxSourceFilter;
+    dateFrom?: string;
+    dateTo?: string;
+  } = {},
 ) {
   await verifyAdminSession();
 
-  const { query, status } = params;
+  const { query, status, source, dateFrom, dateTo } = params;
 
   const whereClause: Prisma.ContactSubmissionWhereInput = {};
 
@@ -50,6 +94,23 @@ export async function getInboxSubmissions(
     whereClause.isRead = false;
   } else if (status === "read") {
     whereClause.isRead = true;
+  } else if (
+    status === "NEW" ||
+    status === "IN_PROGRESS" ||
+    status === "CLOSED"
+  ) {
+    whereClause.status = status;
+  }
+
+  if (source === "contact") {
+    whereClause.source = "contact";
+  } else if (source === "estimator") {
+    whereClause.source = "estimator";
+  }
+
+  const createdAtRange = parseDateRangeFilter(dateFrom, dateTo);
+  if (createdAtRange) {
+    whereClause.createdAt = createdAtRange;
   }
 
   if (query) {
@@ -62,6 +123,7 @@ export async function getInboxSubmissions(
 
   return prisma.contactSubmission.findMany({
     where: whereClause,
+    include: { estimatorLead: true },
     orderBy: { createdAt: "desc" },
   });
 }
@@ -70,7 +132,42 @@ export async function getSubmissionById(id: string) {
   await verifyAdminSession();
   return prisma.contactSubmission.findUnique({
     where: { id },
+    include: { estimatorLead: true },
   });
+}
+
+export async function updateSubmissionStatus(id: string, status: InquiryStatus) {
+  await verifyAdminSession();
+  await verifyCsrfOrigin();
+
+  const updated = await prisma.contactSubmission.update({
+    where: { id },
+    data: { status },
+  });
+
+  revalidatePath("/admin/inbox");
+  revalidatePath(`/admin/inbox/${id}`);
+  await logActivity({
+    action: "inbox.status_updated",
+    entityType: "ContactSubmission",
+    entityId: id,
+    metadata: { status },
+  });
+  return updated;
+}
+
+export async function updateInternalNotes(id: string, internalNotes: string) {
+  await verifyAdminSession();
+  await verifyCsrfOrigin();
+
+  const updated = await prisma.contactSubmission.update({
+    where: { id },
+    data: { internalNotes: internalNotes.trim() || null },
+  });
+
+  revalidatePath("/admin/inbox");
+  revalidatePath(`/admin/inbox/${id}`);
+  return updated;
 }
 
 export async function markSubmissionAsRead(id: string, isRead: boolean) {
@@ -96,6 +193,11 @@ export async function deleteSubmission(id: string) {
   });
 
   revalidatePath("/admin/inbox");
+  await logActivity({
+    action: "inbox.deleted",
+    entityType: "ContactSubmission",
+    entityId: id,
+  });
 }
 
 // ----------------------------------------------------
@@ -184,6 +286,24 @@ export async function toggleTestimonialVisibility(
   revalidatePath("/admin/testimonials");
   revalidatePath("/");
   return updated;
+}
+
+export async function reorderTestimonials(orderedIds: string[]) {
+  await verifyAdminSession();
+  await verifyCsrfOrigin();
+
+  await prisma.$transaction(
+    orderedIds.map((id, index) =>
+      prisma.testimonial.update({
+        where: { id },
+        data: { order: index },
+      }),
+    ),
+  );
+
+  await invalidateCache("testimonials:all", "testimonials:visible");
+  revalidatePath("/admin/testimonials");
+  revalidatePath("/");
 }
 
 export async function deleteTestimonial(id: string) {

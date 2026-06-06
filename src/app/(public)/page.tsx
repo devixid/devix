@@ -1,4 +1,5 @@
-import { About, FaQ, Heading, Offering, OurTeams } from "@/components";
+import { About, FaQ, Offering, OurTeams } from "@/components";
+import { HeadingStatic } from "@/components/atoms/Heading/HeadingStatic";
 import Testimonials from "@/components/molecules/Testimonials";
 import Contact from "@/components/molecules/Contact";
 import CTA from "@/components/molecules/CTA";
@@ -6,38 +7,81 @@ import { Metadata } from "next";
 import { HeroSection } from "./HeroSection";
 import Link from "next/link";
 import ProjectCard from "@/components/molecules/projects/ProjectCard";
+import { toProjectListItems } from "@/lib/mappers/projects";
 import { getFeaturedProjects } from "@/lib/queries/projects";
+import {
+  getFaqItems,
+  getServiceItems,
+  getTeamMembers,
+  getSiteSection,
+  getSiteSettingsPublic,
+} from "@/lib/queries/site-content";
+export async function generateMetadata(): Promise<Metadata> {
+  const [seo, settings] = await Promise.all([
+    getSiteSection("SEO"),
+    getSiteSettingsPublic(),
+  ]);
 
-export const metadata: Metadata = {
-  title: "Devix — Premium Software Development Agency",
-  description:
-    "We design and build high-performance custom websites and software solutions for global brands.",
-  keywords: [
-    "devix",
-    "web agency",
-    "software development agency",
-    "custom websites",
-    "next.js",
-    "web development",
-  ],
-  alternates: {
-    canonical: "/",
-  },
-};
+  return {
+    title: seo.title,
+    description: seo.description,
+    keywords: seo.keywords,
+    alternates: { canonical: "/" },
+    openGraph: {
+      title: seo.title,
+      description: settings?.metaDescription || seo.description,
+      url: settings?.siteUrl || process.env.NEXT_PUBLIC_SITE_URL,
+    },
+  };
+}
 
-export const revalidate = 60;
+export const revalidate = 3600;
 
 export default async function Page() {
-  const featuredProjects = await getFeaturedProjects();
+  const [
+    featuredProjects,
+    faqItems,
+    serviceItems,
+    teamMembers,
+    hero,
+    about,
+    servicesIntro,
+    teamIntro,
+    portfolioIntro,
+    testimonialsIntro,
+    contact,
+    cta,
+    seo,
+    settings,
+  ] = await Promise.all([
+    getFeaturedProjects(),
+    getFaqItems(),
+    getServiceItems(),
+    getTeamMembers(),
+    getSiteSection("HERO"),
+    getSiteSection("ABOUT"),
+    getSiteSection("SERVICES_INTRO"),
+    getSiteSection("TEAM_INTRO"),
+    getSiteSection("PORTFOLIO_INTRO"),
+    getSiteSection("TESTIMONIALS_INTRO"),
+    getSiteSection("CONTACT"),
+    getSiteSection("CTA"),
+    getSiteSection("SEO"),
+    getSiteSettingsPublic(),
+  ]);
+
+  const faqs = faqItems.map((item) => ({
+    question: "question" in item ? item.question : "",
+    answer: "answer" in item ? item.answer : "",
+  }));
 
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "ProfessionalService",
-    name: "Devix",
-    url: process.env.NEXT_PUBLIC_SITE_URL || "https://devixid.vercel.app",
-    logo: `${process.env.NEXT_PUBLIC_SITE_URL || "https://devixid.vercel.app"}/logo.png`,
-    description:
-      "Premium Software Development Agency specializing in Next.js and React.",
+    name: settings?.siteName || "Devix",
+    url: settings?.siteUrl || process.env.NEXT_PUBLIC_SITE_URL || "https://devixid.vercel.app",
+    logo: `${settings?.siteUrl || process.env.NEXT_PUBLIC_SITE_URL || "https://devixid.vercel.app"}/logo.png`,
+    description: seo.description,
     address: {
       "@type": "PostalAddress",
       addressLocality: "Jakarta",
@@ -52,32 +96,21 @@ export default async function Page() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      {/* Hero */}
-      <HeroSection />
+      <HeroSection content={hero} />
+      <Offering services={serviceItems} intro={servicesIntro} />
+      <About content={about} />
+      <OurTeams members={teamMembers} intro={teamIntro} />
 
-      {/* Services */}
-      <Offering />
-
-      {/* About */}
-      <About />
-
-      {/* Team */}
-      <OurTeams />
-
-      {/* Portfolio */}
-      <section
-        id="portfolio"
-        className="scroll-mt-24 py-20 md:py-32"
-      >
+      <section id="portfolio" className="scroll-mt-24 py-20 md:py-32">
         <div className="mx-auto max-w-6xl px-6 lg:px-10">
           <div className="mb-16 flex items-end justify-between">
             <div className="max-w-xl">
               <p className="mb-4 text-[13px] font-medium tracking-[0.2em] text-zinc-400 uppercase">
-                Selected Work
+                {portfolioIntro.eyebrow}
               </p>
-              <Heading.h2 className="font-extralight">
-                Featured Portfolio.
-              </Heading.h2>
+              <HeadingStatic level="h2" className="font-extralight">
+                {portfolioIntro.headline}
+              </HeadingStatic>
             </div>
             <Link
               href="/projects"
@@ -89,13 +122,16 @@ export default async function Page() {
 
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 lg:gap-8">
             {featuredProjects.length > 0 ? (
-              featuredProjects.slice(0, 3).map((project, idx) => (
-                <ProjectCard
-                  key={project.id}
-                  project={project}
-                  index={idx}
-                />
-              ))
+              toProjectListItems(featuredProjects)
+                .slice(0, 3)
+                .map((project, idx) => (
+                  <ProjectCard
+                    key={project.id}
+                    project={project}
+                    index={idx}
+                    priority={idx === 0}
+                  />
+                ))
             ) : (
               <div className="col-span-full py-10 text-center text-zinc-500">
                 No featured projects yet.
@@ -103,7 +139,6 @@ export default async function Page() {
             )}
           </div>
 
-          {/* Mobile View All Projects Button */}
           <div className="mt-12 flex justify-center md:hidden">
             <Link
               href="/projects"
@@ -119,17 +154,10 @@ export default async function Page() {
         </div>
       </section>
 
-      {/* Testimonials */}
-      <Testimonials />
-
-      {/* FAQ */}
-      <FaQ />
-
-      {/* Contact */}
-      <Contact />
-
-      {/* CTA */}
-      <CTA />
+      <Testimonials intro={testimonialsIntro} />
+      <FaQ faqs={faqs} />
+      <Contact content={contact} />
+      <CTA content={cta} />
     </div>
   );
 }

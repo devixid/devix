@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ExternalLink, GitCommit, ArrowLeft } from "lucide-react";
 import { getProjectBySlug } from "@/lib/queries/projects";
+import { sanitizeRichHtml } from "@/utils/sanitize";
 
 type Props = {
   params: { slug: string };
@@ -134,10 +135,12 @@ export default async function ProjectDetailPage({ params }: Props) {
 
               {/* Rich Content if exists */}
               {project.content && (
-                <div className="mt-12 pt-12 border-t border-zinc-100">
-                  <div 
-                    className="whitespace-pre-line text-zinc-600 leading-relaxed space-y-6"
-                    dangerouslySetInnerHTML={{ __html: project.content }} 
+                <div className="mt-12 border-t border-zinc-100 pt-12">
+                  <div
+                    className="prose prose-lg prose-zinc max-w-none"
+                    dangerouslySetInnerHTML={{
+                      __html: sanitizeRichHtml(project.content),
+                    }}
                   />
                 </div>
               )}

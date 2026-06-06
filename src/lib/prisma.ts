@@ -4,9 +4,24 @@ import pg from "pg";
 
 const { Pool } = pg;
 
+/** Bump when EstimatorLead / SiteSettings schema changes to bust hot-reload cache */
+const PRISMA_SCHEMA_VERSION = 2;
+
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
+  prismaSchemaVersion: number | undefined;
 };
+
+function isStalePrismaClient(client: PrismaClient): boolean {
+  if (globalForPrisma.prismaSchemaVersion !== PRISMA_SCHEMA_VERSION) {
+    return true;
+  }
+
+  return (
+    typeof client.siteSettings === "undefined" ||
+    typeof client.siteSettings.findUnique !== "function"
+  );
+}
 
 const createPrismaClient = () => {
   const connectionString = process.env.DATABASE_URL;
@@ -28,6 +43,24 @@ const createPrismaClient = () => {
   });
 };
 
-export const prisma = globalForPrisma.prisma ?? createPrismaClient();
+function resolvePrismaClient(): PrismaClient {
+  const cached = globalForPrisma.prisma;
 
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+  // After schema changes + `prisma generate`, Next.js hot reload can keep an old
+  // singleton whose delegates (e.g. siteSettings) were never attached.
+  if (cached && isStalePrismaClient(cached)) {
+    void cached.$disconnect().catch(() => {});
+    globalForPrisma.prisma = undefined;
+  }
+
+  const client = globalForPrisma.prisma ?? createPrismaClient();
+
+  if (process.env.NODE_ENV !== "production") {
+    globalForPrisma.prisma = client;
+    globalForPrisma.prismaSchemaVersion = PRISMA_SCHEMA_VERSION;
+  }
+
+  return client;
+}
+
+export const prisma = resolvePrismaClient();

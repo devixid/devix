@@ -1,28 +1,13 @@
-import { Heading } from "@/components/atoms";
+import { HeadingStatic } from "@/components/atoms/Heading/HeadingStatic";
 import { SlideUp } from "@/components/animations/SlideUp";
 import { SmoothScrollLink } from "@/components/atoms/SmoothScrollLink";
 
-const stats = [
-  { value: "3+", label: "Years Experience" },
-  { value: "4", label: "Expert Members" },
-  { value: "100%", label: "Custom Solutions" },
-];
+import { DEFAULT_SITE_SECTIONS, type AboutContent } from "@/lib/content-defaults";
 
-const techStack = [
-  "Next.js",
-  "Tailwind CSS",
-  "Framer Motion",
-  "TypeScript",
-  "Supabase",
-  "Prisma",
-  "React",
-  "PostgreSQL",
-];
-
-// Duplicate for seamless loop
-const marqueeItems = [...techStack, ...techStack];
-
-export default function About() {
+export default function About({ content }: { content?: AboutContent }) {
+  const about = content ?? DEFAULT_SITE_SECTIONS.ABOUT;
+  const stats = about.stats;
+  const marqueeItems = [...about.techStack, ...about.techStack];
   return (
     <section
       id="about"
@@ -37,9 +22,11 @@ export default function About() {
             className="mb-8 md:mb-0 md:w-1/3"
           >
             <p className="mb-4 text-[13px] font-medium tracking-[0.2em] text-zinc-400 uppercase">
-              About Us
+              {about.eyebrow}
             </p>
-            <Heading.h2 className="font-extralight">Who we are.</Heading.h2>
+            <HeadingStatic level="h2" className="font-extralight">
+              {about.headline}
+            </HeadingStatic>
           </SlideUp>
 
           <SlideUp
@@ -49,18 +36,14 @@ export default function About() {
             className="flex flex-col gap-y-8 md:w-2/3"
           >
             <p className="max-w-xl text-base leading-relaxed text-zinc-500 md:text-lg">
-              We are a dedicated team of web developers and designers committed
-              to building top-tier digital solutions for your business. From
-              sleek landing pages to full-scale e-commerce platforms, we merge
-              premium aesthetics with modern technology to deliver fast,
-              SEO-friendly, and high-converting websites.
+              {about.body}
             </p>
             <SmoothScrollLink
               href="#services"
               className="group text-accent hover:text-accent-light inline-flex items-center gap-x-2 text-sm font-medium transition-colors duration-300"
             >
               <span className="relative">
-                See our services
+                {about.ctaLabel}
                 <span className="bg-accent absolute bottom-0 left-0 h-[1px] w-full origin-left scale-x-0 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-x-100" />
               </span>
               <span className="text-lg">→</span>

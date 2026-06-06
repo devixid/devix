@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import { Metadata } from "next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { syne, dmSans } from "./fonts";
 import "@/styles/globals.css";
 import Provider from "./provider";
@@ -41,6 +42,7 @@ export default function RootLayout({ children }: Props) {
         suppressHydrationWarning
       >
         <Provider>{children}</Provider>
+        <SpeedInsights />
       </body>
     </html>
   );
