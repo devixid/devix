@@ -7,12 +7,18 @@ const withBundleAnalyzer = bundleAnalyzer({
 
 const isDev = process.env.NODE_ENV === "development";
 
+// CSP is only sent in production builds (see headers() below). Third-party
+// checkout widgets must be allowlisted explicitly — default-src 'self' blocks
+// their scripts/iframes/fetches when frame-src/connect-src are omitted.
+// Turnstile: https://developers.cloudflare.com/turnstile/reference/content-security-policy/
 const cspHeader = `
   default-src 'self';
-  script-src 'self' 'unsafe-eval' 'unsafe-inline';
-  style-src 'self' 'unsafe-inline';
+  script-src 'self' 'unsafe-eval' 'unsafe-inline' https://challenges.cloudflare.com https://js.stripe.com https://va.vercel-scripts.com;
+  style-src 'self' 'unsafe-inline' https://challenges.cloudflare.com;
   img-src 'self' blob: data: https:;
   font-src 'self' data:;
+  connect-src 'self' https://challenges.cloudflare.com https://api.stripe.com https://vitals.vercel-insights.com;
+  frame-src 'self' https://challenges.cloudflare.com https://js.stripe.com https://hooks.stripe.com;
   object-src 'none';
   base-uri 'self';
   form-action 'self';
