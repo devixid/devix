@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { PurchaseEmailResend } from "@/components/molecules/PurchaseEmailResend";
+import { maskEmail } from "@/lib/purchase-email-resend";
 import { getStripe, isStripeConfigured } from "@/lib/stripe";
 
 export const metadata = {
@@ -14,6 +16,7 @@ export default async function StoreSuccessPage({
 }: SuccessPageProps) {
   const { session_id: sessionId } = await searchParams;
   let productName: string | null = null;
+  let maskedEmail: string | null = null;
 
   if (sessionId && isStripeConfigured()) {
     try {
@@ -25,8 +28,16 @@ export default async function StoreSuccessPage({
       if (!productName && session.metadata?.productId) {
         productName = "your purchase";
       }
+
+      const buyerEmail =
+        session.metadata?.buyerEmail ||
+        session.customer_details?.email ||
+        session.customer_email;
+      if (buyerEmail) {
+        maskedEmail = maskEmail(buyerEmail);
+      }
     } catch {
-      // Non-blocking — email is the source of truth for the download link
+      // Non-blocking — resend flow re-verifies the session server-side.
     }
   }
 
@@ -43,12 +54,26 @@ export default async function StoreSuccessPage({
           {productName
             ? `Thank you for purchasing ${productName}.`
             : "Thank you for your purchase."}{" "}
-          We&apos;ve sent a secure, one-time download link to your email. It
-          expires in 24 hours.
+          Your secure download link is sent to your email and expires in 24
+          hours.
         </p>
         <p className="mt-2 text-sm text-zinc-500">
-          Check your inbox (and spam folder). The link can only be used once.
+          Check your inbox and spam folder. The link allows a limited number of
+          downloads.
         </p>
+
+        {sessionId ? (
+          <PurchaseEmailResend
+            sessionId={sessionId}
+            maskedEmail={maskedEmail}
+          />
+        ) : (
+          <p className="mt-6 text-sm text-zinc-500">
+            If you don&apos;t receive an email within a few minutes, contact
+            support with your receipt.
+          </p>
+        )}
+
         <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
           <Link
             href="/store"

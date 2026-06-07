@@ -115,6 +115,22 @@ export function getPurchaseEmailLimiter() {
   return _purchaseEmailLimiter;
 }
 
+// Customer-initiated resend on the store success page (per checkout session + IP).
+let _purchaseEmailResendLimiter: Ratelimit | null = null;
+export function getPurchaseEmailResendLimiter() {
+  const redis = getRedisClient();
+  if (!redis) return null;
+  if (!_purchaseEmailResendLimiter) {
+    _purchaseEmailResendLimiter = new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(3, "15 m"),
+      prefix: "ratelimit:purchase:email-resend",
+      ephemeralCache: cache,
+    });
+  }
+  return _purchaseEmailResendLimiter;
+}
+
 // Blunt hammering on the download endpoint (token brute force / parallel fetch).
 let _downloadLimiter: Ratelimit | null = null;
 export function getDownloadLimiter() {

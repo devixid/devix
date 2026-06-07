@@ -8,11 +8,14 @@ interface TurnstileFieldProps {
   /** Bump to reset the widget (e.g. after a failed submit). */
   resetKey?: number;
   onVerifiedChange?: (verified: boolean) => void;
+  /** For server actions / fetch handlers that need the raw token. */
+  onTokenChange?: (token: string) => void;
 }
 
 export function TurnstileField({
   resetKey = 0,
   onVerifiedChange,
+  onTokenChange,
 }: TurnstileFieldProps) {
   const widgetRef = useRef<TurnstileInstance>(null);
   const [token, setToken] = useState("");
@@ -24,6 +27,7 @@ export function TurnstileField({
     prevResetKey.current = resetKey;
     setToken("");
     onVerifiedChange?.(false);
+    onTokenChange?.("");
     widgetRef.current?.reset();
     // eslint-disable-next-line react-hooks/exhaustive-deps -- onVerifiedChange is stable (setState)
   }, [resetKey]);
@@ -44,15 +48,18 @@ export function TurnstileField({
         options={{ theme: "light", size: "normal" }}
         onSuccess={(value) => {
           setToken(value);
+          onTokenChange?.(value);
           onVerifiedChange?.(true);
         }}
         onExpire={() => {
           setToken("");
+          onTokenChange?.("");
           onVerifiedChange?.(false);
           widgetRef.current?.reset();
         }}
         onError={() => {
           setToken("");
+          onTokenChange?.("");
           onVerifiedChange?.(false);
         }}
       />

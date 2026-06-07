@@ -214,7 +214,11 @@ export async function sendPurchaseConfirmation({
   siteUrl?: string;
 }) {
   const config = getResendConfig();
-  if (!config) return;
+  if (!config) {
+    throw new Error(
+      "Purchase confirmation email failed: RESEND_API_KEY or RESEND_FROM_EMAIL not configured.",
+    );
+  }
 
   const safeName = escapeHtml(name);
   const baseUrl = (siteUrl || getSiteUrl()).replace(/\/$/, "");
