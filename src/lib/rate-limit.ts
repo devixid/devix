@@ -99,6 +99,38 @@ export function getPurchaseLimiter() {
   return _purchaseLimiter;
 }
 
+// Per-email velocity guard against card-testing across rotating IPs.
+let _purchaseEmailLimiter: Ratelimit | null = null;
+export function getPurchaseEmailLimiter() {
+  const redis = getRedisClient();
+  if (!redis) return null;
+  if (!_purchaseEmailLimiter) {
+    _purchaseEmailLimiter = new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(5, "1 h"),
+      prefix: "ratelimit:purchase:email",
+      ephemeralCache: cache,
+    });
+  }
+  return _purchaseEmailLimiter;
+}
+
+// Blunt hammering on the download endpoint (token brute force / parallel fetch).
+let _downloadLimiter: Ratelimit | null = null;
+export function getDownloadLimiter() {
+  const redis = getRedisClient();
+  if (!redis) return null;
+  if (!_downloadLimiter) {
+    _downloadLimiter = new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(20, "10 m"),
+      prefix: "ratelimit:download",
+      ephemeralCache: cache,
+    });
+  }
+  return _downloadLimiter;
+}
+
 import net from "net";
 
 /**

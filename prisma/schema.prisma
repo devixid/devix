@@ -265,8 +265,10 @@ model Product {
   name        String
   slug        String   @unique
   description String   @db.Text
-  price       Float // in USD
-  fileKey     String // path in Supabase Storage, e.g., "products/devix-starter-kit.zip"
+  price       Float // DEPRECATED display value (USD). Charging uses priceMinor + currency.
+  priceMinor  Int? // price in the currency's smallest unit (e.g. cents for USD)
+  currency    String   @default("usd")
+  fileKey     String // object path inside the "products" bucket, e.g., "devix-starter-kit.zip"
   previewUrl  String? // screenshot or preview image URL
   isVisible   Boolean  @default(true)
   order       Int      @default(0)
@@ -283,13 +285,44 @@ model Purchase {
   productId      String
   buyerName      String
   buyerEmail     String
-  downloadToken  String   @unique @default(cuid()) // one-time token for download
-  tokenUsed      Boolean  @default(false) // true after link is clicked
+  downloadToken  String   @unique // one-time download token (app-generated CSPRNG)
+  tokenUsed      Boolean  @default(false) // legacy flag; true once downloadCount exhausts maxDownloads
+  downloadCount  Int      @default(0)
+  maxDownloads   Int      @default(3)
+  firstDownloadedAt DateTime?
+  downloadedAt   DateTime? // last successful redemption
   tokenExpiresAt DateTime // 24 hours from purchase time
-  createdAt      DateTime @default(now())
+
+  // Stripe linkage
+  stripeSessionId       String? @unique
+  stripePaymentIntentId String? @unique
+  stripeChargeId        String?
+
+  // Money snapshot for reporting / refunds
+  currency    String @default("usd")
+  amountMinor Int?
+
+  // Fulfillment + lifecycle
+  emailSentAt   DateTime?
+  revokedAt     DateTime?
+  disputeStatus String?
+
+  // Fraud evidence
+  buyerIp   String?
+  userAgent String?
+
+  createdAt DateTime @default(now())
 
   product Product @relation(fields: [productId], references: [id])
 
   @@index([productId])
   @@map("purchases")
+}
+
+model ProcessedStripeEvent {
+  id        String   @id // Stripe event.id (e.g. evt_...)
+  type      String
+  createdAt DateTime @default(now())
+
+  @@map("processed_stripe_events")
 }

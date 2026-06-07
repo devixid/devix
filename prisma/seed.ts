@@ -163,7 +163,7 @@ async function main() {
           description:
             "A production-ready Next.js 16 starter kit with Tailwind CSS v4, Supabase, Prisma, and Bun. Includes authentication, admin dashboard, and a clean component library.",
           price: 49,
-          fileKey: "products/devix-starter-kit.zip",
+          fileKey: "devix-starter-kit.zip",
           previewUrl: null,
           isVisible: true,
           order: 1,
@@ -174,7 +174,7 @@ async function main() {
           description:
             "A premium agency landing page template with editorial design, Framer Motion animations, and HeroUI components. Ready to customize and deploy.",
           price: 29,
-          fileKey: "products/agency-landing-page.zip",
+          fileKey: "agency-landing-page.zip",
           previewUrl: null,
           isVisible: true,
           order: 2,

@@ -1,19 +1,19 @@
 import Link from "next/link";
 
-export default function DownloadUsedPage() {
+export default function DownloadRevokedPage() {
   return (
     <div className="flex min-h-[70vh] flex-col items-center justify-center px-4 text-center">
       <div className="max-w-md space-y-6">
         <h1 className="font-syne text-4xl font-bold tracking-tight text-zinc-900">
-          Link Already Used
+          Download Unavailable
         </h1>
         <p className="text-zinc-600">
-          For security reasons, download links are single-use only. This link is
-          no longer valid because it has already been used.
+          Access to this download has been revoked. This usually happens after a
+          refund or a payment dispute on the order.
         </p>
         <p className="text-sm text-zinc-500">
-          If your download failed or you need another copy, please checkout the
-          product again.
+          If you believe this is a mistake, please contact support with your
+          purchase email.
         </p>
         <div className="pt-4">
           <Link

@@ -205,18 +205,20 @@ export async function sendPurchaseConfirmation({
   email,
   productName,
   downloadToken,
+  siteUrl,
 }: {
   name: string;
   email: string;
   productName: string;
   downloadToken: string;
+  siteUrl?: string;
 }) {
   const config = getResendConfig();
   if (!config) return;
 
   const safeName = escapeHtml(name);
-  const siteUrl = getSiteUrl();
-  const downloadUrl = `${siteUrl}/download/${encodeURIComponent(downloadToken)}`;
+  const baseUrl = (siteUrl || getSiteUrl()).replace(/\/$/, "");
+  const downloadUrl = `${baseUrl}/download/${encodeURIComponent(downloadToken)}`;
 
   const { error } = await config.resend.emails.send({
     from: config.fromEmail,
@@ -225,7 +227,7 @@ export async function sendPurchaseConfirmation({
     html: `
       <h2>Hi ${safeName},</h2>
       <p>Thank you for downloading <strong>${escapeHtml(productName)}</strong> from Devix.</p>
-      <p>Here is your unique download link. For security reasons, this link is valid for <strong>one-time use only</strong> and will expire in 24 hours.</p>
+      <p>Here is your unique download link. For security reasons, this link is valid for a <strong>limited number of downloads</strong> and will expire in 24 hours.</p>
       <p style="margin: 30px 0;">
         <a href="${escapeHtml(downloadUrl)}" style="background-color: #000; color: #fff; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold;">Download ${escapeHtml(productName)}</a>
       </p>
@@ -237,9 +239,13 @@ export async function sendPurchaseConfirmation({
   });
 
   if (error) {
+    // Throw so the caller (webhook fulfillment) can return 500 and let Stripe
+    // retry until the email is actually delivered. The emailSentAt gate
+    // prevents duplicate sends on retry.
     console.error(
       "[Email] Failed to send purchase confirmation:",
       error.message,
     );
+    throw new Error(`Purchase confirmation email failed: ${error.message}`);
   }
 }

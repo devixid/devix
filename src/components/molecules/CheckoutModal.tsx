@@ -27,10 +27,15 @@ export function CheckoutModal({
   const [isSuccess, setIsSuccess] = useState(false);
 
   useEffect(() => {
+    if (state.success && state.checkoutUrl) {
+      window.location.assign(state.checkoutUrl);
+      return;
+    }
+
     if (state.success) {
       setIsSuccess(true);
     }
-  }, [state.success]);
+  }, [state.success, state.checkoutUrl]);
 
   // Reset isSuccess only when the modal is opened
   useEffect(() => {
@@ -194,7 +199,8 @@ export function CheckoutModal({
                 required
               />
               <p className="text-xs text-zinc-500">
-                We&apos;ll send the secure download link here.
+                You&apos;ll complete payment on Stripe. The download link is
+                sent here after payment.
               </p>
               {state.errors?.buyerEmail && (
                 <p className="text-xs text-red-500">
@@ -221,10 +227,10 @@ export function CheckoutModal({
                 disabled={isPending}
                 className="flex w-full items-center justify-center gap-2 bg-black px-6 py-3 text-sm font-medium tracking-widest text-white uppercase transition-colors hover:bg-zinc-800 disabled:opacity-50 sm:w-auto"
               >
-                {isPending ? (
+                {isPending || (state.success && state.checkoutUrl) ? (
                   <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/20 border-t-white"></span>
                 ) : (
-                  "Get Link"
+                  "Continue to payment"
                 )}
               </button>
             </div>
