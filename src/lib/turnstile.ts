@@ -6,6 +6,13 @@ export function isTurnstileEnabled(): boolean {
   return Boolean(process.env.TURNSTILE_SECRET_KEY);
 }
 
+export const TURNSTILE_SITE_KEY =
+  process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? "";
+
+export function isTurnstileClientEnabled(): boolean {
+  return Boolean(TURNSTILE_SITE_KEY);
+}
+
 export async function verifyTurnstile(
   token: string | null | undefined,
   ip?: string,

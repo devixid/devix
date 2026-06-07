@@ -7,7 +7,11 @@ import {
 } from "@stripe/react-stripe-js";
 import { getStripeBrowser } from "@/lib/stripe-client";
 import { createEmbeddedCheckoutSession } from "@/actions/purchase";
+import { isTurnstileClientEnabled } from "@/lib/turnstile";
+import { TurnstileField } from "@/components/molecules/TurnstileField";
 import { cn } from "@/utils";
+
+const turnstileEnabled = isTurnstileClientEnabled();
 
 interface EmbeddedProductCheckoutProps {
   productId: string;
@@ -26,6 +30,8 @@ export function EmbeddedProductCheckout({
   const [error, setError] = useState<string | null>(null);
   const [isPending, setIsPending] = useState(false);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [turnstileReady, setTurnstileReady] = useState(!turnstileEnabled);
+  const [turnstileResetKey, setTurnstileResetKey] = useState(0);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -40,6 +46,8 @@ export function EmbeddedProductCheckout({
 
     if (!result.ok) {
       setError(result.error);
+      setTurnstileReady(false);
+      setTurnstileResetKey((key) => key + 1);
       return;
     }
 
@@ -112,11 +120,16 @@ export function EmbeddedProductCheckout({
         </p>
       </div>
 
+      <TurnstileField
+        resetKey={turnstileResetKey}
+        onVerifiedChange={setTurnstileReady}
+      />
+
       {error && <p className="text-sm text-red-500">{error}</p>}
 
       <button
         type="submit"
-        disabled={isPending}
+        disabled={isPending || !turnstileReady}
         className={cn(
           "flex w-full items-center justify-center gap-2 bg-black px-6 py-3 text-sm font-medium tracking-widest text-white uppercase transition-colors hover:bg-zinc-800 disabled:opacity-50",
         )}

@@ -3,7 +3,11 @@
 import { useActionState, useEffect, useState } from "react";
 import { Product } from "@prisma/client";
 import { submitPurchase, PurchaseState } from "@/actions/purchase";
+import { isTurnstileClientEnabled } from "@/lib/turnstile";
+import { TurnstileField } from "@/components/molecules/TurnstileField";
 import { cn } from "@/utils";
+
+const turnstileEnabled = isTurnstileClientEnabled();
 
 const initialState: PurchaseState = {
   success: false,
@@ -25,6 +29,8 @@ export function CheckoutModal({
     initialState,
   );
   const [isSuccess, setIsSuccess] = useState(false);
+  const [turnstileReady, setTurnstileReady] = useState(!turnstileEnabled);
+  const [turnstileResetKey, setTurnstileResetKey] = useState(0);
 
   useEffect(() => {
     if (state.success && state.checkoutUrl) {
@@ -41,6 +47,8 @@ export function CheckoutModal({
   useEffect(() => {
     if (isOpen) {
       setIsSuccess(false);
+      setTurnstileReady(!turnstileEnabled);
+      setTurnstileResetKey((key) => key + 1);
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "";
@@ -49,6 +57,13 @@ export function CheckoutModal({
       document.body.style.overflow = "";
     };
   }, [isOpen]);
+
+  useEffect(() => {
+    if (state.message && !state.success) {
+      setTurnstileReady(false);
+      setTurnstileResetKey((key) => key + 1);
+    }
+  }, [state.message, state.success]);
 
   // Handle Escape key
   useEffect(() => {
@@ -209,6 +224,11 @@ export function CheckoutModal({
               )}
             </div>
 
+            <TurnstileField
+              resetKey={turnstileResetKey}
+              onVerifiedChange={setTurnstileReady}
+            />
+
             {state.message && !state.success && (
               <p className="text-sm text-red-500">{state.message}</p>
             )}
@@ -224,7 +244,7 @@ export function CheckoutModal({
               </button>
               <button
                 type="submit"
-                disabled={isPending}
+                disabled={isPending || !turnstileReady}
                 className="flex w-full items-center justify-center gap-2 bg-black px-6 py-3 text-sm font-medium tracking-widest text-white uppercase transition-colors hover:bg-zinc-800 disabled:opacity-50 sm:w-auto"
               >
                 {isPending || (state.success && state.checkoutUrl) ? (
