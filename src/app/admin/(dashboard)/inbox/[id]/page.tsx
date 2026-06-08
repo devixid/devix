@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getSubmissionById } from "@/actions/admin";
 import InboxDetailPanel from "@/components/admin/InboxDetailPanel";
+import { StarRating } from "@/components/admin/StarRating";
 import { getExcludedLabelsForProjectType } from "@/lib/estimator-deliverables";
 import type { ProjectType } from "@/types/estimator";
 
@@ -141,6 +142,31 @@ export default async function InboxDetailPage({ params }: Props) {
               </div>
             );
           })()}
+
+        {submission.feedback && (
+          <div className="rounded border border-[#C8A96E]/20 bg-[#C8A96E]/5 p-4">
+            <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+              <p className="text-[10px] tracking-wider text-[#C8A96E] uppercase">
+                Consultation feedback
+              </p>
+              <Link
+                href={`/admin/feedback/${submission.feedback.id}`}
+                className="text-xs text-zinc-400 hover:text-zinc-200"
+              >
+                View detail →
+              </Link>
+            </div>
+            <StarRating
+              rating={submission.feedback.rating}
+              size="md"
+            />
+            {submission.feedback.comment && (
+              <p className="mt-3 text-sm leading-relaxed whitespace-pre-wrap text-zinc-300">
+                {submission.feedback.comment}
+              </p>
+            )}
+          </div>
+        )}
 
         <InboxDetailPanel
           id={submission.id}

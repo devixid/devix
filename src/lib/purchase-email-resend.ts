@@ -125,7 +125,7 @@ export async function resendPurchaseEmailByStripeSession(
     };
   }
 
-  let purchaseForEmail = purchase;
+  let purchaseForEmail;
   try {
     // New token invalidates any previous link; grace window resets for 24h.
     purchaseForEmail = await rotatePurchaseDownloadToken(purchase.id);

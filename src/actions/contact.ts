@@ -18,6 +18,7 @@ type ContactFormData = {
 type ActionResult = {
   success: boolean;
   error?: string;
+  submissionId?: string;
 };
 
 export async function submitContactForm(
@@ -47,7 +48,7 @@ export async function submitContactForm(
     const estimatorLeadId = data.estimatorLeadId?.trim() || null;
     const source = estimatorLeadId ? "estimator" : "contact";
 
-    await prisma.contactSubmission.create({
+    const submission = await prisma.contactSubmission.create({
       data: {
         name: validatedData.name.trim(),
         email: validatedData.email.trim().toLowerCase(),
@@ -86,7 +87,7 @@ export async function submitContactForm(
 
     revalidatePath("/");
     revalidatePath("/admin/inbox");
-    return { success: true };
+    return { success: true, submissionId: submission.id };
   } catch (error) {
     console.error("Contact form submission error:", error);
     return { success: false, error: "Something went wrong. Please try again." };

@@ -18,6 +18,7 @@ export type SiteSettingsData = {
   socialLinks: SocialLinks | null;
   maintenanceMode: boolean;
   maintenanceMessage: string | null;
+  paymentProvider: string;
 };
 
 function getSiteSettingsDelegate() {
@@ -45,6 +46,7 @@ export async function getSiteSettings(): Promise<SiteSettingsData | null> {
       socialLinks: (settings.socialLinks as SocialLinks) ?? null,
       maintenanceMode: settings.maintenanceMode,
       maintenanceMessage: settings.maintenanceMessage,
+      paymentProvider: settings.paymentProvider,
     };
   } catch (error) {
     console.warn("[SiteSettings] Failed to read settings:", error);
@@ -76,6 +78,8 @@ export async function updateSiteSettings(
     updateData.maintenanceMode = data.maintenanceMode;
   if (data.maintenanceMessage !== undefined)
     updateData.maintenanceMessage = data.maintenanceMessage;
+  if (data.paymentProvider !== undefined)
+    updateData.paymentProvider = data.paymentProvider;
 
   await delegate.upsert({
     where: { id: DEFAULT_SETTINGS_ID },
@@ -88,6 +92,7 @@ export async function updateSiteSettings(
       socialLinks: data.socialLinks ?? undefined,
       maintenanceMode: data.maintenanceMode ?? false,
       maintenanceMessage: data.maintenanceMessage ?? null,
+      paymentProvider: data.paymentProvider ?? "stripe",
     },
     update: updateData,
   });

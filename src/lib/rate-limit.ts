@@ -69,6 +69,21 @@ export function getContactLimiter() {
   return _contactLimiter;
 }
 
+let _feedbackLimiter: Ratelimit | null = null;
+export function getFeedbackLimiter() {
+  const redis = getRedisClient();
+  if (!redis) return null;
+  if (!_feedbackLimiter) {
+    _feedbackLimiter = new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(5, "10 m"),
+      prefix: "ratelimit:feedback",
+      ephemeralCache: cache,
+    });
+  }
+  return _feedbackLimiter;
+}
+
 let _apiLimiter: Ratelimit | null = null;
 export function getApiLimiter() {
   const redis = getRedisClient();

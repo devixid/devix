@@ -54,12 +54,14 @@ export async function getOverviewStats() {
 export async function getNavBadges() {
   await verifyAdminSession();
 
-  const [unreadSubmissions, newEstimatorLeads] = await Promise.all([
-    prisma.contactSubmission.count({ where: { isRead: false } }),
-    prisma.estimatorLead.count({ where: { status: "NEW" } }),
-  ]);
+  const [unreadSubmissions, newEstimatorLeads, unreadFeedback] =
+    await Promise.all([
+      prisma.contactSubmission.count({ where: { isRead: false } }),
+      prisma.estimatorLead.count({ where: { status: "NEW" } }),
+      prisma.consultationFeedback.count({ where: { isRead: false } }),
+    ]);
 
-  return { unreadSubmissions, newEstimatorLeads };
+  return { unreadSubmissions, newEstimatorLeads, unreadFeedback };
 }
 
 // ----------------------------------------------------
@@ -132,7 +134,7 @@ export async function getSubmissionById(id: string) {
   await verifyAdminSession();
   return prisma.contactSubmission.findUnique({
     where: { id },
-    include: { estimatorLead: true },
+    include: { estimatorLead: true, feedback: true },
   });
 }
 

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { PurchaseEmailResend } from "@/components/molecules/PurchaseEmailResend";
 import { maskEmail } from "@/lib/purchase-email-resend";
+import { resolvePaymentProviderId } from "@/lib/payment";
 import { getStripe, isStripeConfigured } from "@/lib/stripe";
 
 export const metadata = {
@@ -15,10 +16,11 @@ export default async function StoreSuccessPage({
   searchParams,
 }: SuccessPageProps) {
   const { session_id: sessionId } = await searchParams;
+  const providerId = await resolvePaymentProviderId();
   let productName: string | null = null;
   let maskedEmail: string | null = null;
 
-  if (sessionId && isStripeConfigured()) {
+  if (sessionId && providerId === "stripe" && isStripeConfigured()) {
     try {
       const stripe = getStripe();
       const session = await stripe.checkout.sessions.retrieve(sessionId, {

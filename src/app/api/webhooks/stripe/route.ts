@@ -114,8 +114,8 @@ export async function POST(request: Request) {
 
   // Idempotency: record the event id first. A duplicate delivery short-circuits.
   try {
-    await prisma.processedStripeEvent.create({
-      data: { id: event.id, type: event.type },
+    await prisma.processedPaymentEvent.create({
+      data: { id: event.id, provider: "stripe", type: event.type },
     });
   } catch (err) {
     if (isUniqueViolation(err)) {
@@ -226,7 +226,7 @@ export async function POST(request: Request) {
       error,
     );
     // Remove the idempotency record so the retry can reprocess this event.
-    await prisma.processedStripeEvent
+    await prisma.processedPaymentEvent
       .delete({ where: { id: event.id } })
       .catch(() => {});
     return NextResponse.json(

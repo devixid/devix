@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { containsProfanity } from "@/lib/profanity";
 
 export const ContactFormSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters.").max(100),
@@ -90,8 +91,55 @@ export const ProjectSchema = z.object({
     .min(1),
 });
 
+export const ConsultationFeedbackSchema = z.object({
+  contactSubmissionId: z.string().cuid("Invalid submission reference."),
+  rating: z.coerce.number().int().min(1).max(5),
+  comment: z
+    .string()
+    .max(500)
+    .optional()
+    .nullable()
+    .refine((v) => !v?.trim() || !containsProfanity(v), {
+      message:
+        "Komentar mengandung kata yang tidak pantas. Mohon gunakan bahasa yang sopan.",
+    }),
+});
+
 export const PurchaseSchema = z.object({
   productId: z.string().cuid("Invalid product ID."),
   buyerName: z.string().min(2, "Name must be at least 2 characters.").max(100),
   buyerEmail: z.string().email("Please enter a valid email address.").max(255),
+});
+
+export const ProductSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters.").max(200),
+  slug: z
+    .string()
+    .min(2)
+    .max(200)
+    .regex(
+      /^[a-z0-9-]+$/,
+      "Slug can only contain lowercase letters, numbers, and hyphens.",
+    ),
+  description: z
+    .string()
+    .min(10, "Description must be at least 10 characters.")
+    .max(10000),
+  price: z.coerce.number().positive("Price must be greater than zero."),
+  currency: z
+    .string()
+    .length(3, "Currency must be a 3-letter ISO code.")
+    .transform((c) => c.toLowerCase()),
+  previewUrl: z
+    .union([z.string().url("Preview must be a valid URL."), z.literal("")])
+    .optional()
+    .nullable()
+    .transform((v) => (v && v.length > 0 ? v : null)),
+  lemonSqueezyVariantId: z
+    .union([z.string().min(1).max(50), z.literal("")])
+    .optional()
+    .nullable()
+    .transform((v) => (v && v.length > 0 ? v : null)),
+  isVisible: z.coerce.boolean().optional().default(true),
+  order: z.coerce.number().int().min(0).optional().default(0),
 });

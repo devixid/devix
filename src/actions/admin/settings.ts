@@ -1,12 +1,12 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import type { SocialLinks } from "@/lib/site-settings";
 import {
   getNotificationEmail,
   setNotificationEmail,
   getSiteSettings,
   updateSiteSettings,
-  type SocialLinks,
 } from "@/lib/site-settings";
 import { invalidateContentCache } from "@/lib/queries/site-content";
 import { invalidateCache } from "@/lib/redis";
@@ -21,6 +21,11 @@ import {
 import { ChangePasswordSchema, RegisterSchema } from "@/lib/schemas";
 import { getRegisterLimiter, getClientIp } from "@/lib/rate-limit";
 import { headers } from "next/headers";
+import {
+  getPaymentProviderStatus,
+  isPaymentProviderId,
+  type PaymentProviderId,
+} from "@/lib/payment/config";
 
 const MAX_TEAM_MEMBERS = 4;
 
@@ -203,6 +208,48 @@ export async function revalidatePublicCache() {
   revalidatePath("/", "layout");
   revalidatePath("/projects");
   await logActivity({ action: "cache.revalidated", entityType: "System" });
+  return { success: true };
+}
+
+export async function getPaymentSettings() {
+  await verifyAdminSession();
+  const settings = await getSiteSettings();
+  const activeProvider: PaymentProviderId =
+    settings?.paymentProvider && isPaymentProviderId(settings.paymentProvider)
+      ? settings.paymentProvider
+      : "stripe";
+
+  return {
+    activeProvider,
+    stripe: getPaymentProviderStatus("stripe"),
+    lemonsqueezy: getPaymentProviderStatus("lemonsqueezy"),
+  };
+}
+
+export async function updatePaymentProvider(provider: PaymentProviderId) {
+  await verifyAdminSession();
+  await verifyCsrfOrigin();
+
+  if (!isPaymentProviderId(provider)) {
+    throw new Error("Invalid payment provider.");
+  }
+
+  const status = getPaymentProviderStatus(provider);
+  if (!status.configured) {
+    throw new Error(
+      `Cannot switch to ${provider}: missing ${status.missing.join(", ")} in environment variables.`,
+    );
+  }
+
+  await updateSiteSettings({ paymentProvider: provider });
+  revalidatePath("/store");
+  revalidatePath("/store/checkout");
+  revalidatePath("/admin/settings");
+  await logActivity({
+    action: "settings.payment_provider",
+    entityType: "SiteSettings",
+    metadata: { paymentProvider: provider },
+  });
   return { success: true };
 }
 

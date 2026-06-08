@@ -8,53 +8,53 @@ datasource db {
   relationMode = "prisma"
 }
 
-enum InquiryStatus {
-  NEW
-  IN_PROGRESS
-  CLOSED
-}
-
-enum EstimatorLeadStatus {
-  NEW
-  CONTACTED
-  CONVERTED
-  CLOSED
-}
-
 model User {
-  id        String   @id @default(uuid()) @db.Uuid
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  email          String  @unique
+  id             String        @id @default(uuid()) @db.Uuid
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  email          String        @unique
   hashedPassword String
   firstName      String?
   lastName       String?
-  isActive       Boolean @default(true)
-
-  mediaAssets  MediaAsset[]
-  activityLogs ActivityLog[]
+  isActive       Boolean       @default(true)
+  mediaAssets    MediaAsset[]
+  activityLogs   ActivityLog[]
 
   @@map("users")
 }
 
 model ContactSubmission {
-  id              String         @id @default(cuid())
+  id              String                @id @default(cuid())
   name            String
   email           String
-  message         String         @db.Text
-  isRead          Boolean        @default(false)
-  status          InquiryStatus  @default(NEW)
-  internalNotes   String?        @db.Text
-  source          String         @default("contact")
-  estimatorLeadId String?        @unique
-  estimatorLead   EstimatorLead? @relation(fields: [estimatorLeadId], references: [id], onDelete: SetNull)
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
+  message         String
+  isRead          Boolean               @default(false)
+  status          InquiryStatus         @default(NEW)
+  internalNotes   String?
+  source          String                @default("contact")
+  estimatorLeadId String?               @unique
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
+  estimatorLead   EstimatorLead?        @relation(fields: [estimatorLeadId], references: [id], onDelete: SetNull)
+  feedback        ConsultationFeedback?
 
   @@index([status])
   @@index([source])
   @@map("contact_submissions")
+}
+
+model ConsultationFeedback {
+  id                  String            @id @default(cuid())
+  contactSubmissionId String            @unique
+  rating              Int
+  comment             String?
+  isRead              Boolean           @default(false)
+  createdAt           DateTime          @default(now())
+  contactSubmission   ContactSubmission @relation(fields: [contactSubmissionId], references: [id], onDelete: Cascade)
+
+  @@index([isRead])
+  @@index([createdAt])
+  @@map("consultation_feedback")
 }
 
 model EstimatorLead {
@@ -71,9 +71,9 @@ model EstimatorLead {
   deliverableSavingsUsd Float?
   currency              String              @default("USD")
   status                EstimatorLeadStatus @default(NEW)
-  contactSubmission     ContactSubmission?
   createdAt             DateTime            @default(now())
   updatedAt             DateTime            @updatedAt
+  contactSubmission     ContactSubmission?
 
   @@index([status])
   @@map("estimator_leads")
@@ -84,7 +84,7 @@ model Testimonial {
   clientName String
   clientRole String
   company    String
-  content    String   @db.Text
+  content    String
   avatarUrl  String?
   isVisible  Boolean  @default(true)
   order      Int      @default(0)
@@ -96,24 +96,23 @@ model Testimonial {
 }
 
 model Project {
-  id            String    @id @default(cuid())
+  id            String             @id @default(cuid())
   title         String
-  slug          String    @unique
-  description   String    @db.Text
-  content       String?   @db.Text
+  slug          String             @unique
+  description   String
+  content       String?
   category      String
   imageUrl      String
   liveUrl       String?
   githubUrl     String?
-  isFeatured    Boolean   @default(false)
-  isVisible     Boolean   @default(true)
-  featuredOrder Int       @default(0)
+  isFeatured    Boolean            @default(false)
+  isVisible     Boolean            @default(true)
+  featuredOrder Int                @default(0)
   completedAt   DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-
-  techStacks ProjectTechStack[]
-  developers ProjectDeveloper[]
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+  techStacks    ProjectTechStack[]
+  developers    ProjectDeveloper[]
 
   @@index([isVisible])
   @@index([isFeatured])
@@ -122,11 +121,10 @@ model Project {
 }
 
 model ProjectTechStack {
-  id        String @id @default(cuid())
+  id        String  @id @default(cuid())
   name      String
   projectId String
-
-  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   @@unique([projectId, name])
   @@index([projectId])
@@ -138,25 +136,11 @@ model ProjectDeveloper {
   name      String
   role      String?
   projectId String
-
-  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   @@unique([projectId, name])
   @@index([projectId])
   @@map("project_developers")
-}
-
-enum SiteSectionKey {
-  HERO
-  ABOUT
-  SERVICES_INTRO
-  TEAM_INTRO
-  PORTFOLIO_INTRO
-  TESTIMONIALS_INTRO
-  CTA
-  CONTACT
-  FOOTER
-  SEO
 }
 
 model SiteSettings {
@@ -169,6 +153,7 @@ model SiteSettings {
   maintenanceMode    Boolean  @default(false)
   maintenanceMessage String?
   updatedAt          DateTime @updatedAt
+  paymentProvider    String   @default("stripe")
 
   @@map("site_settings")
 }
@@ -176,7 +161,7 @@ model SiteSettings {
 model FaqItem {
   id        String   @id @default(cuid())
   question  String
-  answer    String   @db.Text
+  answer    String
   order     Int      @default(0)
   isVisible Boolean  @default(true)
   createdAt DateTime @default(now())
@@ -189,7 +174,7 @@ model FaqItem {
 model ServiceItem {
   id          String   @id @default(cuid())
   title       String
-  description String   @db.Text
+  description String
   order       Int      @default(0)
   isVisible   Boolean  @default(true)
   createdAt   DateTime @default(now())
@@ -203,7 +188,7 @@ model TeamMember {
   id          String   @id @default(cuid())
   name        String
   title       String
-  description String   @db.Text
+  description String
   imageUrl    String
   socialLinks Json?
   order       Int      @default(0)
@@ -234,8 +219,8 @@ model MediaAsset {
   sizeBytes    Int
   alt          String?
   uploadedById String?  @db.Uuid
-  uploadedBy   User?    @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
   createdAt    DateTime @default(now())
+  uploadedBy   User?    @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
 
   @@index([createdAt])
   @@index([bucket])
@@ -246,13 +231,13 @@ model MediaAsset {
 model ActivityLog {
   id         String   @id @default(cuid())
   actorId    String?  @db.Uuid
-  actor      User?    @relation(fields: [actorId], references: [id], onDelete: SetNull)
   actorEmail String
   action     String
   entityType String
   entityId   String?
   metadata   Json?
   createdAt  DateTime @default(now())
+  actor      User?    @relation(fields: [actorId], references: [id], onDelete: SetNull)
 
   @@index([createdAt])
   @@index([entityType, entityId])
@@ -261,68 +246,88 @@ model ActivityLog {
 }
 
 model Product {
-  id          String   @id @default(cuid())
-  name        String
-  slug        String   @unique
-  description String   @db.Text
-  price       Float // DEPRECATED display value (USD). Charging uses priceMinor + currency.
-  priceMinor  Int? // price in the currency's smallest unit (e.g. cents for USD)
-  currency    String   @default("usd")
-  fileKey     String // object path inside the "products" bucket, e.g., "devix-starter-kit.zip"
-  previewUrl  String? // screenshot or preview image URL
-  isVisible   Boolean  @default(true)
-  order       Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  purchases Purchase[]
+  id                    String     @id @default(cuid())
+  name                  String
+  slug                  String     @unique
+  description           String
+  price                 Float
+  fileKey               String
+  previewUrl            String?
+  isVisible             Boolean    @default(true)
+  order                 Int        @default(0)
+  createdAt             DateTime   @default(now())
+  updatedAt             DateTime   @updatedAt
+  priceMinor            Int?
+  currency              String     @default("usd")
+  lemonSqueezyVariantId String?
+  purchases             Purchase[]
 
   @@map("products")
 }
 
 model Purchase {
-  id             String   @id @default(cuid())
-  productId      String
-  buyerName      String
-  buyerEmail     String
-  downloadToken  String   @unique // one-time download token (app-generated CSPRNG)
-  tokenUsed      Boolean  @default(false) // legacy flag; true once downloadCount exhausts maxDownloads
-  downloadCount  Int      @default(0)
-  maxDownloads   Int      @default(3)
-  firstDownloadedAt DateTime?
-  downloadedAt   DateTime? // last successful redemption
-  tokenExpiresAt DateTime // 24 hours from purchase time
-
-  // Stripe linkage
-  stripeSessionId       String? @unique
-  stripePaymentIntentId String? @unique
+  id                    String    @id @default(cuid())
+  productId             String
+  buyerName             String
+  buyerEmail            String
+  downloadToken         String    @unique
+  tokenUsed             Boolean   @default(false)
+  tokenExpiresAt        DateTime
+  createdAt             DateTime  @default(now())
+  stripeSessionId       String?   @unique
+  downloadCount         Int       @default(0)
+  maxDownloads          Int       @default(3)
+  firstDownloadedAt     DateTime?
+  downloadedAt          DateTime?
+  stripePaymentIntentId String?   @unique
   stripeChargeId        String?
-
-  // Money snapshot for reporting / refunds
-  currency    String @default("usd")
-  amountMinor Int?
-
-  // Fulfillment + lifecycle
-  emailSentAt   DateTime?
-  revokedAt     DateTime?
-  disputeStatus String?
-
-  // Fraud evidence
-  buyerIp   String?
-  userAgent String?
-
-  createdAt DateTime @default(now())
-
-  product Product @relation(fields: [productId], references: [id])
+  currency              String    @default("usd")
+  amountMinor           Int?
+  emailSentAt           DateTime?
+  revokedAt             DateTime?
+  disputeStatus         String?
+  buyerIp               String?
+  userAgent             String?
+  deliveredFileKey      String?
+  provider              String    @default("stripe")
+  lemonSqueezyOrderId   String?   @unique
+  product               Product   @relation(fields: [productId], references: [id])
 
   @@index([productId])
   @@map("purchases")
 }
 
-model ProcessedStripeEvent {
-  id        String   @id // Stripe event.id (e.g. evt_...)
+model ProcessedPaymentEvent {
+  id        String   @id
   type      String
   createdAt DateTime @default(now())
+  provider  String   @default("stripe")
 
-  @@map("processed_stripe_events")
+  @@map("processed_payment_events")
+}
+
+enum InquiryStatus {
+  NEW
+  IN_PROGRESS
+  CLOSED
+}
+
+enum EstimatorLeadStatus {
+  NEW
+  CONTACTED
+  CONVERTED
+  CLOSED
+}
+
+enum SiteSectionKey {
+  HERO
+  ABOUT
+  SERVICES_INTRO
+  TEAM_INTRO
+  PORTFOLIO_INTRO
+  TESTIMONIALS_INTRO
+  CTA
+  CONTACT
+  FOOTER
+  SEO
 }

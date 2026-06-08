@@ -1,10 +1,12 @@
 import SettingsPanel from "@/components/admin/SettingsPanel";
 import { ExtendedSettingsPanel } from "@/components/admin/ExtendedSettingsPanel";
+import { PaymentSettingsPanel } from "@/components/admin/PaymentSettingsPanel";
 import {
   getTeamMembers,
   getTeamSlotInfo,
   getNotificationEmailSetting,
   getExtendedSiteSettings,
+  getPaymentSettings,
 } from "@/actions/admin/settings";
 
 export const metadata = {
@@ -12,12 +14,13 @@ export const metadata = {
 };
 
 export default async function SettingsPage() {
-  const [members, slotInfo, notificationEmail, siteSettings] =
+  const [members, slotInfo, notificationEmail, siteSettings, paymentSettings] =
     await Promise.all([
       getTeamMembers(),
       getTeamSlotInfo(),
       getNotificationEmailSetting(),
       getExtendedSiteSettings(),
+      getPaymentSettings(),
     ]);
 
   return (
@@ -38,6 +41,11 @@ export default async function SettingsPage() {
         members={members}
         slotInfo={slotInfo}
         notificationEmailProp={notificationEmail}
+      />
+      <PaymentSettingsPanel
+        activeProvider={paymentSettings.activeProvider}
+        stripe={paymentSettings.stripe}
+        lemonsqueezy={paymentSettings.lemonsqueezy}
       />
       <ExtendedSettingsPanel settings={siteSettings} />
     </div>

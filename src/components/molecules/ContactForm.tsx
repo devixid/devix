@@ -6,6 +6,7 @@ import { submitContactForm } from "@/actions/contact";
 import { buildEstimatorContactMessage } from "@/lib/estimator-contact";
 import { m, AnimatePresence } from "framer-motion";
 import { Loader2, Check } from "lucide-react";
+import { ConsultationFeedbackWidget } from "@/components/molecules/ConsultationFeedbackWidget";
 
 interface ContactFormProps {
   initialMessage?: string;
@@ -14,7 +15,7 @@ interface ContactFormProps {
   fillFromUrlParams?: boolean;
   variant?: "default" | "estimator";
   onEstimatorSuccess?: () => void;
-  onSuccess?: () => void;
+  onSuccess?: (submissionId?: string) => void;
   className?: string;
 }
 
@@ -32,6 +33,7 @@ export function ContactForm({
   const [message, setMessage] = useState(initialMessage ?? "");
   const [errorMsg, setErrorMsg] = useState("");
   const [success, setSuccess] = useState(false);
+  const [submissionId, setSubmissionId] = useState<string | null>(null);
   const [estimatorLeadId, setEstimatorLeadId] = useState<string | null>(
     estimatorLeadIdProp,
   );
@@ -110,10 +112,13 @@ export function ContactForm({
 
       if (result.success) {
         setSuccess(true);
+        if (result.submissionId) {
+          setSubmissionId(result.submissionId);
+        }
         setName("");
         setEmail("");
         setMessage("");
-        onSuccess?.();
+        onSuccess?.(result.submissionId);
       } else {
         setErrorMsg(result.error || "An unexpected error occurred.");
       }
@@ -285,6 +290,10 @@ export function ContactForm({
           </m.div>
         )}
       </AnimatePresence>
+
+      {variant === "estimator" && submissionId && success && (
+        <ConsultationFeedbackWidget contactSubmissionId={submissionId} />
+      )}
     </div>
   );
 }

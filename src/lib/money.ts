@@ -80,6 +80,11 @@ export function resolveProductAmount(product: {
   return { amountMinor, currency };
 }
 
+/** Convert stored minor units to major units for form display. */
+export function minorToMajor(amountMinor: number, currency: string): number {
+  return isZeroDecimalCurrency(currency) ? amountMinor : amountMinor / 100;
+}
+
 /** Display formatting from minor units. */
 export function formatMinor(amountMinor: number, currency: string): string {
   const value = isZeroDecimalCurrency(currency)
