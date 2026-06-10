@@ -8,6 +8,7 @@ export default defineConfig({
     },
   },
   test: {
+    setupFiles: ["src/lib/test/mocks/vitest.setup.ts"],
     exclude: ["**/node_modules/**", "**/e2e/**", "**/.next/**"],
   },
 });
