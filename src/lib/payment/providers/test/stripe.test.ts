@@ -1,3 +1,4 @@
+import { Decimal } from "@/lib/money";
 import { describe, expect, it } from "vitest";
 import type { ParsedWebhookEvent } from "@/lib/payment/types";
 import type Stripe from "stripe";
@@ -33,7 +34,7 @@ describe("stripeProvider.toFulfillmentEvent", () => {
         siteUrl: "https://devix.test",
       },
       payment_intent: "pi_test",
-    } as Stripe.Checkout.Session;
+    } as unknown as Stripe.Checkout.Session;
 
     const event = stripeProvider.toFulfillmentEvent({
       provider: "stripe",
@@ -52,7 +53,7 @@ describe("stripeProvider.toFulfillmentEvent", () => {
       buyerEmail: "buyer@example.com",
       stripeSessionId: "cs_test",
       stripePaymentIntentId: "pi_test",
-      amountMinor: 2500,
+      amountMinor: new Decimal("2500"),
       currency: "usd",
       buyerIp: "127.0.0.1",
       userAgent: "vitest",
@@ -69,7 +70,7 @@ describe("stripeProvider.toFulfillmentEvent", () => {
         buyerName: "Buyer",
         buyerEmail: "buyer@example.com",
       },
-    } as Stripe.Checkout.Session;
+    } as unknown as Stripe.Checkout.Session;
 
     expect(
       stripeProvider.toFulfillmentEvent({

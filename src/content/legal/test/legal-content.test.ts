@@ -3,9 +3,12 @@ import { privacyPolicy } from "@/content/legal/privacy";
 import { termsOfService } from "@/content/legal/terms";
 
 function assertLegalDocument(doc: {
-  title: string;
-  lastUpdated: string;
-  sections: { heading: string; body: string }[];
+  readonly title: string;
+  readonly lastUpdated: string;
+  readonly sections: ReadonlyArray<{
+    readonly heading: string;
+    readonly body: string;
+  }>;
 }) {
   expect(doc.title.length).toBeGreaterThan(0);
   expect(doc.lastUpdated.length).toBeGreaterThan(0);

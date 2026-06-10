@@ -1,4 +1,5 @@
 import { prisma } from "../src/lib/prisma";
+import { Decimal } from "@prisma/client/runtime/client";
 import {
   DEFAULT_FAQ_ITEMS,
   DEFAULT_SERVICE_ITEMS,
@@ -162,7 +163,9 @@ async function main() {
           slug: "devix-starter-kit",
           description:
             "A production-ready Next.js 16 starter kit with Tailwind CSS v4, Supabase, Prisma, and Bun. Includes authentication, admin dashboard, and a clean component library.",
-          price: 49,
+          price: new Decimal("49.0000"),
+          priceMinor: new Decimal("4900"),
+          currency: "usd",
           fileKey: "devix-starter-kit.zip",
           previewUrl: null,
           isVisible: true,
@@ -173,7 +176,9 @@ async function main() {
           slug: "agency-landing-page",
           description:
             "A premium agency landing page template with editorial design, Framer Motion animations, and HeroUI components. Ready to customize and deploy.",
-          price: 29,
+          price: new Decimal("29.0000"),
+          priceMinor: new Decimal("2900"),
+          currency: "usd",
           fileKey: "agency-landing-page.zip",
           previewUrl: null,
           isVisible: true,

@@ -1,5 +1,6 @@
 "use server";
 
+import { Decimal } from "@/lib/money";
 import { prisma } from "@/lib/prisma";
 import { verifyAdminSession, verifyCsrfOrigin } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
@@ -69,11 +70,13 @@ function buildLeadRecord(
     scope: state.scope!,
     complexity: state.complexity!,
     timeline: state.timeline!,
-    budgetUsd,
+    budgetUsd: new Decimal(budgetUsd),
     budgetDisplay,
     excludedDeliverables,
     deliverableSavingsUsd:
-      deliverableSavingsUsd > 0 ? deliverableSavingsUsd : null,
+      deliverableSavingsUsd > 0
+        ? new Decimal(deliverableSavingsUsd)
+        : null,
     currency,
   };
 }

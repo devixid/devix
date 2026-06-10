@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import type Stripe from "stripe";
 import { getStripe, constructWebhookEvent } from "@/lib/stripe";
-import { toStripeAmount } from "@/lib/money";
+import { minorToStripeUnit, stripeUnitToMinor } from "@/lib/money";
 import type {
   CreateCheckoutParams,
   CreateCheckoutResult,
@@ -25,7 +25,7 @@ function buildLineItems(ctx: CreateCheckoutParams) {
       quantity: 1,
       price_data: {
         currency: ctx.currency,
-        unit_amount: toStripeAmount(ctx.amountMinor),
+        unit_amount: minorToStripeUnit(ctx.amountMinor),
         product_data: {
           name: ctx.productName,
           description: ctx.productDescription.slice(0, 500) || undefined,
@@ -85,7 +85,10 @@ function mapCheckoutSessionToFulfillment(
     buyerEmail,
     stripeSessionId: session.id,
     stripePaymentIntentId: asId(session.payment_intent),
-    amountMinor: session.amount_total ?? undefined,
+    amountMinor:
+      session.amount_total != null
+        ? stripeUnitToMinor(session.amount_total)
+        : undefined,
     currency: session.currency ?? undefined,
     buyerIp: session.metadata?.buyerIp,
     userAgent: session.metadata?.userAgent,
@@ -111,7 +114,12 @@ function mapPaymentIntentToFulfillment(
     buyerEmail,
     stripePaymentIntentId: pi.id,
     stripeChargeId: asId(pi.latest_charge),
-    amountMinor: pi.amount_received ?? pi.amount ?? undefined,
+    amountMinor:
+      pi.amount_received != null
+        ? stripeUnitToMinor(pi.amount_received)
+        : pi.amount != null
+          ? stripeUnitToMinor(pi.amount)
+          : undefined,
     currency: pi.currency ?? undefined,
     buyerIp: pi.metadata?.buyerIp,
     userAgent: pi.metadata?.userAgent,

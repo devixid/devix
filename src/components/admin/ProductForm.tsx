@@ -7,7 +7,7 @@ import Link from "next/link";
 import { Product } from "@prisma/client";
 import { createProduct, updateProduct } from "@/actions/admin/products";
 import { uploadToSupabaseStorage } from "@/lib/supabase-storage";
-import { minorToMajor } from "@/lib/money";
+import { minorToMajor, resolveProductAmount } from "@/lib/money";
 import { MAX_PRODUCT_FILE_BYTES } from "@/lib/product-storage";
 import { ArrowLeft, UploadCloud } from "lucide-react";
 
@@ -37,7 +37,7 @@ export default function ProductForm({
 
   const initialPrice = initialData
     ? minorToMajor(
-        initialData.priceMinor ?? Math.round(initialData.price * 100),
+        resolveProductAmount(initialData).amountMinor,
         initialData.currency,
       )
     : "";

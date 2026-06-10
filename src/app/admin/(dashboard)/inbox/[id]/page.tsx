@@ -4,6 +4,7 @@ import { getSubmissionById } from "@/actions/admin";
 import InboxDetailPanel from "@/components/admin/InboxDetailPanel";
 import { StarRating } from "@/components/admin/StarRating";
 import { getExcludedLabelsForProjectType } from "@/lib/estimator-deliverables";
+import { formatUsdDecimal } from "@/lib/money";
 import type { ProjectType } from "@/types/estimator";
 
 interface Props {
@@ -124,13 +125,10 @@ export default async function InboxDetailPage({ params }: Props) {
                     Budget: {lead.budgetDisplay}
                   </span>
                   {lead.deliverableSavingsUsd != null &&
-                    lead.deliverableSavingsUsd > 0 && (
+                    lead.deliverableSavingsUsd.gt(0) && (
                       <span className="col-span-2">
-                        Package savings: −$
-                        {Math.round(
-                          lead.deliverableSavingsUsd,
-                        ).toLocaleString()}{" "}
-                        USD
+                        Package savings: −
+                        {formatUsdDecimal(lead.deliverableSavingsUsd)} USD
                       </span>
                     )}
                   {excludedLabels.length > 0 && (

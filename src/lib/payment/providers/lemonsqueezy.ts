@@ -6,6 +6,7 @@ import {
   getLemonWebhookSecret,
   verifyLemonSignature,
 } from "@/lib/lemonsqueezy";
+import { stripeUnitToMinor } from "@/lib/money";
 import {
   buildLemonWebhookEventId,
   parseLemonOrderWebhook,
@@ -50,7 +51,7 @@ function mapOrderToFulfillment(
     buyerName,
     buyerEmail,
     lemonSqueezyOrderId: payload.data.id,
-    amountMinor: attributes.total,
+    amountMinor: stripeUnitToMinor(attributes.total),
     currency: attributes.currency.toLowerCase(),
     buyerIp: custom?.buyerIp,
     userAgent: custom?.userAgent,

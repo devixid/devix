@@ -1,11 +1,12 @@
 import type { PaymentProviderId } from "@/lib/payment/constants";
+import type { MoneyMinor } from "@/lib/money";
 
 export type CreateCheckoutParams = {
   productId: string;
   lemonSqueezyVariantId?: string | null;
   buyerName: string;
   buyerEmail: string;
-  amountMinor: number;
+  amountMinor: MoneyMinor;
   currency: string;
   productName: string;
   productDescription: string;
@@ -26,7 +27,7 @@ export type FulfillmentEvent = {
   productId: string;
   buyerName: string;
   buyerEmail: string;
-  amountMinor?: number;
+  amountMinor?: MoneyMinor;
   currency?: string;
   buyerIp?: string;
   userAgent?: string;

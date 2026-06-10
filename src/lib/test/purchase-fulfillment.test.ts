@@ -1,3 +1,4 @@
+import { Decimal } from "@/lib/money";
 import { describe, expect, it } from "vitest";
 import { fulfillmentEventToInput } from "@/lib/purchase-fulfillment";
 import type { FulfillmentEvent } from "@/lib/payment/types";
@@ -11,7 +12,7 @@ describe("fulfillmentEventToInput", () => {
       buyerEmail: "buyer@example.com",
       stripeSessionId: "cs_test",
       stripePaymentIntentId: "pi_test",
-      amountMinor: 2500,
+      amountMinor: new Decimal("2500"),
       currency: "usd",
       buyerIp: "127.0.0.1",
       userAgent: "vitest",
@@ -27,7 +28,7 @@ describe("fulfillmentEventToInput", () => {
       stripePaymentIntentId: "pi_test",
       stripeChargeId: undefined,
       lemonSqueezyOrderId: undefined,
-      amountMinor: 2500,
+      amountMinor: new Decimal("2500"),
       currency: "usd",
       buyerIp: "127.0.0.1",
       userAgent: "vitest",

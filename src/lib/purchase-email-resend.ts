@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { sendPurchaseConfirmation } from "@/lib/email";
 import { fulfillProductPurchase } from "@/lib/purchase-fulfillment";
 import { rotatePurchaseDownloadToken } from "@/lib/rotate-purchase-download-token";
+import { stripeUnitToMinor } from "@/lib/money";
 import { getStripe, isStripeConfigured } from "@/lib/stripe";
 
 export type PurchaseEmailResendResult =
@@ -99,7 +100,10 @@ export async function resendPurchaseEmailByStripeSession(
         buyerEmail,
         stripeSessionId: session.id,
         stripePaymentIntentId: asId(session.payment_intent),
-        amountMinor: session.amount_total ?? undefined,
+        amountMinor:
+          session.amount_total != null
+            ? stripeUnitToMinor(session.amount_total)
+            : undefined,
         currency: session.currency ?? undefined,
         buyerIp: session.metadata?.buyerIp,
         userAgent: session.metadata?.userAgent,

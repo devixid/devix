@@ -1,16 +1,18 @@
+import { Decimal } from "@/lib/money";
+
 export type ProductFixture = {
   id: string;
   name: string;
   slug: string;
   description: string;
-  price: number;
+  price: Decimal;
   fileKey: string;
   previewUrl: string | null;
   isVisible: boolean;
   order: number;
   createdAt: Date;
   updatedAt: Date;
-  priceMinor: number | null;
+  priceMinor: Decimal | null;
   currency: string;
   lemonSqueezyVariantId: string | null;
 };
@@ -32,7 +34,7 @@ export type PurchaseFixture = {
   stripePaymentIntentId: string | null;
   stripeChargeId: string | null;
   currency: string;
-  amountMinor: number | null;
+  amountMinor: Decimal | null;
   emailSentAt: Date | null;
   revokedAt: Date | null;
   disputeStatus: string | null;
@@ -52,14 +54,14 @@ export function buildProduct(
     name: "Starter Kit",
     slug: "starter-kit",
     description: "A downloadable starter kit for new projects.",
-    price: 29,
+    price: new Decimal("29.0000"),
     fileKey: "starter-kit/starter-kit.zip",
     previewUrl: null,
     isVisible: true,
     order: 0,
     createdAt: new Date("2026-06-01T00:00:00.000Z"),
     updatedAt: new Date("2026-06-01T00:00:00.000Z"),
-    priceMinor: 2900,
+    priceMinor: new Decimal("2900"),
     currency: "usd",
     lemonSqueezyVariantId: null,
     ...overrides,
@@ -94,7 +96,7 @@ export function buildPurchase(
     stripePaymentIntentId: "pi_test_fixture",
     stripeChargeId: null,
     currency: "usd",
-    amountMinor: 2900,
+    amountMinor: new Decimal("2900"),
     emailSentAt: null,
     revokedAt: null,
     disputeStatus: null,

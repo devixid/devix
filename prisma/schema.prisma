@@ -65,10 +65,10 @@ model EstimatorLead {
   scope                 String
   complexity            String
   timeline              String
-  budgetUsd             Float
+  budgetUsd             Decimal  @db.Decimal(19, 2)
   budgetDisplay         String
   excludedDeliverables  Json?
-  deliverableSavingsUsd Float?
+  deliverableSavingsUsd Decimal? @db.Decimal(19, 2)
   currency              String              @default("USD")
   status                EstimatorLeadStatus @default(NEW)
   createdAt             DateTime            @default(now())
@@ -250,14 +250,14 @@ model Product {
   name                  String
   slug                  String     @unique
   description           String
-  price                 Float
+  price                 Decimal    @db.Decimal(19, 4)
   fileKey               String
   previewUrl            String?
   isVisible             Boolean    @default(true)
   order                 Int        @default(0)
   createdAt             DateTime   @default(now())
   updatedAt             DateTime   @updatedAt
-  priceMinor            Int?
+  priceMinor            Decimal?   @db.Decimal(19, 0)
   currency              String     @default("usd")
   lemonSqueezyVariantId String?
   purchases             Purchase[]
@@ -282,7 +282,7 @@ model Purchase {
   stripePaymentIntentId String?   @unique
   stripeChargeId        String?
   currency              String    @default("usd")
-  amountMinor           Int?
+  amountMinor           Decimal?   @db.Decimal(19, 0)
   emailSentAt           DateTime?
   revokedAt             DateTime?
   disputeStatus         String?

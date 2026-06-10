@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getEstimatorLeadById } from "@/actions/estimator-leads";
+import { formatUsdDecimal } from "@/lib/money";
 import LeadStatusActions from "@/components/admin/LeadStatusActions";
 import { getExcludedLabelsForProjectType } from "@/lib/estimator-deliverables";
 import type { ProjectType } from "@/types/estimator";
@@ -94,13 +95,13 @@ export default async function LeadDetailPage({ params }: Props) {
               {lead.budgetDisplay}
             </span>
             <span className="ml-2 text-xs text-zinc-500">
-              (~${Math.round(lead.budgetUsd).toLocaleString()} USD)
+              (~{formatUsdDecimal(lead.budgetUsd)} USD)
             </span>
             {lead.deliverableSavingsUsd != null &&
-              lead.deliverableSavingsUsd > 0 && (
+              lead.deliverableSavingsUsd.gt(0) && (
                 <p className="mt-1 text-xs text-zinc-500">
-                  Package savings: −$
-                  {Math.round(lead.deliverableSavingsUsd).toLocaleString()} USD
+                  Package savings: −{formatUsdDecimal(lead.deliverableSavingsUsd)}{" "}
+                  USD
                 </p>
               )}
           </div>

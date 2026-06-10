@@ -1,11 +1,15 @@
 "use server";
 
+import {
+  Decimal,
+  isAboveStripeMinimum,
+  priceToMinor,
+} from "@/lib/money";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { verifyAdminSession, verifyCsrfOrigin } from "@/lib/auth";
 import { logActivity } from "@/lib/activity-log";
 import { ProductSchema } from "@/lib/schemas";
-import { isAboveStripeMinimum, priceToMinor } from "@/lib/money";
 import {
   assertProductFileExists,
   buildProductFileKey,
@@ -79,13 +83,14 @@ async function uploadValidatedProductFile(slug: string, file: File) {
 }
 
 function resolvePriceFields(price: number, currency: string) {
-  const priceMinor = priceToMinor(price, currency);
+  const priceDecimal = new Decimal(price);
+  const priceMinor = priceToMinor(priceDecimal, currency);
   if (!isAboveStripeMinimum(priceMinor, currency)) {
     throw new Error(
       `Price is below Stripe's minimum charge for ${currency.toUpperCase()}.`,
     );
   }
-  return { priceMinor, price };
+  return { priceMinor, price: priceDecimal };
 }
 
 async function countPurchasesReferencingFileKey(fileKey: string) {

@@ -3,6 +3,7 @@
 import { useActionState, useEffect, useState } from "react";
 import { Product } from "@prisma/client";
 import { submitPurchase, PurchaseState } from "@/actions/purchase";
+import { formatMinor, resolveProductAmount } from "@/lib/money";
 import { isTurnstileClientEnabled } from "@/lib/turnstile";
 import { TurnstileField } from "@/components/molecules/TurnstileField";
 import { cn } from "@/utils";
@@ -162,7 +163,10 @@ export function CheckoutModal({
             <div className="mb-2 border border-zinc-100 bg-zinc-50 p-4">
               <h3 className="font-medium text-zinc-900">{product.name}</h3>
               <p className="mt-1 text-sm font-semibold text-zinc-500">
-                ${product.price.toFixed(2)}
+                {formatMinor(
+                  resolveProductAmount(product).amountMinor,
+                  resolveProductAmount(product).currency,
+                )}
               </p>
             </div>
 

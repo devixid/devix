@@ -1,3 +1,4 @@
+import { Decimal } from "@/lib/money";
 import { describe, expect, it, vi } from "vitest";
 import {
   buildLemonWebhookEventId,
@@ -74,7 +75,7 @@ describe("lemonSqueezyProvider.toFulfillmentEvent", () => {
       buyerName: "Buyer",
       buyerEmail: "buyer@example.com",
       lemonSqueezyOrderId: "5",
-      amountMinor: 750,
+      amountMinor: new Decimal("750"),
       currency: "usd",
       buyerIp: undefined,
       userAgent: undefined,
@@ -94,7 +95,7 @@ describe("lemonCheckoutIdempotencyKey", () => {
       buyerName: "Buyer",
       productName: "Kit",
       productDescription: "Desc",
-      amountMinor: 1000,
+      amountMinor: new Decimal("1000"),
       currency: "usd",
       baseUrl: "https://devix.test",
       ip: "127.0.0.1",

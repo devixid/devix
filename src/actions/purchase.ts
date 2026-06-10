@@ -112,7 +112,7 @@ async function resolveCheckoutContext(
   }
 
   const { amountMinor, currency } = resolveProductAmount(product);
-  if (amountMinor <= 0) {
+  if (amountMinor.lte(0)) {
     return { error: "This product is not available for purchase." };
   }
 

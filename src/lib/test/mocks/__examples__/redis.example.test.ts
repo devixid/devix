@@ -18,7 +18,7 @@ vi.mock("@/lib/redis", async () => {
         return fetcher();
       }
 
-      const cachedData = await redis.get<T>(key);
+      const cachedData = (await redis.get(key)) as T | null;
       if (cachedData) {
         return cachedData;
       }

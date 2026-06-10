@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { Product } from "@prisma/client";
+import { formatMinor, resolveProductAmount } from "@/lib/money";
 import { CheckoutModal } from "./CheckoutModal";
 
 interface StoreProductCardProps {
@@ -16,6 +17,8 @@ export function StoreProductCard({
   priority = false,
 }: StoreProductCardProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const { amountMinor, currency } = resolveProductAmount(product);
+  const priceLabel = formatMinor(amountMinor, currency);
 
   return (
     <>
@@ -55,7 +58,7 @@ export function StoreProductCard({
               {product.name}
             </h3>
             <span className="shrink-0 bg-zinc-100 px-3 py-1 text-sm font-semibold text-zinc-900">
-              ${product.price.toFixed(2)}
+              {priceLabel}
             </span>
           </div>
 

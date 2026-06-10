@@ -2,6 +2,7 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { sendPurchaseConfirmation } from "@/lib/email";
 import { generateDownloadToken } from "@/lib/tokens";
+import type { MoneyMinor } from "@/lib/money";
 import type { FulfillmentEvent } from "@/lib/payment/types";
 
 export type FulfillPurchaseInput = {
@@ -13,7 +14,7 @@ export type FulfillPurchaseInput = {
   stripePaymentIntentId?: string;
   stripeChargeId?: string;
   lemonSqueezyOrderId?: string;
-  amountMinor?: number;
+  amountMinor?: MoneyMinor;
   currency?: string;
   buyerIp?: string;
   userAgent?: string;

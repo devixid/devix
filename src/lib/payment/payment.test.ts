@@ -1,3 +1,4 @@
+import { Decimal } from "@/lib/money";
 import { describe, expect, it } from "vitest";
 import { createHmac } from "node:crypto";
 import { verifyLemonSignature } from "@/lib/lemonsqueezy";
@@ -108,7 +109,7 @@ describe("lemonSqueezyProvider.toFulfillmentEvent", () => {
       buyerName: "Buyer",
       buyerEmail: "buyer@example.com",
       lemonSqueezyOrderId: "7",
-      amountMinor: 500,
+      amountMinor: new Decimal("500"),
       currency: "usd",
       buyerIp: "127.0.0.1",
       userAgent: "vitest",

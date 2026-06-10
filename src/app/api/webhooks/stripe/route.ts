@@ -9,6 +9,7 @@ import {
   setDisputeStatus,
 } from "@/lib/purchase-revocation";
 import { submitDisputeEvidence } from "@/lib/dispute-evidence";
+import { stripeUnitToMinor } from "@/lib/money";
 
 export const runtime = "nodejs";
 export const maxDuration = 30;
@@ -52,7 +53,10 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     buyerEmail,
     stripeSessionId: session.id,
     stripePaymentIntentId: asId(session.payment_intent),
-    amountMinor: session.amount_total ?? undefined,
+    amountMinor:
+      session.amount_total != null
+        ? stripeUnitToMinor(session.amount_total)
+        : undefined,
     currency: session.currency ?? undefined,
     buyerIp: session.metadata?.buyerIp,
     userAgent: session.metadata?.userAgent,
@@ -80,7 +84,12 @@ async function handlePaymentIntentSucceeded(pi: Stripe.PaymentIntent) {
     buyerEmail,
     stripePaymentIntentId: pi.id,
     stripeChargeId: asId(pi.latest_charge),
-    amountMinor: pi.amount_received ?? pi.amount ?? undefined,
+    amountMinor:
+      pi.amount_received != null
+        ? stripeUnitToMinor(pi.amount_received)
+        : pi.amount != null
+          ? stripeUnitToMinor(pi.amount)
+          : undefined,
     currency: pi.currency ?? undefined,
     buyerIp: pi.metadata?.buyerIp,
     userAgent: pi.metadata?.userAgent,
