@@ -1,6 +1,9 @@
 import { prisma } from "@/lib/prisma";
 import { format } from "date-fns";
 import { PurchaseRowActions } from "@/components/admin/PurchaseRowActions";
+import { parseDateRangeFilter } from "@/lib/admin-filters";
+import { PurchasesFilter } from "@/components/admin/PurchasesFilter";
+import { Prisma } from "@prisma/client";
 
 export const revalidate = 0;
 
@@ -24,8 +27,24 @@ function statusBadge(
   );
 }
 
-export default async function AdminPurchasesPage() {
+interface Props {
+  searchParams: Promise<{
+    dateFrom?: string;
+    dateTo?: string;
+  }>;
+}
+
+export default async function AdminPurchasesPage({ searchParams }: Props) {
+  const { dateFrom, dateTo } = await searchParams;
+
+  const where: Prisma.PurchaseWhereInput = {};
+  const createdAtRange = parseDateRangeFilter(dateFrom, dateTo);
+  if (createdAtRange) {
+    where.createdAt = createdAtRange;
+  }
+
   const purchases = await prisma.purchase.findMany({
+    where,
     orderBy: { createdAt: "desc" },
     include: { product: true },
   });
@@ -42,6 +61,9 @@ export default async function AdminPurchasesPage() {
           </p>
         </div>
       </div>
+
+      <PurchasesFilter />
+
 
       <div className="overflow-x-auto rounded-lg border border-zinc-800 bg-zinc-900/50">
         <table className="w-full text-left text-sm text-zinc-300">
