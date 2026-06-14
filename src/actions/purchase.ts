@@ -134,6 +134,12 @@ async function resolveCheckoutContext(
         ? "embedded"
         : checkoutMode;
 
+  const couponCodeRaw = formData.get("couponCode");
+  const couponCode =
+    typeof couponCodeRaw === "string" && couponCodeRaw.trim()
+      ? couponCodeRaw.trim()
+      : undefined;
+
   return {
     context: {
       productId: product.id,
@@ -148,6 +154,7 @@ async function resolveCheckoutContext(
       ip,
       userAgent: headerList.get("user-agent")?.slice(0, 500) ?? undefined,
       checkoutMode: checkoutModeForProvider,
+      couponCode,
     },
   };
 }

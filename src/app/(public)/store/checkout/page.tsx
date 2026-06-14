@@ -16,13 +16,13 @@ export const metadata = {
 };
 
 type CheckoutPageProps = {
-  searchParams: Promise<{ product?: string }>;
+  searchParams: Promise<{ product?: string; coupon?: string }>;
 };
 
 export default async function StoreCheckoutPage({
   searchParams,
 }: CheckoutPageProps) {
-  const { product: slug } = await searchParams;
+  const { product: slug, coupon } = await searchParams;
   const providerId = await resolvePaymentProviderId();
   const providerReady = isPaymentProviderConfigured(providerId);
 
@@ -82,6 +82,7 @@ export default async function StoreCheckoutPage({
                   productId={product.id}
                   productName={product.name}
                   priceLabel={priceLabel}
+                  coupon={coupon}
                 />
               );
             }
@@ -92,6 +93,7 @@ export default async function StoreCheckoutPage({
                   productId={product.id}
                   productName={product.name}
                   priceLabel={priceLabel}
+                  coupon={coupon}
                 />
               );
             }

@@ -101,6 +101,7 @@ export const lemonSqueezyProvider: PaymentProvider = {
         checkoutData: {
           email: params.buyerEmail,
           name: params.buyerName,
+          discountCode: params.couponCode || undefined,
           custom: {
             productId: params.productId,
             buyerName: params.buyerName,

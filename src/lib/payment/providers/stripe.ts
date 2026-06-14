@@ -151,6 +151,23 @@ export const stripeProvider: PaymentProvider = {
     const metadata = buildCheckoutMetadata(params);
     const mode = params.checkoutMode ?? "embedded";
 
+    // Resolve customer-facing coupon code to Stripe Promotion Code ID
+    let discounts: Stripe.Checkout.SessionCreateParams.Discount[] | undefined = undefined;
+    if (params.couponCode) {
+      try {
+        const promoCodes = await stripe.promotionCodes.list({
+          code: params.couponCode,
+          active: true,
+          limit: 1,
+        });
+        if (promoCodes.data.length > 0) {
+          discounts = [{ promotion_code: promoCodes.data[0].id }];
+        }
+      } catch (err) {
+        console.error("Failed to resolve Stripe promotion code:", err);
+      }
+    }
+
     if (mode === "redirect") {
       const session = await stripe.checkout.sessions.create(
         {
@@ -161,6 +178,8 @@ export const stripeProvider: PaymentProvider = {
           payment_intent_data: { metadata },
           success_url: `${params.baseUrl}/store/success?session_id={CHECKOUT_SESSION_ID}`,
           cancel_url: `${params.baseUrl}/store/cancel`,
+          allow_promotion_codes: true,
+          discounts,
         },
         { idempotencyKey: checkoutIdempotencyKey(params, "redirect") },
       );
@@ -180,6 +199,8 @@ export const stripeProvider: PaymentProvider = {
       metadata,
       payment_intent_data: { metadata },
       return_url: `${params.baseUrl}/store/success?session_id={CHECKOUT_SESSION_ID}`,
+      allow_promotion_codes: true,
+      discounts,
     } as unknown as Stripe.Checkout.SessionCreateParams;
 
     const session = await stripe.checkout.sessions.create(createParams, {

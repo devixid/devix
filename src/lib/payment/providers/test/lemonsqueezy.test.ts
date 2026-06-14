@@ -324,6 +324,26 @@ describe("lemonSqueezyProvider.createCheckout", () => {
 
     await expect(lemonSqueezyProvider.createCheckout(baseParams)).rejects.toThrow("Could not start Lemon Squeezy");
   });
+
+  it("forwards couponCode to SDK discountCode when provided", async () => {
+    mockCreateCheckoutSDK.mockResolvedValueOnce({
+      data: { data: { attributes: { url: "https://ls.checkout/embed" } } },
+      error: null,
+    });
+
+    const result = await lemonSqueezyProvider.createCheckout({
+      ...baseParams,
+      couponCode: "WINTER10",
+    });
+
+    expect(mockCreateCheckoutSDK).toHaveBeenCalledWith("store_123", "var_99", expect.objectContaining({
+      checkoutData: expect.objectContaining({
+        discountCode: "WINTER10",
+      }),
+    }));
+
+    expect(result).toEqual({ mode: "overlay", url: "https://ls.checkout/embed" });
+  });
 });
 
 describe("lemonSqueezyProvider.parseWebhook", () => {

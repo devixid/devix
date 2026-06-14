@@ -17,6 +17,7 @@ interface EmbeddedProductCheckoutProps {
   productId: string;
   productName: string;
   priceLabel: string;
+  coupon?: string;
 }
 
 type Phase = "form" | "checkout";
@@ -25,6 +26,7 @@ export function EmbeddedProductCheckout({
   productId,
   productName,
   priceLabel,
+  coupon,
 }: EmbeddedProductCheckoutProps) {
   const [phase, setPhase] = useState<Phase>("form");
   const [error, setError] = useState<string | null>(null);
@@ -78,6 +80,7 @@ export function EmbeddedProductCheckout({
       onSubmit={handleSubmit}
       className="mx-auto flex w-full max-w-md flex-col gap-5"
     >
+      <input type="hidden" name="couponCode" value={coupon || ""} />
       <div className="border border-zinc-100 bg-zinc-50 p-4">
         <h2 className="font-medium text-zinc-900">{productName}</h2>
         <p className="mt-1 text-sm font-semibold text-zinc-500">{priceLabel}</p>

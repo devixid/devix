@@ -7,6 +7,7 @@ import { asId, stripeProvider } from "@/lib/payment/providers/stripe";
 // ── Mock Stripe helpers ──
 const mockCreateSession = vi.fn();
 const mockConstructWebhookEvent = vi.fn();
+export const mockListPromotionCodes = vi.fn().mockResolvedValue({ data: [] });
 
 vi.mock("@/lib/stripe", () => ({
   getStripe: vi.fn(() => ({
@@ -14,6 +15,9 @@ vi.mock("@/lib/stripe", () => ({
       sessions: {
         create: mockCreateSession,
       },
+    },
+    promotionCodes: {
+      list: (...args: any[]) => mockListPromotionCodes(...args),
     },
   })),
   constructWebhookEvent: (body: any, sig: any) => mockConstructWebhookEvent(body, sig),
@@ -281,6 +285,7 @@ describe("stripeProvider.toRevocationEvent", () => {
 describe("stripeProvider.createCheckout", () => {
   beforeEach(() => {
     mockCreateSession.mockClear();
+    mockListPromotionCodes.mockClear();
   });
 
   const baseParams = {
@@ -359,6 +364,33 @@ describe("stripeProvider.createCheckout", () => {
         checkoutMode: "redirect",
       }),
     ).rejects.toThrow("Could not start checkout");
+  });
+
+  it("resolves and applies coupon code when provided", async () => {
+    mockListPromotionCodes.mockResolvedValueOnce({
+      data: [{ id: "promo_12345" }],
+    });
+    mockCreateSession.mockResolvedValueOnce({
+      client_secret: "cs_secret_abc",
+    });
+
+    const result = await stripeProvider.createCheckout({
+      ...baseParams,
+      couponCode: "WINTER10",
+    });
+
+    expect(mockListPromotionCodes).toHaveBeenCalledWith({
+      code: "WINTER10",
+      active: true,
+      limit: 1,
+    });
+
+    expect(mockCreateSession).toHaveBeenCalledWith(expect.objectContaining({
+      allow_promotion_codes: true,
+      discounts: [{ promotion_code: "promo_12345" }],
+    }), expect.any(Object));
+
+    expect(result).toEqual({ mode: "embedded", clientSecret: "cs_secret_abc" });
   });
 });
 

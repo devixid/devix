@@ -15,6 +15,7 @@ export type CreateCheckoutParams = {
   userAgent?: string;
   /** Stripe embedded checkout session vs redirect modal */
   checkoutMode?: "embedded" | "redirect";
+  couponCode?: string;
 };
 
 export type CreateCheckoutResult =
