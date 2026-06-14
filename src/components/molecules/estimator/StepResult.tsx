@@ -33,6 +33,7 @@ interface StepResultProps {
     currency: CurrencyCode;
     fingerprint: string;
   }) => void;
+  onEmailSent?: (data: { name: string; email: string; leadId: string }) => void;
 }
 
 export function StepResult({
@@ -47,6 +48,7 @@ export function StepResult({
   savedFingerprint,
   onBack,
   onScheduleConsultation,
+  onEmailSent,
 }: StepResultProps) {
   const [isSaving, startTransition] = useTransition();
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -189,6 +191,8 @@ export function StepResult({
         excludedLabels={excludedLabels}
         packageSavings={packageSavings}
         ratesError={ratesError}
+        leadId={contactLeadId}
+        onEmailSent={onEmailSent}
       />
 
       {saveError && (

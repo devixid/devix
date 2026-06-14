@@ -32,6 +32,7 @@ import {
   getPrevStepKey,
   type EstimatorStepKey,
 } from "@/lib/estimator-steps";
+import { buildEstimatorFingerprint } from "@/lib/estimator-fingerprint";
 
 const INITIAL_STATE: EstimatorState = {
   type: null,
@@ -61,6 +62,8 @@ export default function ProjectEstimator() {
   const [currency, setCurrency] = useState<CurrencyCode>("USD");
   const [state, setState] = useState<EstimatorState>(INITIAL_STATE);
   const [contactSuccess, setContactSuccess] = useState(false);
+  const [clientName, setClientName] = useState("");
+  const [clientEmail, setClientEmail] = useState("");
 
   const steps = buildEstimatorSteps(state);
 
@@ -77,8 +80,10 @@ export default function ProjectEstimator() {
       currency,
       contactLeadId,
       savedFingerprint,
+      clientName,
+      clientEmail,
     }),
-    [state, currentStepKey, currency, contactLeadId, savedFingerprint],
+    [state, currentStepKey, currency, contactLeadId, savedFingerprint, clientName, clientEmail],
   );
 
   useEstimatorSessionPersistence(sessionSnapshot, hydrated && !contactSuccess);
@@ -91,6 +96,8 @@ export default function ProjectEstimator() {
       setCurrency(session.currency);
       setContactLeadId(session.contactLeadId);
       setSavedFingerprint(session.savedFingerprint);
+      if (session.clientName) setClientName(session.clientName);
+      if (session.clientEmail) setClientEmail(session.clientEmail);
       setShowRestoredBanner(true);
     } else {
       setCurrency(detectDefaultCurrency());
@@ -109,6 +116,8 @@ export default function ProjectEstimator() {
       setContactLeadId(null);
       setSavedFingerprint(null);
       setContactSuccess(false);
+      setClientName("");
+      setClientEmail("");
     }
 
     setState((prev) => {
@@ -136,6 +145,14 @@ export default function ProjectEstimator() {
     setSavedFingerprint(data.fingerprint);
     setSlideDirection(1);
     setCurrentStepKey("contact");
+  };
+
+  const handleEmailSent = (data: { name: string; email: string; leadId: string }) => {
+    setClientName(data.name);
+    setClientEmail(data.email);
+    setContactLeadId(data.leadId);
+    const fingerprint = buildEstimatorFingerprint(state, currency);
+    setSavedFingerprint(fingerprint);
   };
 
   const handleContactSuccess = () => {
@@ -305,6 +322,7 @@ export default function ProjectEstimator() {
                 savedFingerprint={savedFingerprint}
                 onBack={prevStep}
                 onScheduleConsultation={handleScheduleConsultation}
+                onEmailSent={handleEmailSent}
               />
             )}
             {currentStepKey === "contact" && (
@@ -317,6 +335,8 @@ export default function ProjectEstimator() {
                 onBack={prevStep}
                 onContactSuccess={handleContactSuccess}
                 onAdjustEstimate={handleAdjustEstimate}
+                initialName={clientName}
+                initialEmail={clientEmail}
               />
             )}
           </EstimatorStepTransition>

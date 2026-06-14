@@ -16,7 +16,9 @@ import {
   resolveExcludedDeliverables,
   validateExcludedDeliverables,
 } from "@/lib/estimator-deliverables";
-import { sendEstimatorLeadNotification } from "@/lib/email";
+import { sendEstimatorLeadNotification, sendClientEstimateEmail } from "@/lib/email";
+import { buildEstimatorSummaryLines } from "@/lib/estimator-summary";
+import { z } from "zod";
 
 export type SaveEstimatorLeadResult =
   | { ok: true; id: string; created?: boolean }
@@ -201,4 +203,127 @@ export async function updateEstimatorLeadStatus(
   revalidatePath("/admin/leads");
   revalidatePath(`/admin/leads/${id}`);
   return updated;
+}
+
+export async function emailEstimateToClientAction(data: {
+  leadId?: string | null;
+  name: string;
+  email: string;
+  state: EstimatorState;
+  budgetDisplay: string;
+  currency: CurrencyCode;
+  excludedLabels: string[];
+  pdfBase64?: string;
+}) {
+  // 1. Validate name and email
+  const parsed = z
+    .object({
+      name: z.string().min(2, "Name must be at least 2 characters."),
+      email: z.string().email("Please enter a valid email address."),
+    })
+    .safeParse({ name: data.name, email: data.email });
+
+  if (!parsed.success) {
+    return { ok: false as const, error: parsed.error.issues[0].message };
+  }
+
+  // 2. Validate estimator lead inputs
+  const validation = validateEstimatorLeadInput(data.state);
+  if (!validation.ok) {
+    return { ok: false as const, error: validation.error };
+  }
+
+  try {
+    const record = buildLeadRecord(data.state, data.currency, data.budgetDisplay);
+    let finalLeadId = data.leadId || null;
+
+    // 3. Save / Update lead in database and link to a ContactSubmission
+    if (finalLeadId) {
+      const existing = await prisma.estimatorLead.findUnique({
+        where: { id: finalLeadId },
+        include: { contactSubmission: true },
+      });
+
+      if (existing) {
+        await prisma.estimatorLead.update({
+          where: { id: finalLeadId },
+          data: record,
+        });
+
+        if (!existing.contactSubmission) {
+          await prisma.contactSubmission.create({
+            data: {
+              name: data.name.trim(),
+              email: data.email.trim().toLowerCase(),
+              message: "Estimated budget summary sent to client.",
+              source: "estimator",
+              estimatorLeadId: finalLeadId,
+            },
+          });
+        } else {
+          await prisma.contactSubmission.update({
+            where: { id: existing.contactSubmission.id },
+            data: {
+              name: data.name.trim(),
+              email: data.email.trim().toLowerCase(),
+            },
+          });
+        }
+      } else {
+        const lead = await prisma.estimatorLead.create({
+          data: { ...record, status: "NEW" },
+        });
+        finalLeadId = lead.id;
+        await prisma.contactSubmission.create({
+          data: {
+            name: data.name.trim(),
+            email: data.email.trim().toLowerCase(),
+            message: "Estimated budget summary sent to client.",
+            source: "estimator",
+            estimatorLeadId: finalLeadId,
+          },
+        });
+      }
+    } else {
+      const lead = await prisma.estimatorLead.create({
+        data: { ...record, status: "NEW" },
+      });
+      finalLeadId = lead.id;
+      await prisma.contactSubmission.create({
+        data: {
+          name: data.name.trim(),
+          email: data.email.trim().toLowerCase(),
+          message: "Estimated budget summary sent to client.",
+          source: "estimator",
+          estimatorLeadId: finalLeadId,
+        },
+      });
+    }
+
+    // 4. Generate client email payload and trigger send
+    const summary = buildEstimatorSummaryLines({
+      state: data.state,
+      budgetDisplay: data.budgetDisplay,
+      currency: data.currency,
+      excludedLabels: data.excludedLabels,
+    });
+
+    await sendClientEstimateEmail({
+      name: data.name.trim(),
+      email: data.email.trim().toLowerCase(),
+      summary,
+      pdfBase64: data.pdfBase64,
+    });
+
+    revalidatePath("/admin/leads");
+    revalidatePath("/admin/inbox");
+
+    return { ok: true as const, leadId: finalLeadId };
+  } catch (err) {
+    console.error("Failed to email estimate to client:", err);
+    return {
+      ok: false as const,
+      error: "We could not send your estimate. Please check your connection and try again.",
+    };
+  }
 }

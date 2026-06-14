@@ -17,6 +17,8 @@ export type EstimatorSessionSnapshot = {
   currency: CurrencyCode;
   contactLeadId: string | null;
   savedFingerprint: string | null;
+  clientName?: string;
+  clientEmail?: string;
 };
 
 export function useEstimatorSessionPersistence(
@@ -36,6 +38,8 @@ export function useEstimatorSessionPersistence(
         currency: snapshot.currency,
         contactLeadId: snapshot.contactLeadId,
         savedFingerprint: snapshot.savedFingerprint,
+        clientName: snapshot.clientName,
+        clientEmail: snapshot.clientEmail,
         updatedAt: Date.now(),
       });
     }, DEBOUNCE_MS);

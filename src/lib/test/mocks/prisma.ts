@@ -55,6 +55,18 @@ type ProcessedPaymentEventMocks = {
   delete: Mock;
 };
 
+type EstimatorLeadMocks = {
+  findUnique: Mock;
+  create: Mock;
+  update: Mock;
+  updateMany: Mock;
+};
+
+type ContactSubmissionMocks = {
+  create: Mock;
+  update: Mock;
+};
+
 export type MockPrismaMocks = {
   purchase: PurchaseMocks;
   product: ProductMocks;
@@ -68,6 +80,8 @@ export type MockPrismaMocks = {
   projectTechStack: ProjectTechStackMocks;
   projectDeveloper: ProjectDeveloperMocks;
   processedPaymentEvent: ProcessedPaymentEventMocks;
+  estimatorLead: EstimatorLeadMocks;
+  contactSubmission: ContactSubmissionMocks;
 };
 
 export type MockPrismaClient = MockPrismaMocks;
@@ -108,6 +122,16 @@ export function createMockPrisma(): {
     projectTechStack: createDelegate<ProjectTechStackMocks>(["findMany"]),
     projectDeveloper: createDelegate<ProjectDeveloperMocks>(["findMany"]),
     processedPaymentEvent: createDelegate<ProcessedPaymentEventMocks>(["create", "delete"]),
+    estimatorLead: createDelegate<EstimatorLeadMocks>([
+      "findUnique",
+      "create",
+      "update",
+      "updateMany",
+    ]),
+    contactSubmission: createDelegate<ContactSubmissionMocks>([
+      "create",
+      "update",
+    ]),
   };
 
   return { prisma: mocks, mocks };

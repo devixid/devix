@@ -9,6 +9,8 @@ import { Loader2, Check } from "lucide-react";
 import { ConsultationFeedbackWidget } from "@/components/molecules/ConsultationFeedbackWidget";
 
 interface ContactFormProps {
+  initialName?: string;
+  initialEmail?: string;
   initialMessage?: string;
   estimatorLeadId?: string | null;
   /** When false, only uses props for prefill (estimator inline form) */
@@ -20,6 +22,8 @@ interface ContactFormProps {
 }
 
 export function ContactForm({
+  initialName = "",
+  initialEmail = "",
   initialMessage,
   estimatorLeadId: estimatorLeadIdProp = null,
   fillFromUrlParams = true,
@@ -28,8 +32,8 @@ export function ContactForm({
   onSuccess,
   className,
 }: ContactFormProps = {}) {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const [name, setName] = useState(initialName);
+  const [email, setEmail] = useState(initialEmail);
   const [message, setMessage] = useState(initialMessage ?? "");
   const [errorMsg, setErrorMsg] = useState("");
   const [success, setSuccess] = useState(false);
@@ -38,6 +42,18 @@ export function ContactForm({
     estimatorLeadIdProp,
   );
   const [isPending, startTransition] = useTransition();
+
+  useEffect(() => {
+    if (initialName && !name) {
+      setName(initialName);
+    }
+  }, [initialName, name]);
+
+  useEffect(() => {
+    if (initialEmail && !email) {
+      setEmail(initialEmail);
+    }
+  }, [initialEmail, email]);
 
   useEffect(() => {
     setEstimatorLeadId(estimatorLeadIdProp);

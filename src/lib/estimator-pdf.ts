@@ -147,6 +147,25 @@ export async function downloadEstimatorPdf(
   doc.save(`devix-estimate-${projectSlug}-${dateStamp}.pdf`);
 }
 
+export async function generateEstimatorPdfBase64(
+  options: DownloadEstimatorPdfOptions,
+): Promise<string> {
+  const summary = buildEstimatorSummaryLines(options);
+  const { jsPDF } = await import("jspdf");
+  const doc = new jsPDF({ unit: "mm", format: "a4" });
+
+  renderSummaryToPdf(summary, doc);
+
+  // doc.output("datauristring") returns "data:application/pdf;filename=generated.pdf;base64,JVBER..."
+  // We extract the raw base64 string.
+  const dataUri = doc.output("datauristring");
+  const base64Index = dataUri.indexOf(";base64,");
+  if (base64Index === -1) {
+    throw new Error("Failed to generate PDF base64 string");
+  }
+  return dataUri.substring(base64Index + 8);
+}
+
 export async function copyEstimatorSummary(
   options: DownloadEstimatorPdfOptions,
 ): Promise<void> {

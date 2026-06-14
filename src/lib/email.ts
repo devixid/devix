@@ -1,5 +1,6 @@
 import { Resend } from "resend";
 import { getNotificationEmail } from "@/lib/site-settings";
+import type { EstimatorSummary } from "@/lib/estimator-summary";
 
 export function escapeHtml(value: string): string {
   return value
@@ -197,6 +198,94 @@ export async function sendEstimatorLeadNotification(
       "[Email] Failed to send estimator lead notification:",
       error.message,
     );
+  }
+}
+
+export async function sendClientEstimateEmail({
+  name,
+  email,
+  summary,
+  pdfBase64,
+}: {
+  name: string;
+  email: string;
+  summary: EstimatorSummary;
+  pdfBase64?: string;
+}) {
+  const config = getResendConfig();
+  if (!config) return;
+
+  const safeName = escapeHtml(name);
+  const siteUrl = getSiteUrl();
+  const summaryText = summary.lines
+    .map(
+      (line) =>
+        `<tr><td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>${escapeHtml(line.label)}</strong></td><td style="padding: 8px 0; border-bottom: 1px solid #eee; text-align: right;">${escapeHtml(line.value)}</td></tr>`,
+    )
+    .join("");
+
+  const attachments = pdfBase64
+    ? [
+        {
+          filename: `devix-estimate-${new Date().toISOString().slice(0, 10)}.pdf`,
+          content: pdfBase64,
+        },
+      ]
+    : undefined;
+
+  const { error } = await config.resend.emails.send({
+    from: config.fromEmail,
+    to: [email],
+    subject: "Your Project Estimate breakdown — Devix",
+    attachments,
+    html: `
+      <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 8px;">
+        <h2 style="font-weight: 300; margin-bottom: 10px;">Hi ${safeName},</h2>
+        <p style="font-size: 15px; line-height: 1.5; color: #666;">Thank you for using the Devix Project Estimator. Here is the breakdown of your estimated budget and scope:</p>
+        
+        <table cellpadding="0" cellspacing="0" style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+          ${summaryText}
+          <tr>
+            <td style="padding: 15px 0 5px 0;"><strong>Estimated Budget</strong></td>
+            <td style="padding: 15px 0 5px 0; text-align: right; font-size: 20px; font-weight: bold; color: #a0783c;">${escapeHtml(summary.budgetDisplay)} (${escapeHtml(summary.currency)})</td>
+          </tr>
+        </table>
+        
+        ${
+          summary.packageSavingsUsd
+            ? `<p style="font-size: 14px; color: #2e7d32; margin-top: 5px;"><strong>Package savings (USD):</strong> $${summary.packageSavingsUsd.toLocaleString()}</p>`
+            : ""
+        }
+        
+        ${
+          summary.excludedLabels.length > 0
+            ? `<p style="font-size: 13px; color: #666; margin-top: 15px;"><strong>Removed deliverables:</strong> ${escapeHtml(summary.excludedLabels.join(", "))}</p>`
+            : ""
+        }
+        
+        ${
+          summary.ratesFallback
+            ? `<p style="font-size: 12px; color: #c62828; margin-top: 15px;"><em>Note: Live exchange rates were unavailable when this estimate was generated.</em></p>`
+            : ""
+        }
+        
+        <p style="font-size: 14px; line-height: 1.6; color: #777; margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px;">
+          ${escapeHtml(summary.disclaimer)}
+        </p>
+
+        <div style="margin-top: 35px; text-align: center;">
+          <a href="${escapeHtml(siteUrl)}" style="background-color: #000; color: #fff; padding: 12px 30px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 14px; display: inline-block;">Explore Devix Portfolio</a>
+        </div>
+        
+        <hr style="border: none; border-top: 1px solid #eaeaea; margin: 30px 0 20px 0;" />
+        <p style="color:#999;font-size:11px;text-align:center;">This is an automated estimation copy from Devix. Please do not reply directly to this email.</p>
+      </div>
+    `,
+  });
+
+  if (error) {
+    console.error("[Email] Failed to send client estimate email:", error.message);
+    throw new Error(`Client estimate email failed: ${error.message}`);
   }
 }
 

@@ -21,6 +21,8 @@ export type EstimatorSession = {
   currency: CurrencyCode;
   contactLeadId: string | null;
   savedFingerprint: string | null;
+  clientName?: string | null;
+  clientEmail?: string | null;
   updatedAt: number;
 };
 
@@ -116,6 +118,8 @@ export function loadEstimatorSession(): EstimatorSession | null {
         typeof parsed.savedFingerprint === "string"
           ? parsed.savedFingerprint
           : null,
+      clientName: typeof parsed.clientName === "string" ? parsed.clientName : "",
+      clientEmail: typeof parsed.clientEmail === "string" ? parsed.clientEmail : "",
       updatedAt: parsed.updatedAt,
     };
   } catch {

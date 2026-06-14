@@ -26,6 +26,7 @@ import {
   sendEstimatorLeadNotification,
   sendInquiryNotification,
   sendPurchaseConfirmation,
+  sendClientEstimateEmail,
 } from "@/lib/email";
 import { getNotificationEmail } from "@/lib/site-settings";
 import { createResendMock } from "@/lib/test/mocks/resend";
@@ -425,3 +426,94 @@ describe("sendPurchaseConfirmation", () => {
     expect(call.html).toContain("tok%20with%20spaces");
   });
 });
+
+describe("sendClientEstimateEmail", () => {
+  beforeEach(() => {
+    resendMock = createResendMock();
+    setResendEnv();
+    process.env.NEXT_PUBLIC_SITE_URL = "https://devix.test";
+  });
+
+  afterEach(() => {
+    clearResendEnv();
+    delete process.env.NEXT_PUBLIC_SITE_URL;
+    vi.clearAllMocks();
+  });
+
+  const mockSummary = {
+    title: "Devix — Project Estimate",
+    generatedAt: "June 14, 2026",
+    lines: [
+      { label: "Project Type", value: "Custom Web App" },
+      { label: "Scope", value: "Large App" },
+    ],
+    budgetDisplay: "$15,000",
+    currency: "USD" as const,
+    excludedLabels: ["SEO", "Blog"],
+    packageSavingsUsd: 500,
+    ratesFallback: true,
+    disclaimer: "Indicative estimate only.",
+  };
+
+  it("returns without sending when not configured", async () => {
+    clearResendEnv();
+    await sendClientEstimateEmail({
+      name: "Alice",
+      email: "alice@example.com",
+      summary: mockSummary,
+    });
+    expect(resendMock.emails.send).not.toHaveBeenCalled();
+  });
+
+  it("sends estimation email with correct html and details", async () => {
+    await sendClientEstimateEmail({
+      name: "Bob",
+      email: "bob@example.com",
+      summary: mockSummary,
+    });
+
+    expect(resendMock.emails.send).toHaveBeenCalledTimes(1);
+    const call = resendMock.emails.send.mock.calls[0][0];
+    expect(call.to).toEqual(["bob@example.com"]);
+    expect(call.subject).toContain("Project Estimate");
+    expect(call.html).toContain("Bob");
+    expect(call.html).toContain("Custom Web App");
+    expect(call.html).toContain("Large App");
+    expect(call.html).toContain("$15,000");
+    expect(call.html).toContain("Removed deliverables:");
+    expect(call.html).toContain("SEO, Blog");
+    expect(call.html).toContain("Live exchange rates were unavailable");
+  });
+
+  it("attaches PDF base64 if provided", async () => {
+    await sendClientEstimateEmail({
+      name: "Bob",
+      email: "bob@example.com",
+      summary: mockSummary,
+      pdfBase64: "dGVzdF9wZGZfYmFzZTY0", // test_pdf_base64
+    });
+
+    const call = resendMock.emails.send.mock.calls[0][0];
+    expect(call.attachments).toBeDefined();
+    expect(call.attachments).toHaveLength(1);
+    expect(call.attachments[0].filename).toContain("devix-estimate");
+    expect(call.attachments[0].filename).toContain(".pdf");
+    expect(call.attachments[0].content).toBe("dGVzdF9wZGZfYmFzZTY0");
+  });
+
+  it("throws when Resend API returns error", async () => {
+    resendMock.emails.send.mockResolvedValueOnce({
+      data: null,
+      error: { message: "sending failed" },
+    });
+
+    await expect(
+      sendClientEstimateEmail({
+        name: "Bob",
+        email: "bob@example.com",
+        summary: mockSummary,
+      }),
+    ).rejects.toThrow("sending failed");
+  });
+});
+

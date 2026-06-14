@@ -15,6 +15,8 @@ interface StepContactProps {
   onBack: () => void;
   onContactSuccess: () => void;
   onAdjustEstimate: () => void;
+  initialName?: string;
+  initialEmail?: string;
 }
 
 export function StepContact({
@@ -26,6 +28,8 @@ export function StepContact({
   onBack,
   onContactSuccess,
   onAdjustEstimate,
+  initialName,
+  initialEmail,
 }: StepContactProps) {
   const excludedLabels = getExcludedDeliverableLabels(state);
 
@@ -69,6 +73,8 @@ export function StepContact({
       <div className="mb-8 w-full">
         <ContactForm
           initialMessage={initialMessage}
+          initialName={initialName}
+          initialEmail={initialEmail}
           estimatorLeadId={leadId}
           fillFromUrlParams={false}
           variant="estimator"
