@@ -15,7 +15,7 @@ export type TestMockRegistry = {
 };
 
 declare global {
-  // eslint-disable-next-line no-var
+   
   var __devixTestMocks: TestMockRegistry | undefined;
 }
 

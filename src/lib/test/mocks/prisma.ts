@@ -21,19 +21,56 @@ type SiteSettingsMocks = {
   upsert: Mock;
 };
 
+type FaqItemMocks = {
+  findMany: Mock;
+};
+
+type ServiceItemMocks = {
+  findMany: Mock;
+};
+
+type TeamMemberMocks = {
+  findMany: Mock;
+};
+
+type SiteSectionMocks = {
+  findUnique: Mock;
+};
+
+type ProjectMocks = {
+  findMany: Mock;
+  findUnique: Mock;
+};
+
+type ProjectTechStackMocks = {
+  findMany: Mock;
+};
+
+type ProjectDeveloperMocks = {
+  findMany: Mock;
+};
+
+type ProcessedPaymentEventMocks = {
+  create: Mock;
+  delete: Mock;
+};
+
 export type MockPrismaMocks = {
   purchase: PurchaseMocks;
   product: ProductMocks;
   user: UserMocks;
   siteSettings: SiteSettingsMocks;
+  faqItem: FaqItemMocks;
+  serviceItem: ServiceItemMocks;
+  teamMember: TeamMemberMocks;
+  siteSection: SiteSectionMocks;
+  project: ProjectMocks;
+  projectTechStack: ProjectTechStackMocks;
+  projectDeveloper: ProjectDeveloperMocks;
+  processedPaymentEvent: ProcessedPaymentEventMocks;
 };
 
-export type MockPrismaClient = {
-  purchase: PurchaseMocks;
-  product: ProductMocks;
-  user: UserMocks;
-  siteSettings: SiteSettingsMocks;
-};
+export type MockPrismaClient = MockPrismaMocks;
 
 function createDelegate<T extends Record<string, Mock>>(methods: (keyof T)[]): T {
   return Object.fromEntries(
@@ -63,6 +100,14 @@ export function createMockPrisma(): {
     product: createDelegate<ProductMocks>(["findUnique"]),
     user: createDelegate<UserMocks>(["findUnique"]),
     siteSettings: createDelegate<SiteSettingsMocks>(["findUnique", "upsert"]),
+    faqItem: createDelegate<FaqItemMocks>(["findMany"]),
+    serviceItem: createDelegate<ServiceItemMocks>(["findMany"]),
+    teamMember: createDelegate<TeamMemberMocks>(["findMany"]),
+    siteSection: createDelegate<SiteSectionMocks>(["findUnique"]),
+    project: createDelegate<ProjectMocks>(["findMany", "findUnique"]),
+    projectTechStack: createDelegate<ProjectTechStackMocks>(["findMany"]),
+    projectDeveloper: createDelegate<ProjectDeveloperMocks>(["findMany"]),
+    processedPaymentEvent: createDelegate<ProcessedPaymentEventMocks>(["create", "delete"]),
   };
 
   return { prisma: mocks, mocks };
