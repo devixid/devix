@@ -5,11 +5,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl =
     process.env.NEXT_PUBLIC_SITE_URL || "https://devixid.vercel.app";
 
-  // Dapatkan tanggal update terakhir dari database untuk menentukan lastModified
-  const latestProject = await prisma.project.findFirst({
-    orderBy: { updatedAt: "desc" },
-    select: { updatedAt: true },
-  });
+  // Fetch all visible projects for individual sitemap entries
+  const [latestProject, projects] = await Promise.all([
+    prisma.project.findFirst({
+      orderBy: { updatedAt: "desc" },
+      select: { updatedAt: true },
+    }),
+    prisma.project.findMany({
+      where: { isVisible: true },
+      select: { slug: true, updatedAt: true },
+    }),
+  ]);
 
   const lastUpdated = latestProject?.updatedAt || new Date();
 
@@ -32,6 +38,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "monthly",
       priority: 0.85,
     },
+    {
+      url: `${baseUrl}/store`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.8,
+    },
+    ...projects.map((p) => ({
+      url: `${baseUrl}/projects/${p.slug}`,
+      lastModified: p.updatedAt,
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+    })),
     {
       url: `${baseUrl}/privacy`,
       lastModified: new Date(),

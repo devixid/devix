@@ -5,6 +5,15 @@ import Link from "next/link";
 import { ExternalLink, GitCommit, ArrowLeft } from "lucide-react";
 import { getProjectBySlug } from "@/lib/queries/projects";
 import { sanitizeRichHtml } from "@/utils/sanitize";
+import { prisma } from "@/lib/prisma";
+
+export async function generateStaticParams() {
+  const projects = await prisma.project.findMany({
+    where: { isVisible: true },
+    select: { slug: true },
+  });
+  return projects.map((p) => ({ slug: p.slug }));
+}
 
 type Props = {
   params: { slug: string };
@@ -15,19 +24,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!project) {
     return {
-      title: "Project Not Found | Devix",
+      title: "Project Not Found",
       robots: { index: false },
     };
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://devix.com";
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://devixid.vercel.app";
 
   return {
-    title: `${project.title} | Case Study by Devix`,
+    title: `${project.title} — Case Study`,
     description: project.description.substring(0, 155),
     openGraph: {
       images: [project.imageUrl],
-      title: `${project.title} | Case Study`,
+      title: `${project.title} — Case Study`,
       description: project.description.substring(0, 155),
     },
     alternates: {
@@ -45,7 +54,7 @@ export default async function ProjectDetailPage({ params }: Props) {
     notFound();
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://devix.com";
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://devixid.vercel.app";
 
   // Breadcrumb Schema
   const breadcrumbJsonLd = {

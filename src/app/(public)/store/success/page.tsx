@@ -3,9 +3,11 @@ import { PurchaseEmailResend } from "@/components/molecules/PurchaseEmailResend"
 import { maskEmail } from "@/lib/purchase-email-resend";
 import { resolvePaymentProviderId } from "@/lib/payment";
 import { getStripe, isStripeConfigured } from "@/lib/stripe";
+import type { Metadata } from "next";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Payment Successful — Devix Store",
+  robots: { index: false, follow: false },
 };
 
 type SuccessPageProps = {

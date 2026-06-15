@@ -8,7 +8,15 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: ["/admin/", "/api/"], // Mencegah bot merayapi panel admin dan API
+      disallow: [
+        "/admin/",
+        "/api/",
+        "/estimate/share/",
+        "/download/",
+        "/store/success",
+        "/store/cancel",
+        "/store/checkout",
+      ],
     },
     sitemap: `${baseUrl}/sitemap.xml`,
   };

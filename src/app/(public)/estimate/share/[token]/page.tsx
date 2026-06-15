@@ -6,6 +6,13 @@ import { PROJECT_TYPE_DELIVERABLES } from "@/lib/estimator-deliverables";
 import type { ProjectType } from "@/types/estimator";
 import { format } from "date-fns";
 
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Proposal — Devix",
+  robots: { index: false, follow: false },
+};
+
 export const revalidate = 0;
 
 interface PageProps {

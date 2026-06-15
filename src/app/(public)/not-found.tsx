@@ -4,7 +4,7 @@ import { SlideUp } from "@/components/animations/SlideUp";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Page Not Found | Devix",
+  title: "Page Not Found",
   robots: {
     index: false,
     follow: true,

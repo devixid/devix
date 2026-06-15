@@ -2,7 +2,7 @@ import ProjectEstimator from "@/components/organisms/estimator/ProjectEstimator"
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Interactive Project Estimator | Devix",
+  title: "Interactive Project Estimator",
   description:
     "Answer a few questions to get an instant cost estimation for your E-Commerce, Web App, or Company Profile project.",
   alternates: {

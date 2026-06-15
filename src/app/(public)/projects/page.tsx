@@ -4,9 +4,12 @@ import { getFilterOptions, getProjects } from "@/lib/queries/projects";
 import CatalogClient from "@/components/organisms/CatalogClient";
 
 export const metadata: Metadata = {
-  title: "Projects | Devix",
+  title: "Projects",
   description:
     "Explore our portfolio of custom web development, e-commerce, and SaaS projects.",
+  alternates: {
+    canonical: "/projects",
+  },
 };
 
 export const revalidate = 3600;

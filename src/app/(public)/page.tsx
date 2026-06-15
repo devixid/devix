@@ -82,21 +82,34 @@ export default async function Page() {
     answer: "answer" in item ? item.answer : "",
   }));
 
+  const siteUrl =
+    settings?.siteUrl ||
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    "https://devixid.vercel.app";
+
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "ProfessionalService",
-    name: settings?.siteName || "Devix",
-    url:
-      settings?.siteUrl ||
-      process.env.NEXT_PUBLIC_SITE_URL ||
-      "https://devixid.vercel.app",
-    logo: `${settings?.siteUrl || process.env.NEXT_PUBLIC_SITE_URL || "https://devixid.vercel.app"}/logo.png`,
-    description: seo.description,
-    address: {
-      "@type": "PostalAddress",
-      addressLocality: "Jakarta",
-      addressCountry: "ID",
-    },
+    "@graph": [
+      {
+        "@type": "ProfessionalService",
+        name: settings?.siteName || "Devix",
+        url: siteUrl,
+        logo: `${siteUrl}/devix_logo.dark.png`,
+        description: seo.description,
+        address: {
+          "@type": "PostalAddress",
+          addressLocality: "Jakarta",
+          addressCountry: "ID",
+        },
+      },
+      {
+        "@type": "Organization",
+        name: settings?.siteName || "Devix",
+        url: siteUrl,
+        logo: `${siteUrl}/devix_logo.dark.png`,
+        description: seo.description,
+      },
+    ],
   };
 
   return (
