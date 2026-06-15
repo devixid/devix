@@ -56,6 +56,7 @@ function mapOrderToFulfillment(
     buyerIp: custom?.buyerIp,
     userAgent: custom?.userAgent,
     siteUrl: custom?.siteUrl,
+    couponCode: custom?.couponCode || undefined,
   };
 }
 
@@ -108,6 +109,7 @@ export const lemonSqueezyProvider: PaymentProvider = {
             siteUrl: params.baseUrl,
             buyerIp: params.ip,
             userAgent: params.userAgent ?? "",
+            couponCode: params.couponCode ?? "",
           },
         },
       },

@@ -206,11 +206,13 @@ export async function sendClientEstimateEmail({
   email,
   summary,
   pdfBase64,
+  shareToken,
 }: {
   name: string;
   email: string;
   summary: EstimatorSummary;
   pdfBase64?: string;
+  shareToken?: string;
 }) {
   const config = getResendConfig();
   if (!config) return;
@@ -272,8 +274,13 @@ export async function sendClientEstimateEmail({
         <p style="font-size: 14px; line-height: 1.6; color: #777; margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px;">
           ${escapeHtml(summary.disclaimer)}
         </p>
-
+        
         <div style="margin-top: 35px; text-align: center;">
+          ${
+            shareToken
+              ? `<a href="${escapeHtml(siteUrl)}/estimate/share/${encodeURIComponent(shareToken)}" style="background-color: #a0783c; color: #fff; padding: 12px 30px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 14px; display: inline-block; margin-right: 10px;">View Interactive Proposal</a>`
+              : ""
+          }
           <a href="${escapeHtml(siteUrl)}" style="background-color: #000; color: #fff; padding: 12px 30px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 14px; display: inline-block;">Explore Devix Portfolio</a>
         </div>
         

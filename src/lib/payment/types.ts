@@ -37,6 +37,7 @@ export type FulfillmentEvent = {
   stripePaymentIntentId?: string;
   stripeChargeId?: string;
   lemonSqueezyOrderId?: string;
+  couponCode?: string;
 };
 
 export type RevocationEvent = {

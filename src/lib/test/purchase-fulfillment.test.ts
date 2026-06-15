@@ -77,6 +77,8 @@ describe("purchase-fulfillment tests", () => {
         buyerIp: "127.0.0.1",
         userAgent: "vitest",
         siteUrl: "https://devix.test",
+        couponCode: undefined,
+        incrementCoupon: true,
       });
     });
   });

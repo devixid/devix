@@ -73,6 +73,7 @@ model EstimatorLead {
   status                EstimatorLeadStatus @default(NEW)
   createdAt             DateTime            @default(now())
   updatedAt             DateTime            @updatedAt
+  shareToken            String              @unique @default(cuid())
   contactSubmission     ContactSubmission?
 
   @@index([status])
@@ -292,8 +293,11 @@ model Purchase {
   provider              String    @default("stripe")
   lemonSqueezyOrderId   String?   @unique
   product               Product   @relation(fields: [productId], references: [id])
+  couponCode            String?
+  coupon                Coupon?   @relation(fields: [couponCode], references: [code])
 
   @@index([productId])
+  @@index([couponCode])
   @@map("purchases")
 }
 
@@ -330,4 +334,18 @@ enum SiteSectionKey {
   CONTACT
   FOOTER
   SEO
+}
+
+model Coupon {
+  code          String     @id
+  discountType  String     // "PERCENTAGE" | "FIXED"
+  discountValue Decimal    @db.Decimal(19, 4)
+  active        Boolean    @default(true)
+  maxUses       Int?
+  useCount      Int        @default(0)
+  expiresAt     DateTime?
+  createdAt     DateTime   @default(now())
+  purchases     Purchase[]
+
+  @@map("coupons")
 }

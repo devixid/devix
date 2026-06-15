@@ -238,6 +238,8 @@ export async function emailEstimateToClientAction(data: {
     let finalLeadId = data.leadId || null;
 
     // 3. Save / Update lead in database and link to a ContactSubmission
+    let shareToken = "";
+
     if (finalLeadId) {
       const existing = await prisma.estimatorLead.findUnique({
         where: { id: finalLeadId },
@@ -245,10 +247,11 @@ export async function emailEstimateToClientAction(data: {
       });
 
       if (existing) {
-        await prisma.estimatorLead.update({
+        const lead = await prisma.estimatorLead.update({
           where: { id: finalLeadId },
           data: record,
         });
+        shareToken = lead.shareToken;
 
         if (!existing.contactSubmission) {
           await prisma.contactSubmission.create({
@@ -274,6 +277,7 @@ export async function emailEstimateToClientAction(data: {
           data: { ...record, status: "NEW" },
         });
         finalLeadId = lead.id;
+        shareToken = lead.shareToken;
         await prisma.contactSubmission.create({
           data: {
             name: data.name.trim(),
@@ -289,6 +293,7 @@ export async function emailEstimateToClientAction(data: {
         data: { ...record, status: "NEW" },
       });
       finalLeadId = lead.id;
+      shareToken = lead.shareToken;
       await prisma.contactSubmission.create({
         data: {
           name: data.name.trim(),
@@ -313,6 +318,7 @@ export async function emailEstimateToClientAction(data: {
       email: data.email.trim().toLowerCase(),
       summary,
       pdfBase64: data.pdfBase64,
+      shareToken,
     });
 
     revalidatePath("/admin/leads");

@@ -93,6 +93,7 @@ describe("emailEstimateToClientAction", () => {
   it("creates a new lead and contact submission when no leadId is provided", async () => {
     getTestMocks().prisma!.estimatorLead.create.mockResolvedValueOnce({
       id: "lead_new_123",
+      shareToken: "token_new_123",
     });
     getTestMocks().prisma!.contactSubmission.create.mockResolvedValueOnce({
       id: "submission_new_123",
@@ -147,6 +148,10 @@ describe("emailEstimateToClientAction", () => {
       id: "lead_exist_123",
       contactSubmission: null, // no contact submission linked yet
     });
+    getTestMocks().prisma!.estimatorLead.update.mockResolvedValueOnce({
+      id: "lead_exist_123",
+      shareToken: "token_exist_123",
+    });
 
     const result = await emailEstimateToClientAction({
       leadId: "lead_exist_123",
@@ -184,6 +189,10 @@ describe("emailEstimateToClientAction", () => {
       contactSubmission: {
         id: "submission_exist_123",
       },
+    });
+    getTestMocks().prisma!.estimatorLead.update.mockResolvedValueOnce({
+      id: "lead_exist_123",
+      shareToken: "token_exist_123",
     });
 
     const result = await emailEstimateToClientAction({

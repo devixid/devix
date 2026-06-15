@@ -10,6 +10,15 @@ type PurchaseMocks = {
 
 type ProductMocks = {
   findUnique: Mock;
+  findMany: Mock;
+};
+
+type CouponMocks = {
+  findUnique: Mock;
+  findMany: Mock;
+  create: Mock;
+  update: Mock;
+  delete: Mock;
 };
 
 type UserMocks = {
@@ -70,6 +79,7 @@ type ContactSubmissionMocks = {
 export type MockPrismaMocks = {
   purchase: PurchaseMocks;
   product: ProductMocks;
+  coupon: CouponMocks;
   user: UserMocks;
   siteSettings: SiteSettingsMocks;
   faqItem: FaqItemMocks;
@@ -111,7 +121,14 @@ export function createMockPrisma(): {
       "update",
       "updateMany",
     ]),
-    product: createDelegate<ProductMocks>(["findUnique"]),
+    product: createDelegate<ProductMocks>(["findUnique", "findMany"]),
+    coupon: createDelegate<CouponMocks>([
+      "findUnique",
+      "findMany",
+      "create",
+      "update",
+      "delete",
+    ]),
     user: createDelegate<UserMocks>(["findUnique"]),
     siteSettings: createDelegate<SiteSettingsMocks>(["findUnique", "upsert"]),
     faqItem: createDelegate<FaqItemMocks>(["findMany"]),

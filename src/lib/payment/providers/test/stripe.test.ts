@@ -366,10 +366,7 @@ describe("stripeProvider.createCheckout", () => {
     ).rejects.toThrow("Could not start checkout");
   });
 
-  it("resolves and applies coupon code when provided", async () => {
-    mockListPromotionCodes.mockResolvedValueOnce({
-      data: [{ id: "promo_12345" }],
-    });
+  it("resolves and passes coupon code in metadata when provided", async () => {
     mockCreateSession.mockResolvedValueOnce({
       client_secret: "cs_secret_abc",
     });
@@ -379,15 +376,10 @@ describe("stripeProvider.createCheckout", () => {
       couponCode: "WINTER10",
     });
 
-    expect(mockListPromotionCodes).toHaveBeenCalledWith({
-      code: "WINTER10",
-      active: true,
-      limit: 1,
-    });
-
     expect(mockCreateSession).toHaveBeenCalledWith(expect.objectContaining({
-      allow_promotion_codes: true,
-      discounts: [{ promotion_code: "promo_12345" }],
+      metadata: expect.objectContaining({
+        couponCode: "WINTER10",
+      }),
     }), expect.any(Object));
 
     expect(result).toEqual({ mode: "embedded", clientSecret: "cs_secret_abc" });

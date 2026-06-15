@@ -2,8 +2,14 @@
 
 import { useActionState, useEffect, useState } from "react";
 import { Product } from "@prisma/client";
-import { submitPurchase, PurchaseState } from "@/actions/purchase";
-import { formatMinor, resolveProductAmount } from "@/lib/money";
+import {
+  submitPurchase,
+  PurchaseState,
+  getVisibleProducts,
+  validateCouponAction,
+  getActivePaymentProvider,
+} from "@/actions/purchase";
+import { formatMinor, resolveProductAmount, Decimal } from "@/lib/money";
 import { isTurnstileClientEnabled } from "@/lib/turnstile";
 import { TurnstileField } from "@/components/molecules/TurnstileField";
 import { cn } from "@/utils";
@@ -33,6 +39,17 @@ export function CheckoutModal({
   const [turnstileReady, setTurnstileReady] = useState(!turnstileEnabled);
   const [turnstileResetKey, setTurnstileResetKey] = useState(0);
 
+  const [visibleProducts, setVisibleProducts] = useState<Product[]>([]);
+  const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
+  const [paymentProvider, setPaymentProvider] = useState<string>("stripe");
+  const [couponInput, setCouponInput] = useState<string>("");
+  const [appliedCoupon, setAppliedCoupon] = useState<{
+    code: string;
+    discountType: string;
+    discountValue: number;
+  } | null>(null);
+  const [couponError, setCouponError] = useState<string | null>(null);
+
   useEffect(() => {
     if (state.success && state.checkoutUrl) {
       window.location.assign(state.checkoutUrl);
@@ -44,20 +61,37 @@ export function CheckoutModal({
     }
   }, [state.success, state.checkoutUrl]);
 
-  // Reset isSuccess only when the modal is opened
+  // Reset states only when the modal is opened
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && product) {
       setIsSuccess(false);
       setTurnstileReady(!turnstileEnabled);
       setTurnstileResetKey((key) => key + 1);
       document.body.style.overflow = "hidden";
+
+      setSelectedProductIds([product.id]);
+      setCouponInput("");
+      setAppliedCoupon(null);
+      setCouponError(null);
+
+      const loadData = async () => {
+        try {
+          const provider = await getActivePaymentProvider();
+          setPaymentProvider(provider);
+          const products = await getVisibleProducts();
+          setVisibleProducts(products);
+        } catch (err) {
+          console.error("Failed to load checkout data:", err);
+        }
+      };
+      loadData();
     } else {
       document.body.style.overflow = "";
     }
     return () => {
       document.body.style.overflow = "";
     };
-  }, [isOpen]);
+  }, [isOpen, product]);
 
   useEffect(() => {
     if (state.message && !state.success) {
@@ -82,7 +116,61 @@ export function CheckoutModal({
     };
   }, [isOpen, isPending, onOpenChange]);
 
+  const handleApplyCoupon = async () => {
+    if (!couponInput.trim()) return;
+    setCouponError(null);
+    const res = await validateCouponAction(couponInput);
+    if (res.success) {
+      setAppliedCoupon({
+        code: couponInput.trim().toUpperCase(),
+        discountType: res.discountType!,
+        discountValue: res.discountValue!,
+      });
+      setCouponError(null);
+    } else {
+      setCouponError(res.message || "Invalid coupon");
+      setAppliedCoupon(null);
+    }
+  };
+
   if (!isOpen || !product) return null;
+
+  const selectedProducts = visibleProducts.filter((p) =>
+    selectedProductIds.includes(p.id)
+  );
+
+  const currentProducts =
+    selectedProducts.length > 0 ? selectedProducts : [product];
+
+  const currency = (product.currency || "usd").toLowerCase();
+
+  const subtotalMinor = currentProducts.reduce((sum, p) => {
+    return sum.add(resolveProductAmount(p).amountMinor);
+  }, new Decimal(0));
+
+  let bundleDiscountRate = 0;
+  if (selectedProductIds.length === 2) {
+    bundleDiscountRate = 0.1;
+  } else if (selectedProductIds.length >= 3) {
+    bundleDiscountRate = 0.15;
+  }
+
+  const bundleDiscountAmount = subtotalMinor.mul(bundleDiscountRate).round();
+  const priceAfterBundling = subtotalMinor.sub(bundleDiscountAmount);
+
+  let couponDiscountAmount = new Decimal(0);
+  if (appliedCoupon) {
+    if (appliedCoupon.discountType === "PERCENTAGE") {
+      couponDiscountAmount = priceAfterBundling
+        .mul(appliedCoupon.discountValue / 100)
+        .round();
+    } else if (appliedCoupon.discountType === "FIXED") {
+      const fixedDiscount = new Decimal(appliedCoupon.discountValue).mul(100);
+      couponDiscountAmount = Decimal.min(priceAfterBundling, fixedDiscount);
+    }
+  }
+
+  const totalMinor = Decimal.max(0, priceAfterBundling.sub(couponDiscountAmount));
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center">
@@ -94,7 +182,7 @@ export function CheckoutModal({
       />
 
       {/* Modal Content */}
-      <div className="relative z-10 w-full max-w-md bg-white p-6 shadow-xl sm:rounded-none">
+      <div className="relative z-10 w-full max-w-md bg-white p-6 shadow-xl sm:rounded-none max-h-[90vh] overflow-y-auto">
         <div className="mb-6 flex items-center justify-between border-b border-zinc-100 pb-4">
           <h2 className="font-syne text-xl font-bold tracking-tight text-zinc-900">
             {isSuccess ? "Success!" : "Checkout"}
@@ -160,7 +248,21 @@ export function CheckoutModal({
               value={product.id}
             />
 
-            <div className="mb-2 border border-zinc-100 bg-zinc-50 p-4">
+            {/* Hidden input to ensure primary product is always submitted in productIds array */}
+            <input
+              type="hidden"
+              name="productIds"
+              value={product.id}
+            />
+
+            {/* Hidden input to pass couponCode to server action */}
+            <input
+              type="hidden"
+              name="couponCode"
+              value={appliedCoupon?.code || ""}
+            />
+
+            <div className="border border-zinc-100 bg-zinc-50 p-4">
               <h3 className="font-medium text-zinc-900">{product.name}</h3>
               <p className="mt-1 text-sm font-semibold text-zinc-500">
                 {formatMinor(
@@ -170,7 +272,157 @@ export function CheckoutModal({
               </p>
             </div>
 
-            <div className="flex flex-col gap-1.5">
+            {/* Upsell / Bundle Add-ons */}
+            {paymentProvider === "stripe" && visibleProducts.length > 1 && (
+              <div className="flex flex-col gap-2.5 border-t border-zinc-100 pt-4">
+                <h4 className="text-xs font-semibold tracking-wider text-zinc-500 uppercase">
+                  Add Recommended Templates & Save
+                </h4>
+                <div className="flex flex-col gap-2">
+                  {visibleProducts
+                    .filter((p) => p.id !== product.id)
+                    .map((p) => {
+                      const isChecked = selectedProductIds.includes(p.id);
+                      const currentAmount = resolveProductAmount(p).amountMinor;
+                      const currentCurrency = resolveProductAmount(p).currency;
+                      return (
+                        <label
+                          key={p.id}
+                          className={cn(
+                            "flex items-center justify-between border p-3 cursor-pointer transition-all hover:bg-zinc-50",
+                            isChecked
+                              ? "border-black bg-zinc-50/50"
+                              : "border-zinc-200",
+                          )}
+                        >
+                          <div className="flex items-start gap-2.5">
+                            <input
+                              type="checkbox"
+                              name="productIds"
+                              value={p.id}
+                              checked={isChecked}
+                              onChange={(e) => {
+                                if (e.target.checked) {
+                                  setSelectedProductIds((prev) => [
+                                    ...prev,
+                                    p.id,
+                                  ]);
+                                } else {
+                                  setSelectedProductIds((prev) =>
+                                    prev.filter((id) => id !== p.id),
+                                  );
+                                }
+                              }}
+                              className="mt-1 h-4 w-4 border-zinc-300 text-black focus:ring-black cursor-pointer"
+                            />
+                            <div>
+                              <p className="text-sm font-medium text-zinc-900 leading-tight">
+                                {p.name}
+                              </p>
+                              <p className="text-xs text-zinc-500 mt-0.5 line-clamp-1">
+                                {p.description}
+                              </p>
+                            </div>
+                          </div>
+                          <span className="text-sm font-semibold text-zinc-800 ml-2">
+                            +{formatMinor(currentAmount, currentCurrency)}
+                          </span>
+                        </label>
+                      );
+                    })}
+                </div>
+                {selectedProductIds.length > 1 && (
+                  <p className="text-xs text-emerald-600 font-medium animate-pulse">
+                    ✨ Bundle discount applied:{" "}
+                    {selectedProductIds.length === 2 ? "10%" : "15%"} off!
+                  </p>
+                )}
+              </div>
+            )}
+
+            {/* Promo Code Validation */}
+            <div className="flex flex-col gap-1.5 border-t border-zinc-100 pt-4">
+              <label
+                htmlFor="couponInput"
+                className="text-sm font-medium text-zinc-700"
+              >
+                Promo Code
+              </label>
+              <div className="flex gap-2">
+                <input
+                  id="couponInput"
+                  type="text"
+                  placeholder="ENTER CODE"
+                  value={couponInput}
+                  onChange={(e) => setCouponInput(e.target.value)}
+                  className="w-full border border-zinc-300 px-4 py-2 text-sm uppercase tracking-wider focus:border-black focus:ring-black focus:ring-1 focus:outline-none"
+                />
+                <button
+                  type="button"
+                  onClick={handleApplyCoupon}
+                  className="bg-zinc-900 hover:bg-black text-white px-4 py-2 text-xs font-semibold uppercase tracking-wider transition-colors disabled:opacity-50"
+                  disabled={!couponInput.trim()}
+                >
+                  Apply
+                </button>
+              </div>
+              {couponError && (
+                <p className="text-xs text-red-500 mt-0.5">{couponError}</p>
+              )}
+              {appliedCoupon && (
+                <div className="flex items-center justify-between bg-emerald-50 border border-emerald-100 px-3 py-2 text-xs text-emerald-800 mt-1">
+                  <span>
+                    Code <strong>{appliedCoupon.code}</strong> applied (
+                    {appliedCoupon.discountType === "PERCENTAGE"
+                      ? `${appliedCoupon.discountValue}% Off`
+                      : `${formatMinor(new Decimal(appliedCoupon.discountValue).mul(100), product.currency || "usd")} Off`}
+                    )
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAppliedCoupon(null);
+                      setCouponInput("");
+                    }}
+                    className="text-emerald-600 hover:text-emerald-800 font-bold uppercase tracking-wider ml-2"
+                  >
+                    Remove
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Price Summary Breakdown */}
+            <div className="border border-zinc-200 bg-zinc-50/50 p-4 flex flex-col gap-2">
+              <div className="flex items-center justify-between text-sm text-zinc-600">
+                <span>Items Subtotal</span>
+                <span>{formatMinor(subtotalMinor, currency)}</span>
+              </div>
+
+              {bundleDiscountAmount.gt(0) && (
+                <div className="flex items-center justify-between text-sm text-emerald-600 font-medium">
+                  <span>
+                    Bundle Discount (
+                    {selectedProductIds.length === 2 ? "10%" : "15%"})
+                  </span>
+                  <span>-{formatMinor(bundleDiscountAmount, currency)}</span>
+                </div>
+              )}
+
+              {couponDiscountAmount.gt(0) && (
+                <div className="flex items-center justify-between text-sm text-emerald-600 font-medium">
+                  <span>Promo Discount ({appliedCoupon?.code})</span>
+                  <span>-{formatMinor(couponDiscountAmount, currency)}</span>
+                </div>
+              )}
+
+              <div className="border-t border-zinc-200 pt-2 flex items-center justify-between font-bold text-zinc-950">
+                <span>Total Due</span>
+                <span>{formatMinor(totalMinor, currency)}</span>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-1.5 border-t border-zinc-100 pt-4">
               <label
                 htmlFor="buyerName"
                 className="text-sm font-medium text-zinc-700"

@@ -14,6 +14,7 @@ import { verifyTurnstile } from "@/lib/turnstile";
 import {
   resolveProductAmount,
   isAboveStripeMinimum,
+  Decimal,
 } from "@/lib/money";
 import {
   getPaymentProvider,
@@ -42,6 +43,14 @@ export type EmbeddedCheckoutState =
 export type OverlayCheckoutState =
   | { ok: true; url: string }
   | { ok: false; error: string };
+
+
+
+const CheckoutSchema = z.object({
+  productIds: z.array(z.string().cuid("Invalid product ID.")).min(1, "At least one product is required"),
+  buyerName: z.string().min(2, "Name must be at least 2 characters.").max(100),
+  buyerEmail: z.string().email("Please enter a valid email address.").max(255),
+});
 
 type CheckoutContext = CreateCheckoutParams;
 
@@ -78,16 +87,21 @@ async function resolveCheckoutContext(
     }
   }
 
-  const validatedFields = PurchaseSchema.safeParse({
-    productId: formData.get("productId"),
+  const rawProductIds = formData.getAll("productIds");
+  const productIds = rawProductIds.length > 0
+    ? rawProductIds.map(String)
+    : [String(formData.get("productId") || "")].filter(Boolean);
+
+  const validatedFields = CheckoutSchema.safeParse({
+    productIds,
     buyerName: formData.get("buyerName"),
     buyerEmail: formData.get("buyerEmail"),
   });
   if (!validatedFields.success) {
-    return { error: "Please check your details and try again." };
+    return { error: validatedFields.error.issues[0].message };
   }
 
-  const { productId, buyerName, buyerEmail } = validatedFields.data;
+  const { productIds: validatedProductIds, buyerName, buyerEmail } = validatedFields.data;
 
   const emailLimiter = getPurchaseEmailLimiter();
   if (emailLimiter) {
@@ -99,26 +113,91 @@ async function resolveCheckoutContext(
     }
   }
 
-  const product = await prisma.product.findUnique({ where: { id: productId } });
-  if (!product || !product.isVisible) {
-    return { error: "Product not found or unavailable." };
+  const products = await prisma.product.findMany({
+    where: {
+      id: { in: validatedProductIds },
+      isVisible: true,
+    },
+  });
+
+  if (products.length !== validatedProductIds.length) {
+    return { error: "One or more selected products are unavailable." };
   }
 
-  if (providerId === "lemonsqueezy" && !product.lemonSqueezyVariantId) {
+  if (providerId === "lemonsqueezy" && validatedProductIds.length > 1) {
+    return {
+      error: "Lemon Squeezy only supports purchasing one item at a time.",
+    };
+  }
+
+  if (providerId === "lemonsqueezy" && !products[0].lemonSqueezyVariantId) {
     return {
       error:
         "This product is not available for purchase with the current payment provider.",
     };
   }
 
-  const { amountMinor, currency } = resolveProductAmount(product);
-  if (amountMinor.lte(0)) {
+  let totalOriginalMinor = 0;
+  const currency = (products[0].currency || "usd").toLowerCase();
+
+  for (const prod of products) {
+    const { amountMinor } = resolveProductAmount(prod);
+    totalOriginalMinor += amountMinor.toNumber();
+  }
+
+  if (totalOriginalMinor <= 0) {
     return { error: "This product is not available for purchase." };
   }
 
+  // Calculate bundling discount rate: 2 items = 10%, >=3 items = 15%
+  let bundleDiscountRate = 0;
+  if (validatedProductIds.length === 2) {
+    bundleDiscountRate = 0.10;
+  } else if (validatedProductIds.length >= 3) {
+    bundleDiscountRate = 0.15;
+  }
+
+  const amountAfterBundling = totalOriginalMinor * (1 - bundleDiscountRate);
+
+  const couponCodeRaw = formData.get("couponCode");
+  const couponCode =
+    typeof couponCodeRaw === "string" && couponCodeRaw.trim()
+      ? couponCodeRaw.trim().toUpperCase()
+      : undefined;
+
+  let finalAmountMinor = amountAfterBundling;
+
+  if (couponCode) {
+    const coupon = await prisma.coupon.findUnique({
+      where: { code: couponCode },
+    });
+
+    if (!coupon || !coupon.active) {
+      return { error: "Invalid or inactive coupon code." };
+    }
+
+    if (coupon.expiresAt && coupon.expiresAt < new Date()) {
+      return { error: "This coupon code has expired." };
+    }
+
+    if (coupon.maxUses != null && coupon.useCount >= coupon.maxUses) {
+      return { error: "This coupon code has reached its maximum usage limit." };
+    }
+
+    // Apply coupon
+    if (coupon.discountType === "PERCENTAGE") {
+      finalAmountMinor = amountAfterBundling * (1 - Number(coupon.discountValue) / 100);
+    } else if (coupon.discountType === "FIXED") {
+      const discountMinor = Number(coupon.discountValue) * 100;
+      finalAmountMinor = Math.max(0, amountAfterBundling - discountMinor);
+    }
+  }
+
+  const roundedAmountMinor = new Decimal(Math.round(finalAmountMinor));
+
   if (
     providerId === "stripe" &&
-    !isAboveStripeMinimum(amountMinor, currency)
+    !isAboveStripeMinimum(roundedAmountMinor, currency)
   ) {
     return {
       error: "This product's price is below the minimum chargeable amount.",
@@ -134,22 +213,22 @@ async function resolveCheckoutContext(
         ? "embedded"
         : checkoutMode;
 
-  const couponCodeRaw = formData.get("couponCode");
-  const couponCode =
-    typeof couponCodeRaw === "string" && couponCodeRaw.trim()
-      ? couponCodeRaw.trim()
-      : undefined;
+  const productName = products.map((p) => p.name).join(", ");
+  const productDescription =
+    products.length > 1
+      ? `Bundle purchase of: ${products.map((p) => p.name).join(", ")}`
+      : products[0].description;
 
   return {
     context: {
-      productId: product.id,
-      lemonSqueezyVariantId: product.lemonSqueezyVariantId,
+      productId: validatedProductIds.join(","),
+      lemonSqueezyVariantId: products[0]?.lemonSqueezyVariantId,
       buyerName,
       buyerEmail,
-      amountMinor,
+      amountMinor: roundedAmountMinor,
       currency,
-      productName: product.name,
-      productDescription: product.description,
+      productName,
+      productDescription,
       baseUrl: getRequestBaseUrl(headerList),
       ip,
       userAgent: headerList.get("user-agent")?.slice(0, 500) ?? undefined,
@@ -234,8 +313,13 @@ export async function submitPurchase(
   formData: FormData,
 ): Promise<PurchaseState> {
   try {
-    const validatedFields = PurchaseSchema.safeParse({
-      productId: formData.get("productId"),
+    const rawProductIds = formData.getAll("productIds");
+    const productIds = rawProductIds.length > 0
+      ? rawProductIds.map(String)
+      : [String(formData.get("productId") || "")].filter(Boolean);
+
+    const validatedFields = CheckoutSchema.safeParse({
+      productIds,
       buyerName: formData.get("buyerName"),
       buyerEmail: formData.get("buyerEmail"),
     });
@@ -243,7 +327,9 @@ export async function submitPurchase(
     if (!validatedFields.success) {
       return {
         success: false,
-        errors: validatedFields.error.flatten().fieldErrors,
+        errors: {
+          productId: [validatedFields.error.issues[0].message],
+        } as PurchaseState["errors"],
       };
     }
 
@@ -278,3 +364,61 @@ export async function submitPurchase(
     };
   }
 }
+
+export async function getVisibleProducts() {
+  return prisma.product.findMany({
+    where: { isVisible: true },
+    orderBy: { order: "asc" },
+  });
+}
+
+export async function validateCouponAction(
+  code: string,
+): Promise<{
+  success: boolean;
+  discountType?: string;
+  discountValue?: number;
+  message?: string;
+}> {
+  try {
+    const coupon = await prisma.coupon.findUnique({
+      where: { code: code.trim().toUpperCase() },
+    });
+
+    if (!coupon || !coupon.active) {
+      return { success: false, message: "Invalid or inactive coupon code." };
+    }
+
+    if (coupon.expiresAt && coupon.expiresAt < new Date()) {
+      return { success: false, message: "This coupon code has expired." };
+    }
+
+    if (coupon.maxUses != null && coupon.useCount >= coupon.maxUses) {
+      return {
+        success: false,
+        message: "This coupon code has reached its maximum usage limit.",
+      };
+    }
+
+    return {
+      success: true,
+      discountType: coupon.discountType,
+      discountValue: Number(coupon.discountValue),
+    };
+  } catch (error) {
+    console.error("Coupon validation error:", error);
+    return {
+      success: false,
+      message: "An error occurred during coupon validation.",
+    };
+  }
+}
+
+export async function getActivePaymentProvider(): Promise<string> {
+  const providerId = await resolvePaymentProviderId();
+  return providerId;
+}
+
+
+
+

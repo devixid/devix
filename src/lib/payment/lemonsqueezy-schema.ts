@@ -7,6 +7,7 @@ const lemonCustomDataSchema = z
     siteUrl: z.string().optional(),
     buyerIp: z.string().optional(),
     userAgent: z.string().optional(),
+    couponCode: z.string().optional(),
   })
   .passthrough();
 

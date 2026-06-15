@@ -4,6 +4,7 @@ import { sendPurchaseConfirmation } from "@/lib/email";
 import { generateDownloadToken } from "@/lib/tokens";
 import type { MoneyMinor } from "@/lib/money";
 import type { FulfillmentEvent } from "@/lib/payment/types";
+import { Decimal } from "@/lib/money";
 
 export type FulfillPurchaseInput = {
   provider?: string;
@@ -19,6 +20,8 @@ export type FulfillPurchaseInput = {
   buyerIp?: string;
   userAgent?: string;
   siteUrl?: string;
+  couponCode?: string;
+  incrementCoupon?: boolean;
 };
 
 function isUniqueViolation(err: unknown): boolean {
@@ -73,6 +76,8 @@ export function fulfillmentEventToInput(
     buyerIp: event.buyerIp,
     userAgent: event.userAgent,
     siteUrl: event.siteUrl,
+    couponCode: event.couponCode,
+    incrementCoupon: true,
   };
 }
 
@@ -99,6 +104,8 @@ export async function fulfillProductPurchase(input: FulfillPurchaseInput) {
     buyerIp,
     userAgent,
     siteUrl,
+    couponCode,
+    incrementCoupon = true,
   } = input;
 
   let purchase: PurchaseWithProduct | null = await findExistingPurchase(input);
@@ -133,9 +140,22 @@ export async function fulfillProductPurchase(input: FulfillPurchaseInput) {
           currency: (currency ?? product.currency ?? "usd").toLowerCase(),
           buyerIp,
           userAgent,
+          couponCode: couponCode ?? null,
         },
         include: { product: true },
       });
+
+      // Update coupon use count if set
+      if (couponCode && incrementCoupon) {
+        try {
+          await prisma.coupon.update({
+            where: { code: couponCode },
+            data: { useCount: { increment: 1 } },
+          });
+        } catch (couponErr) {
+          console.error("Failed to increment coupon useCount:", couponErr);
+        }
+      }
     } catch (err) {
       if (isUniqueViolation(err)) {
         purchase = await findExistingPurchase(input);
@@ -174,5 +194,40 @@ export async function fulfillProductPurchase(input: FulfillPurchaseInput) {
 }
 
 export async function fulfillFromPaymentEvent(event: FulfillmentEvent) {
+  const productIds = event.productId.split(",");
+
+  if (productIds.length > 1) {
+    const results = [];
+    const splitAmountMinor = event.amountMinor 
+      ? new Decimal(Math.round(event.amountMinor.toNumber() / productIds.length))
+      : undefined;
+
+    for (let i = 0; i < productIds.length; i++) {
+      const pId = productIds[i];
+      const itemInput: FulfillPurchaseInput = {
+        provider: event.provider,
+        productId: pId,
+        buyerName: event.buyerName,
+        buyerEmail: event.buyerEmail,
+        // Suffix session IDs to prevent database unique index collisions
+        stripeSessionId: event.stripeSessionId ? `${event.stripeSessionId}_${pId}` : undefined,
+        stripePaymentIntentId: event.stripePaymentIntentId ? `${event.stripePaymentIntentId}_${pId}` : undefined,
+        stripeChargeId: event.stripeChargeId ? `${event.stripeChargeId}_${pId}` : undefined,
+        lemonSqueezyOrderId: event.lemonSqueezyOrderId ? `${event.lemonSqueezyOrderId}_${pId}` : undefined,
+        amountMinor: splitAmountMinor,
+        currency: event.currency,
+        buyerIp: event.buyerIp,
+        userAgent: event.userAgent,
+        siteUrl: event.siteUrl,
+        couponCode: event.couponCode,
+        incrementCoupon: i === 0, // only increment coupon use count once
+      };
+
+      const result = await fulfillProductPurchase(itemInput);
+      results.push(result);
+    }
+    return results[0];
+  }
+
   return fulfillProductPurchase(fulfillmentEventToInput(event));
 }
